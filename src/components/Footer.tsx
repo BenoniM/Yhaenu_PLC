@@ -94,16 +94,11 @@ export default function Footer() {
         >
           {/* Brand section */}
           <motion.div variants={itemVariants}>
-            <h3
-              className="font-black text-2xl uppercase mb-4"
-              style={{
-                fontFamily: "'Arial Black', sans-serif",
-                color: '#F3F6FA',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              YHAENU
-            </h3>
+            <img
+              src="/logo2.png"
+              alt="YHAENU PLC"
+              style={{ height: 48, width: 'auto', objectFit: 'contain', marginBottom: '1rem' }}
+            />
             <p
               className="text-sm leading-relaxed"
               style={{ color: 'rgba(243,246,250,0.6)' }}

@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 
 import exportImg from '../assets/about/export.jpg'
 import export2Img from '../assets/about/export2.jpg'
@@ -169,16 +169,16 @@ const IMAGE_CARDS = [
 
 // ── CountStat ─────────────────────────────────────────────────────────────────
 
-function CountStat({ end, suffix, label, index }) {
-  const ref = useRef(null)
+function CountStat({ end, suffix, label, index }: { end: number; suffix: string; label: string; index: number }) {
+  const ref = useRef<HTMLDivElement | null>(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
-  const displayRef = useRef(null)
+  const displayRef = useRef<HTMLSpanElement | null>(null)
 
   useEffect(() => {
     if (!inView || !displayRef.current) return
     const duration = 1800
     const startTime = performance.now()
-    const tick = (now) => {
+    const tick = (now: number) => {
       const elapsed = now - startTime
       const progress = Math.min(elapsed / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
@@ -224,7 +224,7 @@ function CountStat({ end, suffix, label, index }) {
 export default function About() {
   const sectionRef = useRef(null)
   const pinRef = useRef(null)
-  const cardsRef = useRef([])
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
   const titleRef = useRef(null)
   const contentRef = useRef(null)
 

@@ -3,27 +3,7 @@ import { motion } from 'framer-motion'
 import Hls from 'hls.js'
 
 const HLS_SRC = 'https://stream.mux.com/Kec29dVyJgiPdtWaQtPuEiiGHkJIYQAVUJcNiIHUYeo.m3u8'
-
-const MARQUEE_LOGOS = [
-  'Vortex', 'Nimbus', 'Prysma', 'Cirrus', 'Kynder', 'Halcyn',
-]
-
-function LogoItem({ name }: { name: string }) {
-  return (
-    <div className="flex items-center gap-3 flex-shrink-0">
-      {/* Liquid glass icon */}
-      <div
-        className="liquid-glass rounded-lg flex items-center justify-center text-white font-semibold text-sm"
-        style={{ width: 24, height: 24, fontSize: 11 }}
-      >
-        {name[0]}
-      </div>
-      <span className="text-base font-semibold whitespace-nowrap" style={{ color: 'hsl(var(--foreground))' }}>
-        {name}
-      </span>
-    </div>
-  )
-}
+const PAUSE_AT = 4 // seconds — pause here and hold as a still frame
 
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -35,7 +15,12 @@ export default function Hero() {
 
     const setupHls = () => {
       if (Hls.isSupported()) {
-        const hls = new Hls({ lowLatencyMode: false })
+        const hls = new Hls({
+          lowLatencyMode: false,
+          maxBufferLength: 120,
+          maxMaxBufferLength: 240,
+          backBufferLength: 0,
+        })
         hlsRef.current = hls
         hls.loadSource(HLS_SRC)
         hls.attachMedia(video)
@@ -48,24 +33,26 @@ export default function Hero() {
       }
     }
 
-    // Manual loop — seek to 0 and replay on ended
-    const handleEnded = () => {
-      video.currentTime = 0
-      video.play().catch(() => {})
+    // Pause at the target frame and hold it as a still image
+    const handleTimeUpdate = () => {
+      if (video.currentTime >= PAUSE_AT) {
+        video.pause()
+        video.currentTime = PAUSE_AT
+      }
     }
 
-    video.addEventListener('ended', handleEnded)
+    video.addEventListener('timeupdate', handleTimeUpdate)
     setupHls()
 
     return () => {
-      video.removeEventListener('ended', handleEnded)
+      video.removeEventListener('timeupdate', handleTimeUpdate)
       hlsRef.current?.destroy()
     }
   }, [])
 
   return (
     <div className="relative overflow-hidden" style={{ minHeight: '100svh', background: '#0E5F13' }}>
-      {/* ── Background video ── */}
+      {/* ── Background video (pauses at PAUSE_AT seconds) ── */}
       <video
         ref={videoRef}
         muted
@@ -139,7 +126,7 @@ export default function Hero() {
 
             {/* CTA */}
             <motion.a
-              href="#rfq"
+              href="/rfq"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.35 }}
@@ -159,33 +146,6 @@ export default function Hero() {
             </motion.a>
           </div>
         </div>
-
-        {/* ── Logo marquee ── */}
-        <motion.div
-          className="relative z-10 w-full pb-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-        >
-          <div className="max-w-5xl mx-auto px-6 flex items-center gap-12">
-            {/* Static text */}
-            <p
-              className="text-sm flex-shrink-0 leading-snug"
-              style={{ color: 'rgba(243,246,250,0.5)', minWidth: 120 }}
-            >
-              Relied on by brands<br />across the globe
-            </p>
-
-            {/* Scrolling marquee */}
-            <div className="flex-1 overflow-hidden">
-              <div className="flex gap-16 animate-marquee" style={{ width: 'max-content' }}>
-                {[...MARQUEE_LOGOS, ...MARQUEE_LOGOS].map((name, i) => (
-                  <LogoItem key={i} name={name} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </section>
     </div>
   )
