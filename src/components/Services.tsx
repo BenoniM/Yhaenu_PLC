@@ -38,28 +38,34 @@ const services = [
 
 export default function Services() {
   const [active, setActive] = useState(0)
+  const [lastActive, setLastActive] = useState<number | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
+
+  const handleSetActive = (idx: number) => {
+    setLastActive(active)
+    setActive(idx)
+  }
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] })
   const headerY = useTransform(scrollYProgress, [0, 0.3], [40, 0])
   const headerOpacity = useTransform(scrollYProgress, [0, 0.2], [0, 1])
 
-  const next = () => setActive((active + 1) % services.length)
-  const back = () => setActive((active - 1 + services.length) % services.length)
+  const next = () => handleSetActive((active + 1) % services.length)
+  const back = () => handleSetActive((active - 1 + services.length) % services.length)
 
   // Auto-advance
   useEffect(() => {
-    intervalRef.current = setInterval(next, 5000)
+    intervalRef.current = setInterval(next, 10000)
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [active])
 
   // Calculate card order — active card on top, rest stacked behind
   const getCardIndex = (i: number) => {
-    if (i === active) return services.length - 1 // front
-    if (i === (active + 1) % services.length) return services.length - 2 // 1st behind
-    if (i === (active + 2) % services.length) return services.length - 3 // 2nd behind
-    return 0 // rest hidden
+    if (i === active) return 10
+    if (i === lastActive) return 20
+    if (i === (active + 1) % services.length) return 5
+    return 0
   }
 
   return (
@@ -111,14 +117,18 @@ export default function Services() {
               className="absolute inset-0 mx-4 md:mx-10 rounded-[32px] overflow-hidden cursor-pointer"
               style={{ zIndex }}
               animate={{
-                scale: isActive ? 1 : isBehind1 ? 0.94 : isBehind2 ? 0.88 : 0.82,
-                y: isActive ? 0 : isBehind1 ? -30 : isBehind2 ? -60 : -90,
-                opacity: isActive ? 1 : isBehind1 ? 0.7 : isBehind2 ? 0.4 : 0,
-                rotateX: isActive ? 0 : isBehind1 ? -3 : isBehind2 ? -6 : -9,
-                filter: isActive ? 'brightness(1)' : 'brightness(0.85)',
+                scale: isActive ? 1 : i === lastActive ? 1.35 : isBehind1 ? 0.94 : 0.9,
+                y: isActive ? 0 : i === lastActive ? 0 : isBehind1 ? -30 : -40,
+                opacity: isActive ? 1 : i === lastActive ? 0 : isBehind1 ? 0.7 : 0,
+                rotateX: isActive ? 0 : i === lastActive ? 0 : isBehind1 ? -3 : -5,
+                filter: isActive
+                  ? 'grayscale(0) brightness(1)'
+                  : i === lastActive
+                    ? 'grayscale(1) brightness(1)'
+                    : 'grayscale(0) brightness(0.85)',
               }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              onClick={() => !isActive && setActive(i)}
+              transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+              onClick={() => !isActive && handleSetActive(i)}
             >
               {/* Background image */}
               <img src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover" />
@@ -130,7 +140,29 @@ export default function Services() {
                   background: 'linear-gradient(to top, rgba(10,18,40,0.88) 0%, rgba(10,18,40,0.3) 50%, rgba(10,18,40,0.1) 100%)',
                 }}
               />
-        
+
+              {/* Border Progress — only show on active */}
+              {isActive && (
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-[101]">
+                  <motion.rect
+                    x="2"
+                    y="2"
+                    width="calc(100% - 4px)"
+                    height="calc(100% - 4px)"
+                    rx="30"
+                    fill="none"
+                    stroke="#ECBD27"
+                    strokeWidth="4"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{
+                      pathLength: { duration: 10, ease: "linear" },
+                      opacity: { duration: 0.3 }
+                    }}
+                  />
+                </svg>
+              )}
+
 
               {/* Top-left badge — only show on active */}
               {isActive && (
@@ -203,37 +235,23 @@ export default function Services() {
           )
         })}
 
-        {/* ── Progress bar — top of active card ── */}
-        <div
-          className="absolute left-4 right-4 md:left-10 md:right-10 top-0 h-[3px] rounded-full overflow-hidden z-[101]"
-          style={{ background: 'rgba(243,246,250,0.2)' }}
-        >
-          <motion.div
-            className="h-full rounded-full"
-            style={{ background: '#ECBD27' }}
-            key={active}
-            initial={{ width: '0%' }}
-            animate={{ width: '100%' }}
-            transition={{ duration: 5, ease: 'linear' }}
-          />
-        </div>
         <button
           onClick={back}
           aria-label="Previous"
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-[100] w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
-          style={{ background: 'rgba(243,246,250,0.15)', backdropFilter: 'blur(8px)', border: '1px solid rgba(243,246,250,0.2)' }}
+          className="absolute left-2 md:left-[-100px] top-1/2 -translate-y-1/2 z-[100] w-14 h-14 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg"
+          style={{ background: '#0E5F13' }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F3F6FA" strokeWidth="2.5" strokeLinecap="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
         <button
           onClick={next}
           aria-label="Next"
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-[100] w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
-          style={{ background: 'rgba(243,246,250,0.15)', backdropFilter: 'blur(8px)', border: '1px solid rgba(243,246,250,0.2)' }}
+          className="absolute right-2 md:right-[-100px] top-1/2 -translate-y-1/2 z-[100] w-14 h-14 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg"
+          style={{ background: '#0E5F13' }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F3F6FA" strokeWidth="2.5" strokeLinecap="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>
@@ -244,7 +262,7 @@ export default function Services() {
         {services.map((item, i) => (
           <button
             key={item.id}
-            onClick={() => setActive(i)}
+            onClick={() => handleSetActive(i)}
             className="group flex flex-col items-center gap-2 focus:outline-none"
             aria-label={`Go to ${item.badge}`}
           >
@@ -275,7 +293,7 @@ export default function Services() {
         ))}
       </div>
 
-      
+
     </section>
   )
 }

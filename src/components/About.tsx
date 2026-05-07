@@ -35,7 +35,7 @@ const IMAGE_CARDS = [
     /* w: 260, */ w: 370,
     h: 370,
     // Initial 3D state
-    rot3d: { x: 5, y: 5, z: 0, p: 1000 }, 
+    rot3d: { x: 5, y: 5, z: 0, p: 1000 },
     zIdx: 8,
     order: 0,
     fly: {
@@ -43,7 +43,7 @@ const IMAGE_CARDS = [
       y: -300,
       scale: 4,
       // Fly-off 3D state
-      rot3d: { x: -45, y: 90, z: -15 } 
+      rot3d: { x: -45, y: 90, z: -15 }
     },
   },
   {
@@ -203,7 +203,7 @@ function CountStat({ end, suffix, label, index }) {
         style={{
           fontFamily: "'Arial Black', sans-serif",
           fontSize: 'clamp(2.8rem, 6vw, 4.5rem)',
-          color: '#0E5F13',
+          color: 'white',
         }}
       >
         <span ref={displayRef}>0</span>
@@ -211,7 +211,7 @@ function CountStat({ end, suffix, label, index }) {
       </span>
       <span
         className="text-xs tracking-[0.2em] uppercase text-center"
-        style={{ color: 'rgba(14,95,19,0.5)', fontFamily: 'monospace' }}
+        style={{ color: 'rgba(255, 255, 255, 0.6)', fontFamily: 'monospace' }}
       >
         {label}
       </span>
@@ -227,6 +227,7 @@ export default function About() {
   const cardsRef = useRef([])
   const titleRef = useRef(null)
   const contentRef = useRef(null)
+  const scrollIndicatorRef = useRef(null)
 
   useEffect(() => {
     const cards = cardsRef.current.filter(Boolean)
@@ -243,6 +244,16 @@ export default function About() {
           anticipatePin: 1,
         },
       })
+
+      // Fade out scroll indicator exactly when title shrinks and details appear
+      if (scrollIndicatorRef.current) {
+        tl.to(scrollIndicatorRef.current, {
+          opacity: 0,
+          scale: 0.2,
+          duration: 0.3,
+          ease: 'power2.inOut'
+        }, 3.0)
+      }
 
       const layerTimings = [0, 0.9, 1.8]
 
@@ -296,7 +307,7 @@ export default function About() {
     <section
       ref={sectionRef}
       id="about"
-      style={{ background: '#F3F6FA', position: 'relative' }}
+      style={{ background: '#0E5F13', position: 'relative' }}
     >
       <div
         ref={pinRef}
@@ -305,7 +316,7 @@ export default function About() {
           width: '100%',
           position: 'relative',
           overflow: 'hidden',
-          background: '#F3F6FA',
+          background: '#0E5F13',
           perspective: '1200px', // Global perspective for the container
         }}
       >
@@ -318,7 +329,7 @@ export default function About() {
             transform: 'translate(-50%, 25%)',
             fontSize: 'clamp(4rem, 13vw, 12rem)',
             fontWeight: 900,
-            color: '#0E5F13',
+            color: 'white',
             whiteSpace: 'nowrap',
             letterSpacing: '0.05em',
             textTransform: 'uppercase',
@@ -367,7 +378,7 @@ export default function About() {
                 textTransform: 'Capitalize',
               }}
             >
-              {card.caption}
+              {/* {card.caption} */}
             </p>
           </div>
         ))}
@@ -391,7 +402,7 @@ export default function About() {
             style={{
               fontSize: 'clamp(1rem, 2vw, 1.2rem)',
               lineHeight: 1.8,
-              color: 'rgba(14,95,19,0.75)',
+              color: 'rgba(255, 255, 255, 0.9)',
               fontFamily: "'General Sans', sans-serif",
               marginBottom: 40,
             }}
@@ -407,6 +418,86 @@ export default function About() {
             ))}
           </div>
         </div>
+
+        {/* ── 3D Scroll Indicator ── */}
+        <motion.div
+          ref={scrollIndicatorRef}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          style={{
+            position: 'absolute',
+            top: '70%',
+            left: 0,
+            width: '100%',
+            zIndex: 100,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0px',
+            pointerEvents: 'none',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '20px',
+              letterSpacing: '0.5em',
+              textTransform: 'uppercase',
+              color: 'white',
+              fontWeight: '900',
+              fontFamily: 'monospace',
+              textShadow: '0 0 30px rgba(255,255,255,0.3)',
+              opacity: 0.9,
+              textAlign: 'center'
+            }}
+          >
+            Scroll <br /> Down
+          </span>
+
+          <div style={{ perspective: '600px', transformStyle: 'preserve-3d', marginTop: '-70px' }}>
+            <motion.div
+              animate={{
+                rotateX: [80, 70, 80],
+                z: [0, 60, 0],
+                y: [0, 5, 0]
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <svg width="120" height="200" viewBox="0 0 120 200" fill="none">
+                <defs>
+                  <linearGradient id="arrowGradientLarge" x1="60" y1="0" x2="60" y2="200" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="white" stopOpacity="0" />
+                    <stop offset="40%" stopColor="white" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="white" stopOpacity="0.8" />
+                  </linearGradient>
+                  <filter id="glowLarge" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+
+                {/* Long Tapered Tail */}
+                <path
+                  d="M58 0L62 0L68 160L52 160Z"
+                  fill="url(#arrowGradientLarge)"
+                  style={{ filter: 'url(#glowLarge)' }}
+                />
+
+                {/* Large Head pointing at viewer */}
+                <path
+                  d="M20 150L60 195L100 150Z"
+                  fill="white"
+                  style={{ filter: 'url(#glowLarge)' }}
+                />
+              </svg>
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
     </section>
   )
