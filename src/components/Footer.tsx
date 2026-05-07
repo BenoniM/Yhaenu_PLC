@@ -95,7 +95,7 @@ export default function Footer() {
           {/* Brand section */}
           <motion.div variants={itemVariants}>
             <img
-              src="/logo2.png"
+              src="/logo.png"
               alt="YHAENU PLC"
               style={{ height: 48, width: 'auto', objectFit: 'contain', marginBottom: '1rem' }}
             />

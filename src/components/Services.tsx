@@ -108,7 +108,6 @@ export default function Services() {
         {services.map((s, i) => {
           const isActive = i === active
           const isBehind1 = i === (active + 1) % services.length
-          const isBehind2 = i === (active + 2) % services.length
           const zIndex = getCardIndex(i)
 
           return (

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import FlyingIconsButton from './FlyingIconsButton'
 
 interface CtaProps {
   title?: string
@@ -11,12 +12,12 @@ interface CtaProps {
 export default function Cta({
   title = 'Ready to Work With Us?',
   subtitle = 'Get in touch with our team to discuss your needs and discover how we can help your business grow.',
-  buttonText = 'Request a Quote',
-  buttonLink = '#contact',
+  buttonText = 'Get in Touch',
+  buttonLink = '/contact',
   isDark = true,
 }: CtaProps) {
   const bgColor = isDark ? '#0E5F13' : '#F3F6FA'
-  const subtitleColor = 'rgba(243,246,250,0.7)'
+  const subtitleColor = isDark ? 'rgba(243,246,250,0.7)' : 'rgba(14,95,19,0.7)'
 
   return (
     <section
@@ -28,26 +29,16 @@ export default function Cta({
         <div
           className="absolute"
           style={{
-            top: '-10%',
-            right: '-5%',
-            width: '40%',
-            height: '40%',
-            background: isDark
-              ? 'radial-gradient(ellipse, rgba(236,189,39,0.1) 0%, transparent 65%)'
-              : 'radial-gradient(ellipse, rgba(236,189,39,0.08) 0%, transparent 65%)',
+            top: '-10%', right: '-5%', width: '40%', height: '40%',
+            background: 'radial-gradient(ellipse, rgba(236,189,39,0.1) 0%, transparent 65%)',
             borderRadius: '50%',
           }}
         />
         <div
           className="absolute"
           style={{
-            bottom: '-5%',
-            left: '-10%',
-            width: '35%',
-            height: '35%',
-            background: isDark
-              ? 'radial-gradient(ellipse, rgba(236,189,39,0.08) 0%, transparent 65%)'
-              : 'radial-gradient(ellipse, rgba(236,189,39,0.06) 0%, transparent 65%)',
+            bottom: '-5%', left: '-10%', width: '35%', height: '35%',
+            background: 'radial-gradient(ellipse, rgba(236,189,39,0.08) 0%, transparent 65%)',
             borderRadius: '50%',
           }}
         />
@@ -80,7 +71,7 @@ export default function Cta({
 
           {/* Subtitle */}
           <motion.p
-            className="text-base md:text-lg leading-relaxed mb-8 max-w-2xl mx-auto"
+            className="text-base md:text-lg leading-relaxed mb-10 max-w-2xl mx-auto"
             style={{ color: subtitleColor }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -90,27 +81,33 @@ export default function Cta({
             {subtitle}
           </motion.p>
 
-          {/* Button */}
-          <motion.a
-            href={buttonLink}
+          {/* Flying Icons Button */}
+          <motion.div
+            className="flex justify-center"
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            className="inline-block px-10 py-4 rounded-full font-black text-sm uppercase tracking-wide transition-all"
-            style={{
-              background: '#ECBD27',
-              color: '#0E5F13',
-              boxShadow: '0 8px 24px rgba(236,189,39,0.3)',
-            }}
           >
-            {buttonText}
-          </motion.a>
+            <FlyingIconsButton
+              label={buttonText}
+              href={buttonLink}
+              buttonColor="#ECBD27"
+              hoverButtonColor="#F3F6FA"
+              textColor="#0E5F13"
+              hoverTextColor="#0E5F13"
+              iconColor="#ECBD27"
+              iconSize={56}
+              flySpeed={1.8}
+              fadeSpeed={1.6}
+              spreadDistance={140}
+              paddingX={36}
+              paddingY={18}
+              fontSize="0.8rem"
+            />
+          </motion.div>
         </motion.div>
       </div>
     </section>
   )
 }
-
