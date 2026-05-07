@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'About Us', href: '#about' },
-  { label: 'Products', href: '#products' },
-  { label: 'Contact Us', href: '#contact' },
+  { label: 'Home', href: '/', isRoute: true },
+  { label: 'About Us', href: '/about', isRoute: true },
+  { label: 'Products', href: '/#products', isRoute: false },
+  { label: 'Contact Us', href: '/#contact', isRoute: false },
 ]
 
 // Wave paths - smooth, clean waves
@@ -32,13 +33,34 @@ function AnimatedWave() {
   )
 }
 
-function FlipWord({ label, href, onClick, delay = 0 }: {
-  label: string; href: string; onClick: () => void; delay?: number
+function FlipWord({ label, href, isRoute, onClick, delay = 0 }: {
+  label: string; href: string; isRoute: boolean; onClick: () => void; delay?: number
 }) {
+  const navigate = useNavigate()
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    onClick()
+    if (isRoute) {
+      navigate(href)
+    } else {
+      // hash navigation — go home first if needed
+      const hash = href.replace('/#', '#')
+      if (window.location.pathname !== '/') {
+        navigate('/')
+        setTimeout(() => {
+          document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
+      } else {
+        document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }
+
   return (
     <motion.a
       href={href}
-      onClick={onClick}
+      onClick={handleClick}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -46,7 +68,6 @@ function FlipWord({ label, href, onClick, delay = 0 }: {
       className="group relative flex flex-col items-center gap-2 cursor-pointer select-none"
       style={{ perspective: 1000 }}
     >
-      {/* Label */}
       <span className="flex flex-wrap justify-center">
         {label.split('').map((char, i) => (
           <motion.span
@@ -73,12 +94,18 @@ function FlipWord({ label, href, onClick, delay = 0 }: {
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Reset scroll state when navigating to a new page
+  useEffect(() => {
+    setScrolled(false)
+  }, [location.pathname])
 
   return (
     <>
@@ -129,6 +156,7 @@ export default function Navbar() {
                 key={link.href}
                 label={link.label}
                 href={link.href}
+                isRoute={link.isRoute}
                 onClick={() => {}}
                 delay={i * 0.05}
               />
@@ -186,6 +214,7 @@ export default function Navbar() {
                     key={link.href}
                     label={link.label}
                     href={link.href}
+                    isRoute={link.isRoute}
                     onClick={() => setOpen(false)}
                     delay={0.05 + i * 0.07}
                   />

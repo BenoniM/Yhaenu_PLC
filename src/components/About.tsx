@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -11,13 +11,6 @@ const stats = [
   { end: 5,  suffix: '',  label: 'Business Verticals'  },
   { end: 15, suffix: '+', label: 'Countries Reached'   },
   { end: 1,  suffix: '',  label: 'Unified Vision'      },
-]
-
-const services = [
-  { icon: '🌍', num: '01', title: 'Import & Export',      desc: 'Facilitating the movement of goods with efficiency, reliability, and market insight across local and international markets.', dark: true  },
-  { icon: '🏭', num: '02', title: 'Manufacturing',         desc: 'Producing quality cardboard and carton products that meet global standards with precision and care.',                          dark: false },
-  { icon: '🚛', num: '03', title: 'Transportation',        desc: 'Providing reliable vehicles to help customers transport goods, making logistics seamless and dependable.',                    dark: true  },
-  { icon: '🏨', num: '04', title: 'Hospitality',           desc: 'South Star International Hotel in Hawassa — memorable experiences through modern and welcoming hotel operations.',            dark: false },
 ]
 
 // ── Scroll-reveal word-by-word paragraph ─────────────────────────────────────
@@ -68,8 +61,7 @@ function WordReveal({
 
   return (
     <motion.span
-      style={{ opacity, filter: blur.get ? undefined : undefined, y, display: 'inline-block', color: '#0E5F13' }}
-      // apply blur via style update
+      style={{ opacity, y, display: 'inline-block', color: '#0E5F13' }}
     >
       <motion.span
         style={{
@@ -93,14 +85,12 @@ function CountStat({ end, suffix, label, index }: { end: number; suffix: string;
 
   useEffect(() => {
     if (!inView || !displayRef.current) return
-    let start = 0
     const duration = 1800
     const startTime = performance.now()
 
     const tick = (now: number) => {
       const elapsed = now - startTime
       const progress = Math.min(elapsed / duration, 1)
-      // ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3)
       const current = Math.round(eased * end)
       if (displayRef.current) displayRef.current.textContent = String(current)
@@ -136,87 +126,6 @@ function CountStat({ end, suffix, label, index }: { end: number; suffix: string;
       >
         {label}
       </span>
-    </motion.div>
-  )
-}
-
-// ── 3-D service card ──────────────────────────────────────────────────────────
-
-function ServiceCard({ s, index }: { s: typeof services[0]; index: number }) {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
-  const [hovered, setHovered] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
-
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const r = cardRef.current!.getBoundingClientRect()
-    setTilt({
-      x: ((e.clientX - r.left) / r.width  - 0.5) * 22,
-      y: ((e.clientY - r.top)  / r.height - 0.5) * -22,
-    })
-  }
-
-  return (
-    <motion.div
-      ref={cardRef}
-      onMouseMove={onMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setTilt({ x: 0, y: 0 }); setHovered(false) }}
-      initial={{ opacity: 0, y: 70, rotateX: -12 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.7, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      animate={{
-        rotateX: tilt.y,
-        rotateY: tilt.x,
-        scale: hovered ? 1.04 : 1,
-        boxShadow: hovered
-          ? '0 28px 56px rgba(0,0,0,0.22), 0 0 0 1px rgba(236,189,39,0.25)'
-          : '0 6px 20px rgba(0,0,0,0.08)',
-      }}
-      style={{
-        transformStyle: 'preserve-3d',
-        transformPerspective: 900,
-        background: s.dark ? '#0E5F13' : '#F3F6FA',
-        borderRadius: 20,
-        padding: '1.75rem',
-        position: 'relative',
-        overflow: 'hidden',
-        cursor: 'default',
-        border: s.dark ? 'none' : '1px solid rgba(14,95,19,0.08)',
-      }}
-    >
-      {/* Ghost number */}
-      <span className="absolute top-2 right-3 font-black pointer-events-none select-none"
-        style={{ fontFamily: "'Arial Black', sans-serif", fontSize: '4.5rem', lineHeight: 1,
-          color: s.dark ? 'rgba(236,189,39,0.07)' : 'rgba(14,95,19,0.05)' }}>
-        {s.num}
-      </span>
-
-      {/* Hover glow */}
-      <motion.div className="absolute inset-0 rounded-[20px] pointer-events-none"
-        animate={{ opacity: hovered ? 1 : 0 }} transition={{ duration: 0.3 }}
-        style={{ background: s.dark
-          ? 'radial-gradient(circle at 60% 30%, rgba(236,189,39,0.14) 0%, transparent 65%)'
-          : 'radial-gradient(circle at 60% 30%, rgba(14,95,19,0.07) 0%, transparent 65%)' }} />
-
-      <motion.div className="text-3xl mb-3" animate={{ y: hovered ? -4 : 0 }} transition={{ duration: 0.3 }}
-        style={{ transform: 'translateZ(20px)' }}>
-        {s.icon}
-      </motion.div>
-
-      <h3 className="font-black uppercase mb-2"
-        style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(0.9rem, 1.8vw, 1.1rem)',
-          color: s.dark ? '#F3F6FA' : '#0E5F13', transform: 'translateZ(16px)' }}>
-        {s.title}
-      </h3>
-
-      <motion.div className="mb-3 h-[2px] rounded-full" style={{ background: '#ECBD27', transform: 'translateZ(12px)' }}
-        animate={{ width: hovered ? '55%' : '28%' }} transition={{ duration: 0.35 }} />
-
-      <p className="text-sm leading-relaxed"
-        style={{ color: s.dark ? 'rgba(243,246,250,0.65)' : 'rgba(14,95,19,0.6)', transform: 'translateZ(10px)' }}>
-        {s.desc}
-      </p>
     </motion.div>
   )
 }
