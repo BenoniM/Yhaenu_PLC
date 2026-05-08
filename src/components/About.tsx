@@ -31,36 +31,36 @@ const IMAGE_CARDS = [
     src: importImg,
     caption: 'Import & Global Trade',
     top: '35%',
-    left: '10%',
+    left: '15%',
     /* w: 260, */ w: 370,
     h: 370,
     // Initial 3D state
-    rot3d: { x: 5, y: 5, z: 0, p: 1000 },
+    rot3d: { x: 0, y: 15, z: 0, p: 1000 },
     zIdx: 8,
     order: 0,
     fly: {
       x: -1800,
-      y: -300,
+      y: -100,
       scale: 4,
       // Fly-off 3D state
-      rot3d: { x: -45, y: 90, z: -15 }
+      rot3d: { x: -20, y: 90, z: 0 }
     },
   },
   {
     src: transportationImg,
     caption: 'Transportation & Logistics',
     top: '42%',
-    left: '61%',
+    left: '68%',
     /* w: 260, */ w: 300,
     h: 300,
-    rot3d: { x: 8, y: 8, z: 0, p: 1000 },
+    rot3d: { x: 2, y: 8, z: 0, p: 1000 },
     zIdx: 8,
     order: 0,
     fly: {
       x: 1800,
       y: 300,
       scale: 4,
-      rot3d: { x: 30, y: -90, z: 20 }
+      rot3d: { x: 15, y: -120, z: 0 }
     },
   },
   {
@@ -70,14 +70,14 @@ const IMAGE_CARDS = [
     left: '22%',
     /* w: 190, */ w: 250,
     h: 160,
-    rot3d: { x: 10, y: 5, z: 0, p: 1000 },
+    rot3d: { x: 0, y: 10, z: 0, p: 1000 },
     zIdx: 5,
     order: 1,
     fly: {
       x: -1000,
       y: -1400,
       scale: 5,
-      rot3d: { x: 90, y: 0, z: 10 },
+      rot3d: { x: 10, y: 90, z: 0 },
     },
   },
   {
@@ -87,14 +87,14 @@ const IMAGE_CARDS = [
     left: '25%',
     /* w: 180, */ w: 200,
     h: 200,
-    rot3d: { x: 5, y: -10, z: 0, p: 1000 },
+    rot3d: { x: 5, y: 10, z: 0, p: 1000 },
     zIdx: 5,
     order: 1,
     fly: {
       x: -1200,
       y: 800,
       scale: 5,
-      rot3d: { x: -60, y: 40, z: -12 },
+      rot3d: { x: 60, y: 40, z: -12 },
     },
   },
   {
@@ -104,7 +104,7 @@ const IMAGE_CARDS = [
     left: '55%',
     /* w: 170, */ w: 210,
     h: 175,
-    rot3d: { x: 5, y: 10, z: 0, p: 1000 },
+    rot3d: { x: 5, y: -10, z: 0, p: 1000 },
     zIdx: 5,
     order: 1,
     fly: {
@@ -121,14 +121,14 @@ const IMAGE_CARDS = [
     left: '60%',
     /* w: 130, */ w: 180,
     h: 150,
-    rot3d: { x: 0, y: 0, z: 0, p: 1000 },
+    rot3d: { x: 0, y: -20, z: 0, p: 1000 },
     zIdx: 3,
     order: 2,
     fly: {
       x: 1800,
       y: -200,
       scale: 6,
-      rot3d: { x: 40, y: 20, z: 0 },
+      rot3d: { x: 40, y: -20, z: 0 },
     },
   },
   {
@@ -138,14 +138,14 @@ const IMAGE_CARDS = [
     left: '35%',
     /* w: 120, */ w: 170,
     h: 130,
-    rot3d: { x: 0, y: 0, z: 0, p: 1000 },
+    rot3d: { x: 0, y: 20, z: 0, p: 1000 },
     zIdx: 4,
     order: 2,
     fly: {
       x: -1200,
       y: 800,
       scale: 6,
-      rot3d: { x: 60, y: -20, z: 0 },
+      rot3d: { x: 60, y: 20, z: 0 },
     },
   },
   {
