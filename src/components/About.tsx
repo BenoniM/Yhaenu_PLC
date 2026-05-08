@@ -66,7 +66,7 @@ const IMAGE_CARDS = [
   {
     src: exportImg,
     caption: 'Export Operations',
-    top: '35%',
+    top: '30%',
     left: '42.5%',
     w: 220,
     h: 280,
@@ -427,7 +427,7 @@ export default function About() {
           transition={{ delay: 1.5, duration: 1 }}
           style={{
             position: 'absolute',
-            top: '77%',
+            top: '72%',
             left: 0,
             width: '100%',
             zIndex: 100,
