@@ -1,299 +1,262 @@
-import { useState, useRef, useEffect } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { motion, AnimatePresence } from 'framer-motion'
 
-const services = [
+// Asset imports
+import exportImg from '../assets/about/export.jpg'
+import importImg from '../assets/about/import.jpg'
+import manufacturingImg from '../assets/about/manufacturing.jpg'
+import transportationImg from '../assets/about/transportation.jpg'
+import hospitalityImg from '../assets/about/hospitality.jpg'
+
+gsap.registerPlugin(ScrollTrigger)
+
+const baseServices = [
   {
     id: 1,
-    num: '01',
     badge: 'Import & Export',
-    title: 'Trade is in the air',
+    title: 'Global Trade Solutions',
     desc: 'Facilitating the movement of goods with efficiency, reliability, and market insight across local and international markets.',
-    image: '/products1.jpeg',
+    thumb: exportImg,
+    bg: importImg,
   },
   {
     id: 2,
-    num: '02',
     badge: 'Manufacturing',
-    title: 'Quality is in the air',
+    title: 'Precision Production',
     desc: 'Producing quality cardboard and carton products that meet global standards with precision and care.',
-    image: '/products2.jpeg',
+    thumb: manufacturingImg,
+    bg: manufacturingImg,
   },
   {
     id: 3,
-    num: '03',
     badge: 'Transportation',
-    title: 'Motion is in the air',
+    title: 'Reliable Logistics',
     desc: 'Providing reliable vehicles to help customers transport goods, making logistics seamless and dependable.',
-    image: '/products3.jpeg',
+    thumb: transportationImg,
+    bg: transportationImg,
   },
   {
     id: 4,
-    num: '04',
     badge: 'Hospitality',
-    title: 'Warmth is in the air',
+    title: 'Premium Experience',
     desc: 'South Star International Hotel in Hawassa offers memorable experiences through modern and welcoming hotel operations.',
-    image: '/products4.jpeg',
+    thumb: hospitalityImg,
+    bg: hospitalityImg,
   },
 ]
 
-export default function Services() {
-  const [active, setActive] = useState(0)
-  const [lastActive, setLastActive] = useState<number | null>(null)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const sectionRef = useRef<HTMLDivElement>(null)
+const services = [...baseServices, ...baseServices, ...baseServices]
 
-  const handleSetActive = (idx: number) => {
-    setLastActive(active)
-    setActive(idx)
+const CARD_H = 190
+const CARD_W = 340
+const CARD_GAP = 12
+const CARD_STEP = CARD_H + CARD_GAP
+const TOTAL_HEIGHT = baseServices.length * CARD_STEP
+const X_SLOPE = -85
+
+export default function Services() {
+  // Start with the second item of the second set (index 5)
+  const [activeIdx, setActiveIdx] = useState(baseServices.length + 1)
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const stripRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  const centerY = useRef(0)
+  const dragStart = useRef<{ y: number; currentY: number } | null>(null)
+  const isDragging = useRef(false)
+
+  // ── Entrance Animation ──
+  useGSAP(() => {
+    cardRefs.current.forEach((card, i) => {
+      if (!card) return
+      gsap.set(card, { y: i % 2 === 0 ? -1200 : 1200, opacity: 0 })
+    })
+
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: 'top 85%',
+      onEnter: () => {
+        cardRefs.current.forEach((card, i) => {
+          if (!card) return
+          gsap.to(card, {
+            y: 0,
+            opacity: 1,
+            duration: 1.8,
+            delay: i * 0.04,
+            ease: 'expo.out',
+          })
+        })
+      },
+      once: true
+    })
+  }, { scope: sectionRef })
+
+  const updatePosition = (y: number) => {
+    let wrappedY = y
+    if (y > 0) wrappedY = y - TOTAL_HEIGHT
+    if (y < -TOTAL_HEIGHT * 2) wrappedY = y + TOTAL_HEIGHT
+
+    centerY.current = wrappedY
+    const currentX = wrappedY * (X_SLOPE / CARD_STEP)
+    gsap.set(stripRef.current, { y: wrappedY, x: currentX })
+
+    const centerPoint = -wrappedY + (window.innerHeight / 2) - (CARD_H / 2)
+    const rawIdx = Math.round(centerPoint / CARD_STEP)
+    const normalizedIdx = rawIdx % baseServices.length
+    const finalIdx = normalizedIdx < 0 ? normalizedIdx + baseServices.length : normalizedIdx
+
+    if (finalIdx !== (activeIdx % baseServices.length)) {
+      setActiveIdx(rawIdx)
+    }
   }
 
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] })
-  const headerY = useTransform(scrollYProgress, [0, 0.3], [40, 0])
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.2], [0, 1])
-
-  const next = () => handleSetActive((active + 1) % services.length)
-  const back = () => handleSetActive((active - 1 + services.length) % services.length)
-
-  // Auto-advance
   useEffect(() => {
-    intervalRef.current = setInterval(next, 10000)
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [active])
+    // Center the second item of the middle set (index 5)
+    const targetIdx = baseServices.length + 1
+    const initialY = -(targetIdx * CARD_STEP) + (window.innerHeight / 2) - (CARD_H / 2)
+    updatePosition(initialY)
+  }, [])
 
-  // Calculate card order — active card on top, rest stacked behind
-  const getCardIndex = (i: number) => {
-    if (i === active) return 10
-    if (i === lastActive) return 20
-    if (i === (active + 1) % services.length) return 5
-    return 0
+  const onPointerDown = (e: React.PointerEvent) => {
+    isDragging.current = true
+    dragStart.current = { y: e.clientY, currentY: centerY.current }
+      ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+  }
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!isDragging.current || !dragStart.current) return
+    const delta = e.clientY - dragStart.current.y
+    updatePosition(dragStart.current.currentY + delta)
+  }
+
+  const onPointerUp = () => {
+    if (!isDragging.current) return
+    isDragging.current = false
+    const targetY = Math.round(centerY.current / CARD_STEP) * CARD_STEP
+    const targetX = targetY * (X_SLOPE / CARD_STEP)
+    gsap.to(stripRef.current, {
+      y: targetY,
+      x: targetX,
+      duration: 0.7,
+      ease: 'power4.out',
+      onUpdate: () => {
+        centerY.current = gsap.getProperty(stripRef.current, "y") as number
+      }
+    })
   }
 
   return (
     <section
       ref={sectionRef}
       id="products"
-      className="relative overflow-hidden"
-      style={{ background: '#F3F6FA', paddingTop: '6rem', paddingBottom: '6rem' }}
+      className="relative w-full h-[100vh] bg-white overflow-hidden flex items-stretch select-none"
     >
-      {/* ── Header ── */}
-      <motion.div style={{ y: headerY, opacity: headerOpacity }} className="text-center mb-10 px-6">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <span className="h-[2px] w-8 bg-[#ECBD27]" />
-          <span className="text-[#ECBD27] text-xs tracking-[0.4em] uppercase font-bold" style={{ fontFamily: 'monospace' }}>
-            What We Do
-          </span>
-          <span className="h-[2px] w-8 bg-[#ECBD27]" />
-        </div>
-        <div className="overflow-hidden">
-          <motion.h2
-            initial={{ y: '110%' }}
-            whileInView={{ y: '0%' }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-            className="font-black uppercase leading-none"
-            style={{
-              fontFamily: "'Arial Black', sans-serif",
-              fontSize: 'clamp(2.2rem, 6vw, 4.5rem)',
-              color: '#0E5F13',
-              letterSpacing: '-0.02em',
-            }}
+      {/* ── LEFT: Representation ── */}
+      <div
+        className="relative w-[60%] h-full overflow-hidden"
+        style={{
+          clipPath: `polygon(0 0, 100% 0, calc(100% + ${100 * (X_SLOPE / CARD_STEP)}vh) 100%, 0 100%)`
+        }}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeIdx % baseServices.length}
+            className="absolute inset-x-0 top-4 bottom-4"
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           >
-            Our Services
-          </motion.h2>
-        </div>
-      </motion.div>
-
-      {/* ── Stacked cards container ── */}
-      <div className="relative mx-auto" style={{ maxWidth: 1100, height: '70vh', minHeight: 500, perspective: 1200 }}>
-        {services.map((s, i) => {
-          const isActive = i === active
-          const isBehind1 = i === (active + 1) % services.length
-          const zIndex = getCardIndex(i)
-
-          return (
-            <motion.div
-              key={s.id}
-              className="absolute inset-0 mx-4 md:mx-10 rounded-[32px] overflow-hidden cursor-pointer"
-              style={{ zIndex }}
-              animate={{
-                scale: isActive ? 1 : i === lastActive ? 1.35 : isBehind1 ? 0.94 : 0.9,
-                y: isActive ? 0 : i === lastActive ? 0 : isBehind1 ? -30 : -40,
-                opacity: isActive ? 1 : i === lastActive ? 0 : isBehind1 ? 0.7 : 0,
-                rotateX: isActive ? 0 : i === lastActive ? 0 : isBehind1 ? -3 : -5,
-                filter: isActive
-                  ? 'grayscale(0) brightness(1)'
-                  : i === lastActive
-                    ? 'grayscale(1) brightness(1)'
-                    : 'grayscale(0) brightness(0.85)',
-              }}
-              transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
-              onClick={() => !isActive && handleSetActive(i)}
-            >
-              {/* Background image */}
-              <img src={s.image} alt={s.title} className="absolute inset-0 w-full h-full object-cover" />
-
-              {/* Gradient overlay */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: 'linear-gradient(to top, rgba(10,18,40,0.88) 0%, rgba(10,18,40,0.3) 50%, rgba(10,18,40,0.1) 100%)',
-                }}
-              />
-
-              {/* Border Progress — only show on active */}
-              {isActive && (
-                <svg className="absolute inset-0 w-full h-full pointer-events-none z-[101]">
-                  <motion.rect
-                    x="2"
-                    y="2"
-                    width="calc(100% - 4px)"
-                    height="calc(100% - 4px)"
-                    rx="30"
-                    fill="none"
-                    stroke="#ECBD27"
-                    strokeWidth="4"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 1 }}
-                    transition={{
-                      pathLength: { duration: 10, ease: "linear" },
-                      opacity: { duration: 0.3 }
-                    }}
-                  />
-                </svg>
-              )}
-
-
-              {/* Top-left badge — only show on active */}
-              {isActive && (
-                <motion.div
-                  className="absolute top-8 left-8 flex items-center gap-3"
-                  initial={{ opacity: 0, y: -16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                >
-                  <span
-                    className="font-black text-[#ECBD27]"
-                    style={{ fontFamily: "'Arial Black', sans-serif", fontSize: '0.75rem', letterSpacing: '0.2em' }}
-                  >
-                    {s.num}
-                  </span>
-                  <span className="h-[1px] w-6 bg-[#ECBD27]" />
-                  <span className="text-[#F3F6FA]/70 text-xs tracking-widest uppercase" style={{ fontFamily: 'monospace' }}>
-                    {s.badge}
-                  </span>
-                </motion.div>
-              )}
-
-              {/* Bottom content — only show on active */}
-              {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center text-center px-8 pb-10">
-                  <motion.p
-                    className="text-[#F3F6FA]/60 text-xs tracking-widest uppercase mb-2"
-                    style={{ fontFamily: 'monospace' }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25, duration: 0.5 }}
-                  >
-                    {s.badge}
-                  </motion.p>
-
-                  <motion.h3
-                    className="font-bold text-[#F3F6FA] mb-3"
-                    style={{ fontSize: 'clamp(1.6rem, 4vw, 3rem)', lineHeight: 1.15 }}
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.32, duration: 0.55 }}
-                  >
-                    {s.title}
-                  </motion.h3>
-
-                  <motion.p
-                    className="text-[#F3F6FA]/70 text-sm max-w-md leading-relaxed mb-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                  >
-                    {s.desc}
-                  </motion.p>
-
-                  <motion.a
-                    href="#rfq"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.45 }}
-                    whileHover={{ scale: 1.05, backgroundColor: '#ECBD27', color: '#0E5F13', borderColor: '#ECBD27' }}
-                    whileTap={{ scale: 0.97 }}
-                    className="px-7 py-2 rounded-full text-sm font-bold border border-[#F3F6FA]/50 text-[#F3F6FA]"
-                    style={{ backdropFilter: 'blur(8px)', background: 'rgba(255,255,255,0.1)', transition: 'all 0.2s' }}
-                  >
-                    Learn More
-                  </motion.a>
-                </div>
-              )}
-            </motion.div>
-          )
-        })}
-
-        <button
-          onClick={back}
-          aria-label="Previous"
-          className="absolute left-2 md:left-[-100px] top-1/2 -translate-y-1/2 z-[100] w-14 h-14 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg"
-          style={{ background: '#0E5F13' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <button
-          onClick={next}
-          aria-label="Next"
-          className="absolute right-2 md:right-[-100px] top-1/2 -translate-y-1/2 z-[100] w-14 h-14 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg"
-          style={{ background: '#0E5F13' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      </div>
-
-      {/* ── Dot indicators ── */}
-      <div className="flex items-center justify-center gap-6 mt-8 px-6">
-        {services.map((item, i) => (
-          <button
-            key={item.id}
-            onClick={() => handleSetActive(i)}
-            className="group flex flex-col items-center gap-2 focus:outline-none"
-            aria-label={`Go to ${item.badge}`}
-          >
-            <motion.div
-              className="rounded-xl overflow-hidden"
-              animate={{
-                width: active === i ? 80 : 56,
-                height: active === i ? 52 : 36,
-                opacity: active === i ? 1 : 0.45,
-                boxShadow: active === i ? '0 4px 16px rgba(236,189,39,0.4)' : 'none',
-              }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <img src={item.image} alt={item.badge} className="w-full h-full object-cover" />
-            </motion.div>
-
-            <motion.div
-              className="rounded-full"
-              animate={{
-                width: active === i ? 24 : 6,
-                height: 4,
-                background: active === i ? '#ECBD27' : '#0E5F13',
-                opacity: active === i ? 1 : 0.3,
-              }}
-              transition={{ duration: 0.3 }}
+            <img
+              src={services[activeIdx % services.length].bg}
+              alt=""
+              className="w-full h-full object-cover brightness-[0.8]"
             />
-          </button>
-        ))}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent z-10" />
+          </motion.div>
+        </AnimatePresence>
       </div>
 
+      {/* ── CENTER: Diagonal Strip ── */}
+      <div
+        className="absolute left-[67%] inset-y-0 z-40 flex items-center"
+        style={{ width: CARD_W, transform: 'translateX(-50%)' }}
+      >
+        <div
+          className="w-full h-full overflow-visible"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+        >
+          <div ref={stripRef} className="cursor-grab active:cursor-grabbing will-change-transform">
+            {services.map((s, i) => {
+              const isActive = activeIdx === i
+              const xOffset = i * X_SLOPE
 
+              return (
+                <div
+                  key={i}
+                  ref={el => { cardRefs.current[i] = el }}
+                  className={`relative mb-[12px] transition-all duration-700 ease-out 
+                    ${isActive ? 'opacity-100 scale-105' : 'opacity-10 scale-90 blur-[1.5px]'}`}
+                  style={{
+                    width: CARD_W,
+                    height: CARD_H,
+                    transform: `translateX(${xOffset}px)`,
+                    clipPath: 'polygon(23.5% 0%, 100% 0%, 76.5% 100%, 0% 100%)'
+                  }}
+                >
+                  <img src={s.thumb} alt="" className="w-full h-full object-cover pointer-events-none" />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── RIGHT: Info Panel ── */}
+      <div className="flex-1 bg-white h-full flex flex-col justify-end pb-24 px-12 pl-36 relative z-10">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeIdx % baseServices.length}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-sm"
+          >
+            <div className="mb-4">
+              <span className="text-[#ECBD27] font-mono text-[9px] font-bold tracking-[0.4em] uppercase">
+                {services[activeIdx % services.length].badge}
+              </span>
+            </div>
+
+            <h2 className="text-4xl font-black text-[#0E5F13] leading-[1.1] mb-5 uppercase tracking-tight">
+              {services[activeIdx % services.length].title}
+            </h2>
+
+            <p className="text-gray-400 text-sm leading-relaxed mb-10">
+              {services[activeIdx % services.length].desc}
+            </p>
+
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#0E5F13] text-white font-bold uppercase tracking-widest text-[9px]
+                         hover:bg-[#ECBD27] hover:text-[#0E5F13] transition-all duration-300"
+              style={{ clipPath: 'polygon(0 0, 92% 0, 100% 100%, 0% 100%)' }}
+            >
+              Explore Solutions
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </section>
   )
 }
-

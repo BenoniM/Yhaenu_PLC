@@ -25,7 +25,7 @@ const faqs = [
 function FaqItem({ item, isOpen, onClick }: { item: typeof faqs[0]; isOpen: boolean; onClick: () => void }) {
   return (
     <motion.div
-      className="border-b border-[rgba(236,189,39,0.2)]"
+      className="border-b border-[rgba(236,189,39,0.15)] last:border-none"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -33,48 +33,52 @@ function FaqItem({ item, isOpen, onClick }: { item: typeof faqs[0]; isOpen: bool
     >
       <button
         onClick={onClick}
-        className="w-full py-6 flex items-center justify-between group hover:bg-[rgba(236,189,39,0.05)] transition-colors px-4 rounded-lg"
+        className="w-full py-7 flex items-center justify-between group hover:bg-white/5 transition-all px-6"
       >
         <h3
-          className="text-left font-black text-base md:text-lg uppercase tracking-wide"
+          className="text-left font-black text-lg md:text-xl uppercase tracking-wide transition-colors group-hover:text-white"
           style={{
             fontFamily: "'Arial Black', sans-serif",
-            color: '#0E5F13',
+            color: '#ECBD27',
           }}
         >
           {item.question}
         </h3>
         <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
+          animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 1.1 : 1 }}
           transition={{ duration: 0.3 }}
           className="flex-shrink-0 ml-4"
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#ECBD27"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+          <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#ECBD27]/20 transition-colors">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ECBD27"
+              strokeWidth="3"
+              strokeLinecap="round"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
         </motion.div>
       </button>
 
       <motion.div
         initial={{ height: 0, opacity: 0 }}
         animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="overflow-hidden"
       >
-        <p
-          className="px-4 pb-6 text-base leading-relaxed"
-          style={{ color: 'rgba(14,95,19,0.8)' }}
-        >
-          {item.answer}
-        </p>
+        <div className="px-6 pb-8">
+          <p
+            className="text-lg leading-relaxed max-w-2xl"
+            style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 400 }}
+          >
+            {item.answer}
+          </p>
+        </div>
       </motion.div>
     </motion.div>
   )
@@ -84,37 +88,39 @@ export default function Faq() {
   const [openId, setOpenId] = useState<number | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] })
-  const bgY = useTransform(scrollYProgress, [0, 1], ['-4%', '4%'])
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-5%', '5%'])
 
   return (
     <section
       ref={sectionRef}
       id="faq"
-      className="relative overflow-hidden py-28"
-      style={{ background: '#F3F6FA' }}
+      className="relative overflow-hidden py-32"
+      style={{ background: '#0E5F13' }}
     >
-      {/* Parallax blobs */}
+      {/* Decorative Parallax Accents */}
       <motion.div className="absolute inset-0 pointer-events-none" style={{ y: bgY }}>
         <div
           className="absolute"
           style={{
-            top: '5%',
-            left: '-15%',
-            width: '55%',
-            height: '55%',
-            background: 'radial-gradient(ellipse, rgba(236,189,39,0.07) 0%, transparent 65%)',
+            top: '0%',
+            left: '-10%',
+            width: '60%',
+            height: '60%',
+            background: 'radial-gradient(circle, rgba(236,189,39,0.1) 0%, transparent 70%)',
             borderRadius: '50%',
+            filter: 'blur(60px)'
           }}
         />
         <div
           className="absolute"
           style={{
-            bottom: '5%',
-            right: '-10%',
-            width: '45%',
-            height: '45%',
-            background: 'radial-gradient(ellipse, rgba(236,189,39,0.05) 0%, transparent 65%)',
+            bottom: '0%',
+            right: '-5%',
+            width: '50%',
+            height: '50%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
             borderRadius: '50%',
+            filter: 'blur(60px)'
           }}
         />
       </motion.div>
@@ -122,50 +128,44 @@ export default function Faq() {
       <div className="relative z-10 w-full px-6">
         {/* ── Header ── */}
         <motion.div
-          className="text-center mb-8 max-w-3xl mx-auto"
+          className="text-center mb-16 max-w-3xl mx-auto"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7 }}
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="h-[2px] w-8 bg-[#ECBD27]" />
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <span className="h-[2px] w-12 bg-[#ECBD27]" />
             <span
-              className="text-[#ECBD27] text-lg tracking-[0.4em] uppercase font-bold"
+              className="text-[#ECBD27] text-sm md:text-base tracking-[0.5em] uppercase font-bold"
               style={{ fontFamily: 'monospace' }}
             >
-              FAQ
+              Frequently Asked
             </span>
-            <span className="h-[2px] w-8 bg-[#ECBD27]" />
+            <span className="h-[2px] w-12 bg-[#ECBD27]" />
           </div>
-         
+          
+          <h2 
+            className="text-white text-5xl md:text-6xl font-black uppercase tracking-tighter"
+            style={{ fontFamily: "'Arial Black', sans-serif" }}
+          >
+            Questions
+          </h2>
         </motion.div>
 
-        {/* ── Subheading ── */}
-        <motion.p
-          className="text-center mb-12 max-w-2xl mx-auto text-base"
-          style={{ color: 'rgba(14,95,19,0.7)' }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          Find answers to common questions about our services, products, and operations.
-        </motion.p>
-
-        {/* ── FAQ Items ── */}
+        {/* ── FAQ Container ── */}
         <motion.div
-          className="max-w-3xl mx-auto"
+          className="max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
         >
           <div
-            className="rounded-2xl overflow-hidden"
+            className="rounded-3xl overflow-hidden backdrop-blur-sm shadow-2xl"
             style={{
-              background: 'linear-gradient(135deg, rgba(236,189,39,0.08) 0%, rgba(14,95,19,0.05) 100%)',
-              border: '1px solid rgba(236,189,39,0.2)',
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(236,189,39,0.15)',
             }}
           >
             {faqs.map((item) => (
@@ -177,12 +177,16 @@ export default function Faq() {
               />
             ))}
           </div>
+          
+          {/* Subheading below container */}
+          <p
+            className="text-center mt-12 text-lg italic opacity-60"
+            style={{ color: 'white', fontWeight: 300 }}
+          >
+            Have more questions? Contact our team for personalized assistance.
+          </p>
         </motion.div>
-
-        {/* ── CTA ── */}
-        
       </div>
     </section>
   )
 }
-

@@ -2,7 +2,6 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import About from './components/About'
 import Services from './components/Services'
 import Faq from './components/Faq'
 import Cta from './components/Cta'
@@ -13,11 +12,17 @@ import ContactPage from './pages/ContactPage'
 import RfqPage from './pages/RfqPage'
 import MouseTrail from './components/MouseTrail'
 
+if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual'
+}
+
 function ScrollToTop() {
   const { pathname } = useLocation()
+  
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
+    window.scrollTo(0, 0)
   }, [pathname])
+  
   return null
 }
 
@@ -25,7 +30,6 @@ function Home() {
   return (
     <>
       <Hero />
-      <About />
       <Services />
       <Faq />
       <Cta />
@@ -39,7 +43,6 @@ function App() {
     <>
       <MouseTrail />
       <ScrollToTop />
-      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<Aboutpage />} />
@@ -47,6 +50,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/rfq" element={<RfqPage />} />
       </Routes>
+      <Navbar />
     </>
   )
 }

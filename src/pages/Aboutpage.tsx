@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Cta from '../components/Cta'
 import Footer from '../components/Footer'
+import Services from '../components/Services'
 
 const VIDEO_SRC =
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_080021_d598092b-c4c2-4e53-8e46-94cf9064cd50.mp4'
@@ -372,6 +373,9 @@ export default function Aboutpage() {
           <Values3DCarousel />
         </div>
       </section>
+      
+      {/* ── Services (What We Do) ── */}
+      <Services />
 
       {/* ══════════════════════════════════════════════
           4. LEADERSHIP
