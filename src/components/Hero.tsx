@@ -44,7 +44,7 @@ export default function Hero() {
     transportation: useRef<HTMLVideoElement>(null),
   }
 
-  const stRef = useRef<gsap.plugins.ScrollTriggerInstance | null>(null);
+  const stRef = useRef<ScrollTrigger | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
   // Entrance Animation Sequence
@@ -217,7 +217,7 @@ export default function Hero() {
         }
       });
       tlRef.current = tl;
-      stRef.current = tl.scrollTrigger;
+      stRef.current = tl.scrollTrigger || null;
 
       gsap.set([navLeft, navRight], { transformOrigin: "center" });
 

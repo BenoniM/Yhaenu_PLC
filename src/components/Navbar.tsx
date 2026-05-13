@@ -121,10 +121,6 @@ export default function Navbar() {
   useEffect(() => {
     setOpen(false)
     
-    // Safety reset for GSAP-modified elements on EVERY route change
-    const navLeft = document.querySelector('.nav-left')
-    const navRight = document.querySelector('.nav-right')
-    const navContainer = document.querySelector('.navbar-container')
     
     if (location.pathname !== '/') {
       setIsHeroFinished(true)
@@ -157,9 +153,6 @@ export default function Navbar() {
     setVisible(true)
   }, [location.pathname])
 
-  const handleNav = (href: string) => {
-    navigate(href)
-  }
 
   return (
     <>

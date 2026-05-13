@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import ftrVideo from '../assets/ftr-video/14610569_2160_3840_24fps.mp4'
 import logoText from '../assets/logo/Logo-Text.svg'
