@@ -219,39 +219,39 @@ export default function Services() {
       </div>
 
       {/* ── RIGHT: Info Panel ── */}
-      <div className="flex-1 bg-white h-full flex flex-col justify-end pb-24 px-12 pl-36 relative z-10">
+      <div className="flex-1 bg-white h-full flex flex-col items-center justify-center px-12 relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeIdx % baseServices.length}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -30 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-sm"
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ duration: 0.6, ease: "circOut" }}
+            className="w-full flex flex-col items-center text-center relative left-8"
           >
-            <div className="mb-4">
-              <span className="text-[#ECBD27] font-mono text-[9px] font-bold tracking-[0.4em] uppercase">
+            <div className="mb-6">
+              <span className="px-6 py-2 border border-[#ECBD27]/30 rounded-full text-[#ECBD27] font-mono text-[10px] font-bold tracking-[0.4em] uppercase bg-[#ECBD27]/5 backdrop-blur-sm">
                 {services[activeIdx % services.length].badge}
               </span>
             </div>
 
-            <h2 className="text-4xl font-black text-[#0E5F13] leading-[1.1] mb-5 uppercase tracking-tight">
+            <h2 className="text-4xl font-black text-[#0E5F13] leading-[1] mb-6 uppercase tracking-tighter max-w-[300px]">
               {services[activeIdx % services.length].title}
             </h2>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-10">
+            <p className="text-gray-500 text-sm md:text-base leading-relaxed mb-10 max-w-[280px] font-medium">
               {services[activeIdx % services.length].desc}
             </p>
 
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#0E5F13] text-white font-bold uppercase tracking-widest text-[9px]
-                         hover:bg-[#ECBD27] hover:text-[#0E5F13] transition-all duration-300"
-              style={{ clipPath: 'polygon(0 0, 92% 0, 100% 100%, 0% 100%)' }}
+              className="group relative inline-flex items-center gap-4 px-12 py-5 bg-[#0E5F13] text-white font-bold uppercase tracking-[0.2em] text-[9px]
+                         hover:bg-[#ECBD27] hover:text-[#0E5F13] transition-all duration-500 shadow-lg shadow-[#0E5F13]/10"
+              style={{ clipPath: 'polygon(12% 0, 100% 0, 88% 100%, 0% 100%)' }}
             >
               Explore Solutions
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <svg className="w-3.5 h-3.5 transform group-hover:translate-x-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </a>
           </motion.div>

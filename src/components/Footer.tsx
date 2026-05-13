@@ -1,4 +1,7 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
+import ftrVideo from '../assets/ftr-video/14610569_2160_3840_24fps.mp4'
+import logoText from '../assets/logo/Logo-Text.svg'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -7,206 +10,176 @@ export default function Footer() {
     {
       title: 'Company',
       links: [
-        { label: 'About Us', href: '#about' },
-        { label: 'Services', href: '#products' },
-        { label: 'Testimonials', href: '#testimonials' },
-        { label: 'Contact', href: '#contact' },
+        { label: 'Home', href: '/' },
+        { label: 'About Us', href: '/about' },
+        { label: 'Products', href: '/products' },
+        { label: 'Contact Us', href: '/contact' },
       ],
     },
     {
-      title: 'Services',
+      title: 'Our Expertise',
       links: [
-        { label: 'Import & Export', href: '#products' },
-        { label: 'Manufacturing', href: '#products' },
-        { label: 'Transportation', href: '#products' },
-        { label: 'Hospitality', href: '#products' },
-      ],
-    },
-    {
-      title: 'Legal',
-      links: [
-        { label: 'Privacy Policy', href: '#' },
-        { label: 'Terms of Service', href: '#' },
-        { label: 'Cookie Policy', href: '#' },
+        { label: 'Import & Export', href: '/products' },
+        { label: 'Manufacturing', href: '/products' },
+        { label: 'Transportation', href: '/products' },
+        { label: 'Hospitality', href: '/products' },
       ],
     },
   ]
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  }
+  const socialLinks = [
+    { label: 'Instagram', href: 'https://instagram.com' },
+    { label: 'LinkedIn', href: 'https://linkedin.com' },
+    { label: 'Facebook', href: 'https://facebook.com' },
+    { label: 'Twitter', href: 'https://twitter.com' },
+  ]
 
   return (
-    <footer
-      className="relative overflow-hidden"
-      style={{ background: '#0E5F13' }}
-    >
-      {/* Decorative blobs */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute"
-          style={{
-            top: '-20%',
-            right: '-10%',
-            width: '50%',
-            height: '50%',
-            background: 'radial-gradient(ellipse, rgba(236,189,39,0.05) 0%, transparent 65%)',
-            borderRadius: '50%',
-          }}
+    <footer className="relative min-h-[75vh] flex flex-col justify-between overflow-hidden text-[#F3F6FA] pt-24 pb-8 px-8 md:px-20" style={{ background: '#0E5F13' }}>
+      {/* Background Video Layer */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-50 grayscale-[0.2] brightness-[0.7]"
+        >
+          <source src={ftrVideo} type="video/mp4" />
+        </video>
+        {/* Soft greenish tint overlay */}
+        <div 
+          className="absolute inset-0 bg-[#0E5F13]/50 backdrop-blur-[0.5px]" 
         />
-        <div
-          className="absolute"
-          style={{
-            bottom: '-15%',
-            left: '-5%',
-            width: '40%',
-            height: '40%',
-            background: 'radial-gradient(ellipse, rgba(236,189,39,0.04) 0%, transparent 65%)',
-            borderRadius: '50%',
-          }}
-        />
+        {/* Subtle Grain Overlay */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
 
-      <div className="relative z-10 w-full px-6 py-16">
-        {/* Main footer content */}
-        <motion.div
-          className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          {/* Brand section */}
-          <motion.div variants={itemVariants}>
-            <img
-              src="/logo.png"
-              alt="YHAENU PLC"
-              style={{ height: 48, width: 'auto', objectFit: 'contain', marginBottom: '1rem' }}
-            />
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: 'rgba(243,246,250,0.6)' }}
-            >
-              A family-owned company with over 20 years of experience in Import, Export, Manufacturing, Transportation, and Hospitality.
-            </p>
-          </motion.div>
-
-          {/* Links sections */}
-          {footerLinks.map((section, idx) => (
-            <motion.div key={idx} variants={itemVariants}>
-              <h4
-                className="font-black text-sm uppercase mb-4 tracking-wide"
-                style={{
-                  fontFamily: "'Arial Black', sans-serif",
-                  color: '#ECBD27',
-                }}
-              >
-                {section.title}
-              </h4>
-              <ul className="space-y-2">
-                {section.links.map((link, linkIdx) => (
-                  <li key={linkIdx}>
-                    <a
-                      href={link.href}
-                      className="text-sm transition-colors hover:text-[#ECBD27]"
-                      style={{ color: 'rgba(243,246,250,0.6)' }}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Divider */}
-        <div
-          className="h-[1px] mb-8"
-          style={{ background: 'rgba(236,189,39,0.2)' }}
-        />
-
-        {/* Bottom section */}
-        <motion.div
-          className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          {/* Copyright */}
-          <p
-            className="text-sm text-center md:text-left mb-4 md:mb-0"
-            style={{ color: 'rgba(243,246,250,0.5)' }}
-          >
-            © {currentYear} YHAENU PLC. All rights reserved.
-          </p>
-
-          {/* Social links */}
-          <div className="flex items-center gap-6">
-            {[
-              { icon: 'facebook', href: '#' },
-              { icon: 'twitter', href: '#' },
-              { icon: 'linkedin', href: '#' },
-              { icon: 'instagram', href: '#' },
-            ].map((social, idx) => (
-              <motion.a
-                key={idx}
-                href={social.href}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                style={{
-                  background: 'rgba(236,189,39,0.1)',
-                  border: '1px solid rgba(236,189,39,0.2)',
-                }}
-                whileHover={{
-                  background: '#ECBD27',
-                  borderColor: '#ECBD27',
-                }}
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  style={{ color: '#ECBD27' }}
-                >
-                  {social.icon === 'facebook' && (
-                    <path d="M18 2h-3a6 6 0 0 0-6 6v3H7v4h3v8h4v-8h3l1-4h-4V8a1 1 0 0 1 1-1h3z" />
-                  )}
-                  {social.icon === 'twitter' && (
-                    <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7" />
-                  )}
-                  {social.icon === 'linkedin' && (
-                    <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
-                  )}
-                  {social.icon === 'instagram' && (
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  )}
-                </svg>
-              </motion.a>
-            ))}
+      {/* Top Section: 5-Column Grid */}
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 gap-x-12 items-start">
+          
+          {/* 1. Newsletter - 4 cols */}
+          <div className="md:col-span-4 space-y-8">
+            <h2 className="text-4xl md:text-5xl font-serif font-light leading-[1.1] tracking-tight">
+              Join our <br />
+              <span className="italic">newsletter</span>
+            </h2>
+            <div className="relative group max-w-sm">
+              <input 
+                type="email" 
+                placeholder="Email address" 
+                className="w-full bg-transparent border-b border-white/20 py-3 pr-12 focus:outline-none focus:border-[#ECBD27] transition-all duration-500 placeholder:text-white/30 text-lg"
+              />
+              <button className="absolute right-0 bottom-3 text-2xl transition-transform group-hover:translate-x-2 group-hover:-translate-y-2 duration-500">
+                ↗
+              </button>
+            </div>
           </div>
-        </motion.div>
+
+          {/* 2. Contact - 2 cols */}
+          <div className="md:col-span-2 space-y-6 md:pt-4">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Contact</p>
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <a href="mailto:info@yhaenu.com" className="block text-sm font-medium hover:text-[#ECBD27] transition-colors duration-300">info@yhaenu.com</a>
+                <a href="tel:+251111111111" className="block text-sm font-medium hover:text-[#ECBD27] transition-colors duration-300">+251 11 111 1111</a>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[11px] text-white/60 leading-relaxed font-light">
+                  YHAENU PLC Building<br />
+                  Bole Road, Addis Ababa
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Navigation - 2 cols */}
+          <div className="md:col-span-2 space-y-6 md:pt-4">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Navigation</p>
+            <div className="flex flex-col gap-3">
+              {footerLinks[0].links.map((link, idx) => (
+                <Link 
+                  key={idx} 
+                  to={link.href} 
+                  className="text-sm font-light hover:text-[#ECBD27] transition-all duration-300"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. Expertise - 2 cols */}
+          <div className="md:col-span-2 space-y-6 md:pt-4">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Expertise</p>
+            <div className="flex flex-col gap-3">
+              {footerLinks[1].links.map((link, idx) => (
+                <Link 
+                  key={idx} 
+                  to={link.href} 
+                  className="text-sm font-light hover:text-[#ECBD27] transition-all duration-300"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* 5. Follow Us - 2 cols */}
+          <div className="md:col-span-2 space-y-6 md:pt-4">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Follow Us</p>
+            <div className="flex flex-col gap-3">
+              {socialLinks.map((social, idx) => (
+                <a 
+                  key={idx} 
+                  href={social.href} 
+                  className="text-sm font-light hover:text-[#ECBD27] transition-colors duration-300"
+                >
+                  {social.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section: Massive Brand Reveal */}
+      <div className="relative z-10 w-full mt-24 flex flex-col md:flex-row items-end justify-between border-t border-white/5 pt-8 pb-4">
+        <div className="w-full md:w-[80%] lg:w-[75%]">
+          <img 
+            src={logoText} 
+            alt="YHAENU" 
+            className="w-full h-auto opacity-95 transition-opacity hover:opacity-100"
+            style={{ 
+              filter: 'brightness(0) saturate(100%) invert(86%) sepia(43%) saturate(1478%) hue-rotate(345deg) brightness(100%) contrast(92%)'
+            }}
+          />
+        </div>
+        
+        {/* Interactive Logo Badge (No rotating text) */}
+        <div className="mb-4 md:mb-0 group cursor-pointer">
+          <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full border border-white/10 flex items-center justify-center bg-white/[0.03] backdrop-blur-xl transition-all duration-1000 group-hover:border-[#ECBD27]/40 group-hover:scale-105">
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-14 h-14 md:w-18 md:h-18 object-contain relative z-10 mix-blend-screen transition-transform duration-[2s] group-hover:rotate-[360deg]" 
+            />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#ECBD27]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+          </div>
+        </div>
+      </div>
+
+      {/* Legal Bar */}
+      <div className="relative z-10 w-full border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-widest text-white/40">
+        <p>© {currentYear} YHAENU PLC. ALL RIGHTS RESERVED.</p>
+        <div className="flex gap-6">
+          <Link to="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+          <Link to="#" className="hover:text-white transition-colors">Terms of Service</Link>
+        </div>
       </div>
     </footer>
   )
 }
 
+/*  */

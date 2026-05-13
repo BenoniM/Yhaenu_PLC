@@ -11,6 +11,8 @@ import ProductsPage from './pages/ProductsPage'
 import ContactPage from './pages/ContactPage'
 import RfqPage from './pages/RfqPage'
 import MouseTrail from './components/MouseTrail'
+import About from './components/About'
+
 
 if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual'
@@ -31,6 +33,7 @@ function Home() {
     <>
       <Hero />
       <Services />
+      <About />
       <Faq />
       <Cta />
       <Footer />
