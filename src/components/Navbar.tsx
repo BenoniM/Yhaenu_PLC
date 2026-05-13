@@ -176,12 +176,14 @@ export default function Navbar() {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       >
         <div
-          className="navbar-container relative flex items-center px-8 py-3 mx-auto w-full transition-all duration-500"
+          className="navbar-container relative flex items-center px-8 py-3 mx-auto w-full transition-all duration-700 ease-in-out"
           style={{
             background: isPastHero ? '#0E5F13' : 'transparent',
-            maxWidth: 1600,
+            maxWidth: (location.pathname === '/' && isPastHero) ? 720 : 1600,
             backdropFilter: isPastHero ? 'blur(8px)' : 'none',
-            clipPath: 'polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%)',
+            clipPath: (location.pathname === '/' && isPastHero)
+              ? 'polygon(40px 0, 100% 0, calc(100% - 40px) 100%, 0 100%)' 
+              : 'polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%)',
           }}
         >
           {/* Brand — far left */}
