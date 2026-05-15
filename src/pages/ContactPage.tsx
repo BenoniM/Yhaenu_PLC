@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import Hls from 'hls.js'
 import Footer from '../components/Footer'
+
+const HLS_SRC = 'https://stream.mux.com/kF01v9aKFlY63i2GkQKQGDv5Y9PbMGdtQD92j5qJCYWU.m3u8'
+const LOOP_END_OFFSET = 4 // seconds before end to restart loop
 
 function NovaOrb({ size = 500, x = '50%', y = '50%', color1 = '#ECBD27', color2 = '#0E5F13', opacity = 0.15, duration = 9, delay = 0 }: {
   size?: number; x?: string; y?: string; color1?: string; color2?: string; opacity?: number; duration?: number; delay?: number
@@ -34,6 +38,48 @@ const socialLinks = [
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', inquiry: 'General', message: '' })
   const [submitted, setSubmitted] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const hlsRef = useRef<Hls | null>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const setupHls = () => {
+      if (Hls.isSupported()) {
+        const hls = new Hls({
+          lowLatencyMode: false,
+          maxBufferLength: 120,
+          maxMaxBufferLength: 240,
+          backBufferLength: 0,
+        })
+        hlsRef.current = hls
+        hls.loadSource(HLS_SRC)
+        hls.attachMedia(video)
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          video.play().catch(() => { })
+        })
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = HLS_SRC
+        video.play().catch(() => { })
+      }
+    }
+
+    const handleTimeUpdate = () => {
+      if (video.duration && video.currentTime >= video.duration - LOOP_END_OFFSET) {
+        video.currentTime = 0
+        video.play().catch(() => { })
+      }
+    }
+
+    video.addEventListener('timeupdate', handleTimeUpdate)
+    setupHls()
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate)
+      hlsRef.current?.destroy()
+    }
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -59,10 +105,22 @@ export default function ContactPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden" style={{ minHeight: '40vh', background: '#0E5F13' }}>
+      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '50vh', background: '#0E5F13' }}>
+        {/* Background video */}
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          loop
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: 0.6 }}
+        />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(14,95,19,0.8) 0%, rgba(14,95,19,0.4) 50%, rgba(14,95,19,0.1) 100%)' }} />
+        
         <NovaOrb size={600} x="80%" y="50%" color1="#ECBD27" color2="#0E5F13" opacity={0.15} duration={10} />
         <NovaOrb size={350} x="10%" y="60%" color1="#ECBD27" color2="#0a3d0a" opacity={0.1} duration={7} delay={2} />
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-36 pb-16">
+        
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-36 pb-16 w-full">
           <motion.p className="text-xs tracking-[0.4em] uppercase mb-3" style={{ color: '#ECBD27', fontFamily: 'monospace' }}
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             Get In Touch

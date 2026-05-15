@@ -14,9 +14,11 @@ function NovaOrb({ size = 500, x = '50%', y = '50%', color1 = '#ECBD27', color2 
 }) {
   return (
     <motion.div className="absolute pointer-events-none"
-      style={{ width: size, height: size, left: x, top: y, transform: 'translate(-50%,-50%)', borderRadius: '50%',
+      style={{
+        width: size, height: size, left: x, top: y, transform: 'translate(-50%,-50%)', borderRadius: '50%',
         background: `radial-gradient(circle at 40% 40%, ${color1}, ${color2} 50%, transparent 70%)`,
-        filter: 'blur(60px)', opacity, zIndex: 0 }}
+        filter: 'blur(60px)', opacity, zIndex: 0
+      }}
       animate={{ scale: [1, 1.15, 0.95, 1.1, 1], x: [0, 30, -20, 15, 0], y: [0, -20, 25, -10, 0] }}
       transition={{ duration, ease: 'easeInOut', repeat: Infinity, delay }}
     />
@@ -236,11 +238,11 @@ export default function ProductsPage() {
         hls.loadSource(HLS_SRC)
         hls.attachMedia(video)
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          video.play().catch(() => {})
+          video.play().catch(() => { })
         })
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = HLS_SRC
-        video.play().catch(() => {})
+        video.play().catch(() => { })
       }
     }
 
@@ -248,7 +250,7 @@ export default function ProductsPage() {
       // If we're within LOOP_END_OFFSET of the end, jump back to start
       if (video.duration && video.currentTime >= video.duration - LOOP_END_OFFSET) {
         video.currentTime = 0
-        video.play().catch(() => {})
+        video.play().catch(() => { })
       }
     }
 
@@ -264,7 +266,7 @@ export default function ProductsPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <div className="relative overflow-hidden" style={{ minHeight: '100svh', background: '#0E5F13' }}>
+      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '50vh', background: '#0E5F13' }}>
         {/* Background video */}
         <video
           ref={videoRef}
@@ -272,100 +274,45 @@ export default function ProductsPage() {
           playsInline
           loop
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: 1 }}
+          style={{ opacity: 0.4 }}
         />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0E5F13 0%, rgba(14,95,19,0.5) 50%, rgba(14,95,19,0.2) 100%)' }} />
 
-        <section
-          className="relative z-10 flex flex-col"
-          style={{ minHeight: '100svh', overflow: 'visible' }}
-        >
-          {/* Blurred overlay shape */}
-          <div
-            className="absolute pointer-events-none"
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-40 pb-16">
+          <motion.p className="text-xs tracking-[0.4em] uppercase mb-3" style={{ color: '#ECBD27', fontFamily: 'monospace' }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            Our Collection
+          </motion.p>
+          <motion.h1 className="font-black uppercase leading-none mb-4"
+            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(3rem, 8vw, 6rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
+            initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
+            Products & <span style={{ color: '#ECBD27' }}>Services</span>
+          </motion.h1>
+          <motion.p className="text-lg max-w-2xl" style={{ color: 'rgba(243,246,250,0.75)' }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
+            From premium Ethiopian exports to world-class imports — we bridge Ethiopia's potential to the global market.
+          </motion.p>
+          <motion.a
+            href="/rfq"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            whileHover={{ scale: 1.04, background: '#ECBD27', color: '#0E5F13' }}
+            whileTap={{ scale: 0.97 }}
+            className="inline-flex items-center rounded-full font-semibold text-sm transition-all"
             style={{
-              width: 984,
-              height: 527,
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: 'rgba(14,95,19,0.85)',
-              filter: 'blur(82px)',
-              opacity: 0.9,
-              zIndex: 0,
+              marginTop: 24,
+              padding: '14px 28px',
+              background: 'rgba(236,189,39,0.15)',
+              border: '1px solid #ECBD27',
+              color: '#ECBD27',
+              backdropFilter: 'blur(8px)',
             }}
-          />
-
-          <div className="relative z-10 flex-1 flex items-center justify-center px-6">
-            <div className="text-center">
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="text-xs tracking-[0.4em] uppercase mb-4"
-                style={{ color: '#ECBD27', fontFamily: 'monospace' }}
-              >
-                Our Collection
-              </motion.p>
-              
-              <motion.h1
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                style={{
-                  fontFamily: "'General Sans', sans-serif",
-                  fontSize: 'clamp(4rem, 10vw, 8rem)',
-                  fontWeight: 400,
-                  lineHeight: 1.02,
-                  letterSpacing: '-0.024em',
-                  color: '#F3F6FA',
-                }}
-              >
-                Products &{' '}
-                <span
-                  style={{
-                    backgroundImage: 'linear-gradient(to left, #ECBD27, #F3F6FA, #ECBD27)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  Services
-                </span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className="text-lg leading-8 max-w-2xl mx-auto"
-                style={{ color: '#F3F6FA', marginTop: 15, opacity: 0.8 }}
-              >
-                From premium Ethiopian exports to world-class imports — we bridge Ethiopia's potential to the global market.
-              </motion.p>
-
-              <motion.a
-                href="/rfq"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.35 }}
-                whileHover={{ scale: 1.04, background: '#ECBD27', color: '#0E5F13' }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center rounded-full font-semibold text-sm transition-all"
-                style={{
-                  marginTop: 35,
-                  padding: '16px 32px',
-                  background: 'rgba(236,189,39,0.15)',
-                  border: '1px solid #ECBD27',
-                  color: '#ECBD27',
-                  backdropFilter: 'blur(8px)',
-                }}
-              >
-                Request a Quote →
-              </motion.a>
-            </div>
-          </div>
-        </section>
-      </div>
+          >
+            Request a Quote →
+          </motion.a>
+        </div>
+      </section>
 
       {/* ── Product Grid ── */}
       <section className="relative overflow-hidden py-24" style={{ background: '#fff' }}>

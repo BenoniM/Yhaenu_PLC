@@ -106,7 +106,10 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [location.pathname])
 
-  const [isHeroFinished, setIsHeroFinished] = useState(location.pathname !== '/')
+  const isHomePage = location.pathname === '/'
+  const shouldHaveBg = isPastHero || !isHomePage
+
+  const [isHeroFinished, setIsHeroFinished] = useState(!isHomePage)
 
   useEffect(() => {
     if (location.pathname !== '/') {
@@ -120,8 +123,8 @@ export default function Navbar() {
 
   useEffect(() => {
     setOpen(false)
-    
-    
+
+
     if (location.pathname !== '/') {
       setIsHeroFinished(true)
       // Safety reset for GSAP-modified elements
@@ -134,19 +137,19 @@ export default function Navbar() {
     } else {
       // If going back to home, reset hero finished state so it can animate again
       setIsHeroFinished(false)
-      
+
       // Explicitly reset navbar elements to their default home-page states
       const navLeft = document.querySelector('.nav-left')
       const navRight = document.querySelector('.nav-right')
       if (navLeft) gsap.set(navLeft, { clearProps: "x,y,opacity,transform,position,left,right,top,bottom,yPercent" })
       if (navRight) gsap.set(navRight, { clearProps: "x,y,opacity,transform,position,left,right,top,bottom,yPercent" })
-      
+
       // Ensure container starts at full width
       gsap.set('.navbar-container', { maxWidth: 1600, clearProps: "clipPath" })
-      
+
       // Reset links
       gsap.set('.nav-link-0, .nav-link-1, .nav-link-2, .nav-link-3', { clearProps: "x,y,opacity,transform" })
-      
+
       // Ensure the Y logo is hidden initially
       gsap.set('.navbar-y-logo', { opacity: 0 })
     }
@@ -171,11 +174,11 @@ export default function Navbar() {
         <div
           className="navbar-container relative flex items-center px-8 py-3 mx-auto w-full transition-all duration-700 ease-in-out"
           style={{
-            background: isPastHero ? '#0E5F13' : 'transparent',
-            maxWidth: (location.pathname === '/' && isPastHero) ? 720 : 1600,
-            backdropFilter: isPastHero ? 'blur(8px)' : 'none',
-            clipPath: (location.pathname === '/' && isPastHero)
-              ? 'polygon(40px 0, 100% 0, calc(100% - 40px) 100%, 0 100%)' 
+            background: shouldHaveBg ? '#0E5F13' : 'transparent',
+            maxWidth: (isHomePage && isPastHero) ? 720 : 1600,
+            backdropFilter: shouldHaveBg ? 'blur(8px)' : 'none',
+            clipPath: (isHomePage && isPastHero)
+              ? 'polygon(40px 0, 100% 0, calc(100% - 40px) 100%, 0 100%)'
               : 'polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%)',
           }}
         >
@@ -273,9 +276,9 @@ export default function Navbar() {
         className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 transition-colors duration-500"
         style={{
           height: 60,
-          background: isPastHero ? '#0E5F13' : 'transparent',
-          backdropFilter: isPastHero ? 'blur(8px)' : 'none',
-          borderBottom: isPastHero ? '1px solid rgba(236,189,39,0.1)' : 'none'
+          background: shouldHaveBg ? '#0E5F13' : 'transparent',
+          backdropFilter: shouldHaveBg ? 'blur(8px)' : 'none',
+          borderBottom: shouldHaveBg ? '1px solid rgba(236,189,39,0.1)' : 'none'
         }}
         initial={{ y: -80, opacity: 0 }}
         animate={{

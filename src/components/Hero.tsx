@@ -229,7 +229,7 @@ export default function Hero() {
         .set(navLeft, { position: 'absolute', left: '2rem', top: '50%', yPercent: -50, immediateRender: false }, 0.1)
         .set(navRight, { position: 'absolute', right: '2rem', top: '50%', yPercent: -50, immediateRender: false }, 0.1)
         .to([navLeft, navRight], { y: -150, opacity: 0, duration: 0.3, ease: 'power2.inOut', immediateRender: false }, 0.1)
-        .to(yLogoRef.current, { x: currentX + xDiff + 12.25, y: currentY + yDiff - 6.35, scale: targetScale, duration: 0.8, ease: 'power2.inOut' }, 0.2)
+        .to(yLogoRef.current, { x: currentX + xDiff, y: currentY + yDiff - 6.35, scale: targetScale, duration: 0.8, ease: 'power2.inOut' }, 0.2)
         .to('.nav-link-0, .nav-link-1', { x: -60, duration: 0.5, ease: 'power2.inOut' }, 0.3)
         .to('.nav-link-2, .nav-link-3', { x: 60, duration: 0.5, ease: 'power2.inOut' }, 0.3)
         .to(yLogoRef.current, { opacity: 0, duration: 0.1, immediateRender: false }, 0.9)

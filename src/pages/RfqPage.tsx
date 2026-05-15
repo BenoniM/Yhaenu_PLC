@@ -7,9 +7,11 @@ function NovaOrb({ size = 500, x = '50%', y = '50%', color1 = '#ECBD27', color2 
 }) {
   return (
     <motion.div className="absolute pointer-events-none"
-      style={{ width: size, height: size, left: x, top: y, transform: 'translate(-50%,-50%)', borderRadius: '50%',
+      style={{
+        width: size, height: size, left: x, top: y, transform: 'translate(-50%,-50%)', borderRadius: '50%',
         background: `radial-gradient(circle at 40% 40%, ${color1}, ${color2} 50%, transparent 70%)`,
-        filter: 'blur(60px)', opacity, zIndex: 0 }}
+        filter: 'blur(60px)', opacity, zIndex: 0
+      }}
       animate={{ scale: [1, 1.15, 0.95, 1.1, 1], x: [0, 30, -20, 15, 0], y: [0, -20, 25, -10, 0] }}
       transition={{ duration, ease: 'easeInOut', repeat: Infinity, delay }}
     />
@@ -67,10 +69,13 @@ export default function RfqPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden" style={{ minHeight: '40vh', background: '#0E5F13' }}>
+      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '50vh', background: '#0E5F13' }}>
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0E5F13 0%, rgba(14,95,19,0.5) 50%, rgba(14,95,19,0.2) 100%)' }} />
+
         <NovaOrb size={700} x="85%" y="40%" color1="#ECBD27" color2="#0E5F13" opacity={0.15} duration={10} />
         <NovaOrb size={400} x="5%" y="70%" color1="#ECBD27" color2="#0a3d0a" opacity={0.1} duration={7} delay={2} />
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-36 pb-16">
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-36 pb-16 w-full">
           <motion.p className="text-xs tracking-[0.4em] uppercase mb-3" style={{ color: '#ECBD27', fontFamily: 'monospace' }}
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             Business Inquiry
