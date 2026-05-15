@@ -172,14 +172,17 @@ export default function Hero() {
   useGSAP(() => {
     if (isEntering) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       // Also ensure we are at the top
       window.scrollTo(0, 0);
     } else {
       document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = '';
     }
 
     return () => {
       document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = '';
     };
   }, [isEntering]);
 
