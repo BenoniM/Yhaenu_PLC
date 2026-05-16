@@ -1,5 +1,5 @@
-import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import React, { useRef } from 'react'
+import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import Cta from '../components/Cta'
 import Footer from '../components/Footer'
 import Services from '../components/Services'
@@ -263,6 +263,10 @@ export default function Aboutpage() {
   const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroY = useTransform(heroScroll, [0, 1], ['0%', '25%'])
   const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0])
+  const strategyRef = useRef(null)
+  const strategyVisible = useInView(strategyRef, { once: true, margin: '200px' })
+  const footprintRef = useRef(null)
+  const footprintVisible = useInView(footprintRef, { once: true, margin: '200px' })
 
   return (
     <>
@@ -272,7 +276,7 @@ export default function Aboutpage() {
       <div ref={heroRef} className="relative overflow-hidden" style={{ minHeight: '70vh', background: '#0E5F13' }}>
         <motion.video
           src={VIDEO_SRC}
-          autoPlay muted loop playsInline
+          autoPlay muted loop playsInline preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: 0.3, y: heroY }}
         />
@@ -329,7 +333,7 @@ export default function Aboutpage() {
 
           <motion.div className="rounded-2xl overflow-hidden shadow-2xl" style={{ aspectRatio: '16/9' }}
             initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-            <video src={VIDEO_SRC} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+            {strategyVisible && <video src={VIDEO_SRC} autoPlay muted loop playsInline className="w-full h-full object-cover" />}
           </motion.div>
         </div>
       </section>
@@ -477,7 +481,7 @@ export default function Aboutpage() {
 
           <motion.div className="rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: '4/3' }}
             initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-            <video src={VIDEO_SRC} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+            {footprintVisible && <video src={VIDEO_SRC} autoPlay muted loop playsInline className="w-full h-full object-cover" />}
           </motion.div>
         </div>
       </section>

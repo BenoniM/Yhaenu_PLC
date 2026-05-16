@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -186,6 +186,26 @@ export default function Hero() {
     };
   }, [isEntering]);
 
+  // Priority Preloading for Hero Videos
+  useEffect(() => {
+    const videosToPreload = [importVideo, manufacturingVideo, transportationVideo];
+    const links: HTMLLinkElement[] = [];
+
+    videosToPreload.forEach(src => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'video';
+      link.href = src;
+      link.type = 'video/mp4';
+      document.head.appendChild(link);
+      links.push(link);
+    });
+
+    return () => {
+      links.forEach(link => document.head.removeChild(link));
+    };
+  }, []);
+
   // Scroll-Driven Animation Sequence
   useGSAP(() => {
     if (isEntering) return;
@@ -286,7 +306,7 @@ export default function Hero() {
           key={`bg-${cat}`}
           ref={bgRefs[cat]}
           src={cat === 'import' ? importVideo : cat === 'manufacturing' ? manufacturingVideo : transportationVideo}
-          autoPlay loop muted playsInline
+          autoPlay loop muted playsInline preload="auto"
           className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-0"
           style={{ zIndex: 1, transform: 'translate3d(0,0,0)', filter: 'brightness(0.7)' }}
         />
@@ -337,7 +357,7 @@ export default function Hero() {
                 <video
                   ref={logoRefs[item.id as keyof typeof logoRefs]}
                   src={item.id === 'import' ? importVideo : item.id === 'manufacturing' ? manufacturingVideo : transportationVideo}
-                  autoPlay loop muted playsInline
+                  autoPlay loop muted playsInline preload="auto"
                   className="absolute top-1/2 left-1/2 w-screen h-screen object-cover"
                   style={{
                     maxWidth: 'none',

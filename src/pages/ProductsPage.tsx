@@ -273,6 +273,7 @@ export default function ProductsPage() {
           muted
           playsInline
           loop
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: 0.4 }}
         />

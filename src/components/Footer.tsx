@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom'
+import { useRef } from 'react'
+import { useInView } from 'framer-motion'
 import ftrVideo from '../assets/ftr-video/14610569_2160_3840_24fps.mp4'
 import logoText from '../assets/logo/Logo-Text.svg'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const footerRef = useRef(null)
+  const isVisible = useInView(footerRef, { once: true, margin: '200px' })
 
   const footerLinks = [
     {
@@ -34,18 +38,24 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="relative min-h-[75vh] flex flex-col justify-between overflow-hidden text-[#F3F6FA] pt-24 pb-8 px-8 md:px-20" style={{ background: '#0E5F13' }}>
+    <footer 
+      ref={footerRef}
+      className="relative min-h-[75vh] flex flex-col justify-between overflow-hidden text-[#F3F6FA] pt-24 pb-8 px-8 md:px-20" 
+      style={{ background: '#0E5F13' }}
+    >
       {/* Background Video Layer */}
       <div className="absolute inset-0 z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover opacity-50 grayscale-[0.2] brightness-[0.7]"
-        >
-          <source src={ftrVideo} type="video/mp4" />
-        </video>
+        {isVisible && (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover opacity-50 grayscale-[0.2] brightness-[0.7]"
+          >
+            <source src={ftrVideo} type="video/mp4" />
+          </video>
+        )}
         {/* Soft greenish tint overlay */}
         <div 
           className="absolute inset-0 bg-[#0E5F13]/50 backdrop-blur-[0.5px]" 
@@ -180,5 +190,3 @@ export default function Footer() {
     </footer>
   )
 }
-
-/*  */
