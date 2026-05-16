@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Footer from '../components/Footer'
+import GridBackground from '../components/GridBackground'
 
 function NovaOrb({ size = 500, x = '50%', y = '50%', color1 = '#ECBD27', color2 = '#0E5F13', opacity = 0.15, duration = 9, delay = 0 }: {
   size?: number; x?: string; y?: string; color1?: string; color2?: string; opacity?: number; duration?: number; delay?: number
@@ -71,6 +72,7 @@ export default function RfqPage() {
       {/* ── Hero ── */}
       <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '50vh', background: '#0E5F13' }}>
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0E5F13 0%, rgba(14,95,19,0.5) 50%, rgba(14,95,19,0.2) 100%)' }} />
+        <GridBackground color="#ECBD27" gridSize={60} opacity={0.08} isVisible={true} />
 
         <NovaOrb size={700} x="85%" y="40%" color1="#ECBD27" color2="#0E5F13" opacity={0.15} duration={10} />
         <NovaOrb size={400} x="5%" y="70%" color1="#ECBD27" color2="#0a3d0a" opacity={0.1} duration={7} delay={2} />

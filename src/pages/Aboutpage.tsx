@@ -1,8 +1,9 @@
-import React, { useRef } from 'react'
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
+import React, { useRef, useState } from 'react'
+import { motion, useScroll, useTransform, useInView, useMotionTemplate, useMotionValueEvent } from 'framer-motion'
 import Cta from '../components/Cta'
 import Footer from '../components/Footer'
 import Services from '../components/Services'
+import GridBackground from '../components/GridBackground'
 
 const VIDEO_SRC =
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_080021_d598092b-c4c2-4e53-8e46-94cf9064cd50.mp4'
@@ -58,146 +59,159 @@ function NovaOrb({
   )
 }
 
-// ── 3D Carousel for Core Values ──────────────────────────────────────────────
-function Values3DCarousel() {
-  const totalItems = values.length
-  const spreadAngle = 360 / totalItems
-  const translateZ = 320
+// ── Animated Coordinate Tracker ──────────────────────────────────────────────
+function AnimatedCoordinate({ val, prefix }: { val: any; prefix: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  useMotionValueEvent(val, 'change', (latest: number) => {
+    if (ref.current) ref.current.textContent = `${prefix}: ${Math.round(latest)}`
+  })
+  return <span ref={ref}>{prefix}: 0</span>
+}
 
+// ── Stacked Core Values ──────────────────────────────────────────────────────
+const stackedValuesData = [
+  { img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop' },
+  { img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop' },
+  { img: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=800&auto=format&fit=crop' },
+  { img: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=800&auto=format&fit=crop' },
+  { img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop' },
+]
+
+function StackedValues() {
   return (
-    <div
-      style={{
-        width: '100%',
-        height: 340,
-        position: 'relative',
-        perspective: '1000px',
-        overflow: 'hidden',
-      }}
-    >
-      <style>{`
-        @keyframes carousel-rotation {
-          from { transform: rotateY(0deg); }
-          to   { transform: rotateY(360deg); }
-        }
-        .values-carousel {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          transform-style: preserve-3d;
-          transform-origin: center center;
-          animation: carousel-rotation 18s infinite linear;
-        }
-        .values-carousel:hover {
-          animation-play-state: paused;
-        }
-        .values-carousel figure {
-          position: absolute;
-          margin: 0;
-          top: 50%;
-          left: 50%;
-          transform-origin: center center;
-          backface-visibility: visible;
-          transition: transform 0.4s ease;
-        }
-      `}</style>
+    <div className="relative w-full pb-32">
+      {values.map((v, i) => (
+        <div 
+          key={i}
+          className="flex flex-col md:flex-row items-stretch border-t border-[rgba(14,95,19,0.1)] bg-[#F3F6FA] w-full"
+          style={{ 
+            position: 'sticky',
+            top: 80 + (i * 60), 
+            minHeight: '400px',
+            boxShadow: i > 0 ? '0 -10px 30px -15px rgba(0,0,0,0.1)' : 'none',
+            zIndex: 10 + i
+          }}
+        >
+          {/* Left: Number */}
+          <div className="w-full md:w-[15%] p-8 md:p-12 self-start flex-shrink-0">
+            <span className="text-[#0E5F13] font-black text-xl md:text-2xl" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+              0{i + 1} /
+            </span>
+          </div>
 
-      <div className="values-carousel">
-        {values.map((v, i) => {
-          const angle = i * spreadAngle
-          const transform = `translate(-50%, -50%) rotateY(${angle}deg) translateZ(${translateZ}px)`
-          return (
-            <figure
-              key={i}
-              style={{
-                width: 180,
-                height: 200,
-                transform,
-                borderRadius: 16,
-                background: 'rgba(10,61,10,0.85)',
-                border: '1px solid rgba(236,189,39,0.35)',
-                backdropFilter: 'blur(12px)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '1.5rem 1rem',
-                textAlign: 'center',
-                cursor: 'pointer',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-              }}
-            >
-              <span style={{ fontSize: '2.5rem', marginBottom: '0.75rem', display: 'block' }}>{v.icon}</span>
-              <p
-                style={{
-                  fontFamily: "'Arial Black', sans-serif",
-                  fontSize: '0.75rem',
-                  fontWeight: 900,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  color: '#ECBD27',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                {v.label}
-              </p>
-              <p style={{ fontSize: '0.72rem', color: 'rgba(243,246,250,0.65)', lineHeight: 1.5 }}>
-                {v.desc}
-              </p>
-            </figure>
-          )
-        })}
-      </div>
+          {/* Center: Image */}
+          <div className="w-full md:w-[40%] p-6 md:p-10 border-y md:border-y-0 md:border-x border-[rgba(14,95,19,0.1)] flex-shrink-0 flex flex-col justify-center">
+            <div className="w-full aspect-[4/3] md:aspect-square overflow-hidden bg-gray-200">
+              <img src={stackedValuesData[i].img} alt={v.label} className="w-full h-full object-cover" />
+            </div>
+          </div>
+
+          {/* Right: Description */}
+          <div className="w-full md:w-[45%] p-8 md:p-16 flex flex-col justify-center flex-grow">
+            <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#ECBD27] mb-4" style={{ fontFamily: 'monospace' }}>
+              {v.label}
+            </p>
+            <h3 className="text-3xl md:text-5xl font-black text-[#0E5F13] mb-6 leading-tight" style={{ fontFamily: "'Arial Black', sans-serif", letterSpacing: '-0.02em' }}>
+              {v.desc}
+            </h3>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
-function ConicCard({ icon, label, text, delay }: { icon: string; label: string; text: string; delay: number }) {
+// ── Mission & Vision Split Interaction ───────────────────────────────────────
+function MissionVisionSplit() {
+  const [hoveredSide, setHoveredSide] = useState<'mission' | 'vision' | null>(null)
+
   return (
-    <div className="relative rounded-[14px] p-[2px] overflow-hidden h-full">
-      {/* Rotating conic gradient border */}
-      <motion.div
-        className="absolute pointer-events-none"
-        style={{
-          width: '200%',
-          height: '200%',
-          top: '-50%',
-          left: '-50%',
-          background: 'conic-gradient(from 0deg, transparent 0deg, #ECBD27 60deg, transparent 120deg)',
-          zIndex: 0,
-        }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 4, ease: 'linear', repeat: Infinity, delay }}
-      />
-      {/* Inner card */}
-      <div
-        className="relative rounded-[12px] p-8 h-full"
-        style={{ background: '#0a3d0a', zIndex: 1 }}
+    <div className="relative w-full h-[60vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden border-y border-[rgba(236,189,39,0.2)]">
+      {/* Left: Mission */}
+      <div 
+        className="w-full md:w-1/2 relative h-full cursor-pointer overflow-hidden border-b md:border-b-0 md:border-r border-[rgba(236,189,39,0.2)] group/mission"
+        onMouseEnter={() => setHoveredSide('mission')}
+        onMouseLeave={() => setHoveredSide(null)}
       >
-        {/* Inner glow orb */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            width: 200,
-            height: 200,
-            top: '-20%',
-            right: '-10%',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(236,189,39,0.12) 0%, transparent 70%)',
-            filter: 'blur(30px)',
-          }}
+        <img 
+          src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=1200&auto=format&fit=crop" 
+          alt="Mission" 
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out"
+          style={{ transform: hoveredSide === 'mission' ? 'scale(1.05)' : 'scale(1)' }}
         />
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-5">
-            <span className="text-4xl">{icon}</span>
-            <h3
-              className="font-black uppercase text-base"
-              style={{ fontFamily: "'Arial Black', sans-serif", color: '#ECBD27' }}
-            >
-              {label}
-            </h3>
-          </div>
-          <p className="text-base leading-relaxed" style={{ color: 'rgba(243,246,250,0.85)' }}>
-            {text}
+        <div className={`absolute inset-0 transition-colors duration-500 ${hoveredSide === 'mission' ? 'bg-[#0E5F13]/40' : 'bg-[#0E5F13]/70'}`} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center w-full px-4">
+          <motion.h3 
+            className="text-5xl md:text-8xl font-black text-[#F3F6FA] uppercase tracking-widest"
+            style={{ fontFamily: "'Arial Black', sans-serif" }}
+            animate={{ 
+              y: hoveredSide === 'mission' ? -20 : 0, 
+              opacity: hoveredSide === 'mission' ? 0 : 0.6,
+              scale: hoveredSide === 'mission' ? 1.1 : 1
+            }}
+            transition={{ duration: 0.5 }}
+          >
+            Mission
+          </motion.h3>
+        </div>
+
+        {/* Hover Pop-up for Mission */}
+        <div 
+          className="absolute top-1/2 left-1/2 w-[85%] max-w-[450px] p-10 z-20 pointer-events-none transition-all duration-500 ease-out flex flex-col justify-center items-center text-center shadow-2xl bg-[#ECBD27]"
+          style={{ 
+            transform: `translate(-50%, -50%) scale(${hoveredSide === 'mission' ? 1 : 0.95})`,
+            opacity: hoveredSide === 'mission' ? 1 : 0,
+          }}
+        >
+          <h4 className="font-black text-2xl md:text-3xl uppercase mb-4 tracking-widest text-[#0E5F13]" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+            Our Mission
+          </h4>
+          <p className="text-sm md:text-base leading-relaxed font-semibold text-[#0E5F13]">
+            To provide high-quality products and services across import-export, coffee farming and processing, and manufacturing, while fostering sustainability, innovation, integrity, and long-term partnerships in all areas of operation.
+          </p>
+        </div>
+      </div>
+
+      {/* Right: Vision */}
+      <div 
+        className="w-full md:w-1/2 relative h-full cursor-pointer overflow-hidden group/vision"
+        onMouseEnter={() => setHoveredSide('vision')}
+        onMouseLeave={() => setHoveredSide(null)}
+      >
+        <img 
+          src="https://images.unsplash.com/photo-1444628838545-ac4016a5418a?q=80&w=1200&auto=format&fit=crop" 
+          alt="Vision" 
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out"
+          style={{ transform: hoveredSide === 'vision' ? 'scale(1.05)' : 'scale(1)' }}
+        />
+        <div className={`absolute inset-0 transition-colors duration-500 ${hoveredSide === 'vision' ? 'bg-[#0E5F13]/40' : 'bg-[#0E5F13]/70'}`} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center w-full px-4">
+          <motion.h3 
+            className="text-5xl md:text-8xl font-black text-[#ECBD27] uppercase tracking-widest"
+            style={{ fontFamily: "'Arial Black', sans-serif" }}
+            animate={{ 
+              y: hoveredSide === 'vision' ? -20 : 0, 
+              opacity: hoveredSide === 'vision' ? 0 : 0.6,
+              scale: hoveredSide === 'vision' ? 1.1 : 1
+            }}
+            transition={{ duration: 0.5 }}
+          >
+            Vision
+          </motion.h3>
+        </div>
+
+        {/* Hover Pop-up for Vision */}
+        <div 
+          className="absolute top-1/2 left-1/2 w-[85%] max-w-[450px] p-10 z-20 pointer-events-none transition-all duration-500 ease-out flex flex-col justify-center items-center text-center shadow-2xl bg-[#F3F6FA]"
+          style={{ 
+            transform: `translate(-50%, -50%) scale(${hoveredSide === 'vision' ? 1 : 0.95})`,
+            opacity: hoveredSide === 'vision' ? 1 : 0,
+          }}
+        >
+          <h4 className="font-black text-2xl md:text-3xl uppercase mb-4 tracking-widest text-[#0E5F13]" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+            Our Vision
+          </h4>
+          <p className="text-sm md:text-base leading-relaxed font-semibold text-[#0E5F13]">
+            To become a leading diversified Ethiopian enterprise that delivers sustainable value across agriculture, manufacturing, logistics, and international trade, while contributing to national economic growth.
           </p>
         </div>
       </div>
@@ -263,10 +277,23 @@ export default function Aboutpage() {
   const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroY = useTransform(heroScroll, [0, 1], ['0%', '25%'])
   const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0])
-  const strategyRef = useRef(null)
-  const strategyVisible = useInView(strategyRef, { once: true, margin: '200px' })
-  const footprintRef = useRef(null)
-  const footprintVisible = useInView(footprintRef, { once: true, margin: '200px' })
+  const strategyRef = useRef<HTMLElement>(null)
+  const { scrollYProgress: strategyScroll } = useScroll({ target: strategyRef, offset: ['start 85%', 'center center'] })
+  const clipProgress = useTransform(strategyScroll, [0, 1], [0, 100])
+  const clipInverted = useTransform(clipProgress, v => `${100 - v}%`)
+  const strategyClipPath = useMotionTemplate`inset(0% ${clipInverted} ${clipInverted} 0%)`
+
+  const xValue = useTransform(clipProgress, [0, 100], [0, 757])
+  const yValue = useTransform(clipProgress, [0, 100], [0, 934])
+  
+  const footprintRef = useRef<HTMLElement>(null)
+  const { scrollYProgress: footprintScroll } = useScroll({ target: footprintRef, offset: ['start 85%', 'center center'] })
+  const footprintClipProgress = useTransform(footprintScroll, [0, 1], [0, 100])
+  const footprintClipInverted = useTransform(footprintClipProgress, v => `${100 - v}%`)
+  const footprintClipPath = useMotionTemplate`inset(0% 0% ${footprintClipInverted} ${footprintClipInverted})`
+
+  const footprintXValue = useTransform(footprintClipProgress, [0, 100], [0, 757])
+  const footprintYValue = useTransform(footprintClipProgress, [0, 100], [0, 934])
 
   return (
     <>
@@ -281,6 +308,7 @@ export default function Aboutpage() {
           style={{ opacity: 0.3, y: heroY }}
         />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0E5F13 0%, rgba(14,95,19,0.5) 50%, rgba(14,95,19,0.2) 100%)' }} />
+        <GridBackground color="#ECBD27" gridSize={60} opacity={0.08} isVisible={true} />
         {/* Nova orbs */}
         <NovaOrb size={700} x="80%" y="30%" color1="#ECBD27" color2="#0E5F13" opacity={0.15} duration={10} />
         <NovaOrb size={400} x="10%" y="70%" color1="#ECBD27" color2="#0a3d0a" opacity={0.12} duration={7} delay={2} />
@@ -310,30 +338,90 @@ export default function Aboutpage() {
       {/* ══════════════════════════════════════════════
           2. HISTORY & STRATEGY
       ══════════════════════════════════════════════ */}
-      <section className="relative py-24 overflow-hidden" style={{ background: '#F3F6FA' }}>
+      <section ref={strategyRef} className="relative py-24 overflow-hidden border-y border-[rgba(0,0,0,0.08)]" style={{ background: '#F3F6FA' }}>
         {/* Nova orbs */}
         <NovaOrb size={500} x="90%" y="20%" color1="#ECBD27" color2="#F3F6FA" opacity={0.25} duration={9} delay={1} />
         <NovaOrb size={350} x="5%" y="80%" color1="#0E5F13" color2="#F3F6FA" opacity={0.1} duration={11} delay={3} />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-          <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+        <div className="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 border-x border-[rgba(0,0,0,0.08)]">
+          
+          <div className="border-r border-[rgba(0,0,0,0.08)] flex flex-col">
+            <div className="w-full relative border-b border-[rgba(0,0,0,0.08)]">
+              {/* Corner crosshairs */}
+              <div className="absolute -top-1.5 -left-1.5 w-3 h-3 z-20">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[rgba(0,0,0,0.3)]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[rgba(0,0,0,0.3)]"></div>
+              </div>
+              <div className="absolute -top-1.5 -right-1.5 w-3 h-3 z-20">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[rgba(0,0,0,0.3)]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[rgba(0,0,0,0.3)]"></div>
+              </div>
+              <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 z-20">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[rgba(0,0,0,0.3)]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[rgba(0,0,0,0.3)]"></div>
+              </div>
+              <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 z-20">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[rgba(0,0,0,0.3)]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[rgba(0,0,0,0.3)]"></div>
+              </div>
+
+              <motion.div 
+                style={{ 
+                  aspectRatio: '4/5', 
+                  clipPath: strategyClipPath 
+                }}
+                className="w-full relative"
+              >
+                <img 
+                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop" 
+                  alt="History and Strategy" 
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </motion.div>
+              
+              {/* Moving Coordinates tracking the expanding bottom-right corner */}
+              <motion.div 
+                className="absolute z-30" 
+                style={{ 
+                  left: useMotionTemplate`${clipProgress}%`, 
+                  top: useMotionTemplate`${clipProgress}%` 
+                }}
+              >
+                {/* Crosshair at the moving corner */}
+                <div className="absolute -top-1.5 -left-1.5 w-3 h-3">
+                  <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
+                  <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
+                </div>
+
+                <div className="absolute -bottom-6 -left-8 text-[10px] text-[#0E5F13] font-mono tracking-widest whitespace-nowrap">
+                  <AnimatedCoordinate val={xValue} prefix="X" />
+                </div>
+                <div className="absolute -top-12 -right-12 text-[10px] text-[#0E5F13] font-mono tracking-widest whitespace-nowrap rotate-90 origin-bottom-left">
+                  <AnimatedCoordinate val={yValue} prefix="Y" />
+                </div>
+              </motion.div>
+            </div>
+            <div className="flex-grow p-10 min-h-[100px]"></div>
+          </div>
+
+          <motion.div className="p-10 md:p-16 flex flex-col justify-center" initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
             <SectionLabel text="History & Strategy" />
             <Heading>Built on Trust,{' '}<span style={{ color: '#ECBD27' }}>Driven by Purpose</span></Heading>
             <p className="text-base leading-relaxed mb-4" style={{ color: 'rgba(14,95,19,0.8)' }}>
               Yhaenu PLC is a family-owned company with over 20 years of experience in Import, Export, Manufacturing, Transportation, and Hospitality. Headquartered in Ethiopia, we've grown into a trusted name in both local and international markets.
             </p>
-            <p className="text-base leading-relaxed mb-8" style={{ color: 'rgba(14,95,19,0.8)' }}>
+            <p className="text-base leading-relaxed mb-12" style={{ color: 'rgba(14,95,19,0.8)' }}>
               Our mission is simple: to be the bridge that links Ethiopia's potential to the global stage — delivering quality, precision, and excellence across every vertical we operate in.
             </p>
-            <div className="inline-flex items-center gap-4 rounded-2xl px-6 py-4" style={{ background: '#0E5F13' }}>
-              <span className="font-black text-4xl leading-none" style={{ fontFamily: "'Arial Black', sans-serif", color: '#ECBD27' }}>30,000+</span>
-              <span className="text-sm" style={{ color: 'rgba(243,246,250,0.75)' }}>Lives impacted<br />across Ethiopia</span>
-            </div>
-          </motion.div>
 
-          <motion.div className="rounded-2xl overflow-hidden shadow-2xl" style={{ aspectRatio: '16/9' }}
-            initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-            {strategyVisible && <video src={VIDEO_SRC} autoPlay muted loop playsInline className="w-full h-full object-cover" />}
+            <div className="inline-flex max-w-sm group">
+              <div className="flex-grow border border-[#0E5F13] py-4 px-6 font-bold text-sm text-[#0E5F13] group-hover:bg-[#0E5F13] group-hover:text-[#ECBD27] transition-colors cursor-pointer">
+                Request information
+              </div>
+              <div className="border border-[#0E5F13] border-l-0 py-4 px-5 flex items-center justify-center text-[#0E5F13] group-hover:bg-[#0E5F13] group-hover:text-[#ECBD27] transition-colors cursor-pointer">
+                →
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -341,14 +429,14 @@ export default function Aboutpage() {
       {/* ══════════════════════════════════════════════
           3. VISION, MISSION & VALUES
       ══════════════════════════════════════════════ */}
-      <section className="relative py-24 overflow-hidden" style={{ background: '#0E5F13' }}>
+      <section className="relative pt-24 pb-24 overflow-hidden" style={{ background: '#0E5F13' }}>
         {/* Nova orbs */}
         <NovaOrb size={800} x="50%" y="50%" color1="#ECBD27" color2="#0a3d0a" opacity={0.12} duration={12} />
         <NovaOrb size={400} x="5%" y="20%" color1="#ECBD27" color2="#0E5F13" opacity={0.1} duration={8} delay={4} />
         <NovaOrb size={350} x="95%" y="80%" color1="#ECBD27" color2="#0E5F13" opacity={0.1} duration={9} delay={2} />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+        <div className="relative z-10 max-w-6xl mx-auto px-6 mb-16">
+          <motion.div className="text-center" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <div className="flex items-center justify-center gap-3 mb-4">
               <span className="h-[2px] w-8 bg-[#ECBD27]" />
               <span className="text-[#ECBD27] text-xs tracking-[0.4em] uppercase font-bold" style={{ fontFamily: 'monospace' }}>Vision, Mission & Values</span>
@@ -356,25 +444,31 @@ export default function Aboutpage() {
             </div>
             <Heading light>Where We're <span style={{ color: '#ECBD27' }}>Going</span></Heading>
           </motion.div>
+        </div>
 
-          {/* Vision + Mission conic cards */}
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            {[
-              { icon: '🔭', label: 'Vision Statement', text: 'To become a leading diversified Ethiopian enterprise that delivers sustainable value across agriculture, manufacturing, logistics, and international trade, while contributing to national economic growth.', delay: 0 },
-              { icon: '🎯', label: 'Mission Statement', text: 'To provide high-quality products and services across import-export, coffee farming and processing, and manufacturing, while fostering sustainability, innovation, integrity, and long-term partnerships in all areas of operation.', delay: 2 },
-            ].map((item, i) => (
-              <motion.div key={i} className="rounded-2xl overflow-hidden"
-                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.6 }}>
-                <ConicCard icon={item.icon} label={item.label} text={item.text} delay={item.delay} />
-              </motion.div>
-            ))}
-          </div>
+        {/* Full-width Split Interaction */}
+        <div className="relative z-10 w-full">
+          <MissionVisionSplit />
+        </div>
+      </section>
 
-          {/* Core Values — 3D Carousel */}
-          <h3 className="font-black uppercase text-center mb-10" style={{ fontFamily: "'Arial Black', sans-serif", color: '#F3F6FA', fontSize: '1.1rem', letterSpacing: '0.1em' }}>
-            Core Values
-          </h3>
-          <Values3DCarousel />
+      {/* ══════════════════════════════════════════════
+          CORE VALUES (STACKED)
+      ══════════════════════════════════════════════ */}
+      <section className="relative pt-24 overflow-visible" style={{ background: '#F3F6FA' }}>
+        <div className="relative z-10 max-w-[1400px] mx-auto px-6 mb-16">
+          <motion.div className="text-center" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span className="h-[2px] w-8 bg-[#ECBD27]" />
+              <span className="text-[#0E5F13] text-xs tracking-[0.4em] uppercase font-bold" style={{ fontFamily: 'monospace' }}>Core Values</span>
+              <span className="h-[2px] w-8 bg-[#ECBD27]" />
+            </div>
+            <Heading>Our Guiding <span style={{ color: '#ECBD27' }}>Principles</span></Heading>
+          </motion.div>
+        </div>
+
+        <div className="relative z-10 max-w-[1400px] mx-auto">
+          <StackedValues />
         </div>
       </section>
       
@@ -458,12 +552,19 @@ export default function Aboutpage() {
       {/* ══════════════════════════════════════════════
           6. FOOTPRINT
       ══════════════════════════════════════════════ */}
-      <section className="relative py-24 overflow-hidden" style={{ background: '#F3F6FA' }}>
+      <section ref={footprintRef} className="relative py-24 overflow-hidden border-y border-[rgba(0,0,0,0.08)]" style={{ background: '#F3F6FA' }}>
         <NovaOrb size={600} x="50%" y="50%" color1="#ECBD27" color2="#F3F6FA" opacity={0.2} duration={10} />
         <NovaOrb size={300} x="90%" y="10%" color1="#0E5F13" color2="#F3F6FA" opacity={0.1} duration={7} delay={3} />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-          <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+        <div className="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 border-x border-[rgba(0,0,0,0.08)]">
+          {/* Text Left */}
+          <motion.div 
+            className="p-10 md:p-16 flex flex-col justify-center order-2 md:order-1"
+            initial={{ opacity: 0, x: -40 }} 
+            whileInView={{ opacity: 1, x: 0 }} 
+            viewport={{ once: true }} 
+            transition={{ duration: 0.7 }}
+          >
             <SectionLabel text="Our Footprint" />
             <Heading>Expanding Horizons{' '}<span style={{ color: '#ECBD27' }}>Across Africa</span></Heading>
             <p className="text-base leading-relaxed mb-8" style={{ color: 'rgba(14,95,19,0.75)' }}>
@@ -471,18 +572,69 @@ export default function Aboutpage() {
             </p>
             <div className="grid grid-cols-3 gap-4">
               {[{ num: '15+', label: 'Countries' }, { num: '20+', label: 'Years' }, { num: '5', label: 'Verticals' }].map((s, i) => (
-                <div key={i} className="text-center rounded-xl py-4" style={{ background: '#0E5F13', border: '1px solid rgba(236,189,39,0.2)' }}>
-                  <p className="font-black text-2xl" style={{ fontFamily: "'Arial Black', sans-serif", color: '#ECBD27' }}>{s.num}</p>
-                  <p className="text-xs uppercase tracking-widest mt-1" style={{ color: 'rgba(243,246,250,0.5)', fontFamily: 'monospace' }}>{s.label}</p>
+                <div key={i} className="text-center border border-[rgba(0,0,0,0.1)] py-4 bg-white shadow-sm" style={{ borderColor: 'rgba(14,95,19,0.1)' }}>
+                  <p className="font-black text-2xl" style={{ fontFamily: "'Arial Black', sans-serif", color: '#0E5F13' }}>{s.num}</p>
+                  <p className="text-[10px] uppercase tracking-widest mt-1" style={{ color: '#ECBD27', fontFamily: 'monospace', fontWeight: 700 }}>{s.label}</p>
                 </div>
               ))}
             </div>
           </motion.div>
 
-          <motion.div className="rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: '4/3' }}
-            initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-            {footprintVisible && <video src={VIDEO_SRC} autoPlay muted loop playsInline className="w-full h-full object-cover" />}
-          </motion.div>
+          {/* Image Right */}
+          <div className="border-l border-[rgba(0,0,0,0.08)] flex flex-col order-1 md:order-2">
+            <div className="w-full relative border-b border-[rgba(0,0,0,0.08)]">
+              {/* Corner crosshairs */}
+              <div className="absolute -top-1.5 -left-1.5 w-3 h-3 z-20">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
+              </div>
+              <div className="absolute -top-1.5 -right-1.5 w-3 h-3 z-20">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
+              </div>
+              <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 z-20">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
+              </div>
+              <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 z-20">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
+              </div>
+
+              <motion.div 
+                style={{ 
+                  aspectRatio: '4/5', 
+                  clipPath: footprintClipPath 
+                }}
+                className="w-full relative"
+              >
+                <video src={VIDEO_SRC} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
+              </motion.div>
+              
+              {/* Moving Coordinates tracking the expanding bottom-left corner */}
+              <motion.div 
+                className="absolute z-30" 
+                style={{ 
+                  left: footprintClipInverted, 
+                  top: useMotionTemplate`${footprintClipProgress}%` 
+                }}
+              >
+                {/* Crosshair at the moving corner */}
+                <div className="absolute -top-1.5 -left-1.5 w-3 h-3">
+                  <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
+                  <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
+                </div>
+
+                <div className="absolute -bottom-6 -right-8 text-[10px] text-[#0E5F13] font-mono tracking-widest whitespace-nowrap">
+                  <AnimatedCoordinate val={footprintXValue} prefix="X" />
+                </div>
+                <div className="absolute -top-12 -left-12 text-[10px] text-[#0E5F13] font-mono tracking-widest whitespace-nowrap rotate-90 origin-bottom-left">
+                  <AnimatedCoordinate val={footprintYValue} prefix="Y" />
+                </div>
+              </motion.div>
+            </div>
+            <div className="flex-grow p-10 min-h-[100px]"></div>
+          </div>
         </div>
       </section>
 

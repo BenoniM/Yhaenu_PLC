@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import Hls from 'hls.js'
 import Footer from '../components/Footer'
+import GridBackground from '../components/GridBackground'
 
 const HLS_SRC = 'https://stream.mux.com/kF01v9aKFlY63i2GkQKQGDv5Y9PbMGdtQD92j5qJCYWU.m3u8'
 const LOOP_END_OFFSET = 4 // seconds before end to restart loop
@@ -117,6 +118,7 @@ export default function ContactPage() {
           style={{ opacity: 0.6 }}
         />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(14,95,19,0.8) 0%, rgba(14,95,19,0.4) 50%, rgba(14,95,19,0.1) 100%)' }} />
+        <GridBackground color="#ECBD27" gridSize={60} opacity={0.08} isVisible={true} />
         
         <NovaOrb size={600} x="80%" y="50%" color1="#ECBD27" color2="#0E5F13" opacity={0.15} duration={10} />
         <NovaOrb size={350} x="10%" y="60%" color1="#ECBD27" color2="#0a3d0a" opacity={0.1} duration={7} delay={2} />

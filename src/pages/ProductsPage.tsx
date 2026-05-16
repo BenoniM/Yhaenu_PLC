@@ -4,6 +4,7 @@ import Hls from 'hls.js'
 import Footer from '../components/Footer'
 import Cta from '../components/Cta'
 import { useNavigate } from 'react-router-dom'
+import GridBackground from '../components/GridBackground'
 
 const HLS_SRC = 'https://stream.mux.com/Kec29dVyJgiPdtWaQtPuEiiGHkJIYQAVUJcNiIHUYeo.m3u8'
 const LOOP_END_OFFSET = 4 // seconds before end to restart loop
@@ -278,6 +279,7 @@ export default function ProductsPage() {
           style={{ opacity: 0.4 }}
         />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0E5F13 0%, rgba(14,95,19,0.5) 50%, rgba(14,95,19,0.2) 100%)' }} />
+        <GridBackground color="#ECBD27" gridSize={60} opacity={0.08} isVisible={true} />
 
         <div className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-40 pb-16">
           <motion.p className="text-xs tracking-[0.4em] uppercase mb-3" style={{ color: '#ECBD27', fontFamily: 'monospace' }}
