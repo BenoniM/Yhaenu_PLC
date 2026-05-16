@@ -25,12 +25,18 @@ import GridBackground from './GridBackground'
 export default function Hero() {
 
   const [hovered, setHovered] = useState<HoveredState>(null)
+  const hoveredRef = useRef(hovered);
+  useEffect(() => {
+    hoveredRef.current = hovered;
+  }, [hovered]);
   const [isEntering, setIsEntering] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
   const logoWrapperRef = useRef<HTMLDivElement>(null)
   const logoCutRef = useRef<HTMLDivElement>(null)
   const descriptionRef = useRef<HTMLDivElement>(null)
   const yLogoRef = useRef<HTMLDivElement>(null)
+  const yLogoPulseRef = useRef<HTMLDivElement>(null);
+  const pulseTweenRef = useRef<gsap.core.Tween | null>(null);
 
   // Refs for video syncing
   const logoRefs = {
@@ -50,7 +56,16 @@ export default function Hero() {
   // Entrance Animation Sequence
   useGSAP(() => {
     const tl = gsap.timeline({
-      onComplete: () => setIsEntering(false)
+      onComplete: () => {
+        setIsEntering(false);
+        pulseTweenRef.current = gsap.to(yLogoPulseRef.current, {
+          scale: 1.15,
+          duration: 2.0,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut"
+        });
+      }
     });
 
     // 1. Initial State
@@ -127,7 +142,10 @@ export default function Hero() {
 
       const offsetX = centerX - screenCenterX;
       const offsetY = centerY - screenCenterY;
-      const scale = gsap.getProperty(yLogoRef.current, "scale") as number;
+      
+      const scrollScale = gsap.getProperty(yLogoRef.current, "scale") as number || 1;
+      const pulseScale = yLogoPulseRef.current ? (gsap.getProperty(yLogoPulseRef.current, "scale") as number || 1) : 1;
+      const scale = scrollScale * pulseScale;
 
       Object.values(logoRefs).forEach(ref => {
         if (ref.current) {
@@ -237,6 +255,24 @@ export default function Hero() {
           pin: true,
           scrub: true,
           anticipatePin: 1,
+          onUpdate: (self) => {
+            const isScrolling = self.progress > 0.02;
+            const isPulsing = pulseTweenRef.current && pulseTweenRef.current.isActive();
+            
+            if (isScrolling && isPulsing) {
+               pulseTweenRef.current?.kill();
+               gsap.to(yLogoPulseRef.current, { scale: 1, duration: 0.3, ease: 'power2.out', overwrite: "auto" });
+            } else if (!isScrolling && !isPulsing && !hoveredRef.current) {
+               pulseTweenRef.current?.kill();
+               pulseTweenRef.current = gsap.to(yLogoPulseRef.current, {
+                  scale: 1.15,
+                  duration: 2.0,
+                  repeat: -1,
+                  yoyo: true,
+                  ease: "sine.inOut"
+               });
+            }
+          }
         }
       });
       tlRef.current = tl;
@@ -269,6 +305,29 @@ export default function Hero() {
       gsap.set('.nav-link-0, .nav-link-1, .nav-link-2, .nav-link-3', { clearProps: "x,y,opacity,transform" });
     };
   }, [isEntering]);
+
+  // Hover pulse effect
+  useGSAP(() => {
+    if (isEntering) return;
+    
+    if (hovered) {
+      if (pulseTweenRef.current) pulseTweenRef.current.kill();
+      gsap.to(yLogoPulseRef.current, { scale: 1.3, duration: 0.5, ease: 'power2.out', overwrite: "auto" });
+    } else {
+      if (!stRef.current || stRef.current.progress <= 0.02) {
+         if (pulseTweenRef.current) pulseTweenRef.current.kill();
+         pulseTweenRef.current = gsap.to(yLogoPulseRef.current, {
+            scale: 1.15,
+            duration: 2.0,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+         });
+      } else {
+         gsap.to(yLogoPulseRef.current, { scale: 1, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
+      }
+    }
+  }, [hovered, isEntering]);
 
   // Opacity transitions using GSAP
   useGSAP(() => {
@@ -331,6 +390,7 @@ export default function Hero() {
               height: `${window.innerWidth < 768 ? 80 : 150}px`
             }}
           >
+            <div ref={yLogoPulseRef} className="absolute inset-0 w-full h-full origin-center">
             {/* MASKED LOGO WINDOWS (The "Y") */}
             {[
               { id: 'import', path: pathImport },
@@ -400,6 +460,7 @@ export default function Hero() {
                 </svg>
               </div>
             )}
+            </div>
           </div>
 
           {/* THE "HAENU" PART */}

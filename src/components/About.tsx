@@ -7,6 +7,11 @@ const pathImport = "M66.6218 151.625C67.3516 150.734 68.0659 149.827 68.811 148.
 const pathManufacturing = "M233.632 55.706C205.234 55.6753 176.843 55.6753 148.444 55.6753C147.984 55.6753 147.515 55.6369 146.847 55.6061C147.085 55.1683 147.192 54.861 147.377 54.5922C150.203 50.5901 153.023 46.5804 155.865 42.5937C158.814 38.4381 161.787 34.3054 164.745 30.1651C167.756 25.9403 170.751 21.7078 173.747 17.4676C176.336 13.8036 178.901 10.1241 181.49 6.46008C182.819 4.57044 184.148 2.66543 185.554 0.821877C185.838 0.445485 186.422 0.184315 186.906 0.1075C187.62 -0.0154033 188.365 0.0690929 189.102 0.0690929C218.307 0.0690929 247.528 0.0767744 276.74 0.0767744L233.632 55.7137V55.706Z"
 const pathHospitality = "M0 0.176666C0.499296 0.130577 0.775829 0.0844883 1.04468 0.0844883C15.4244 0.0537624 29.8041 0.0230365 44.1838 -7.96001e-06C59.0091 -0.0153709 73.8343 -7.96001e-06 88.6596 -7.96001e-06C91.0792 -7.96001e-06 93.4989 -0.0153709 95.9186 0.0921697C96.4256 0.115214 97.0785 0.506969 97.3781 0.92945C102.878 8.81833 108.347 16.7379 113.801 24.6575C116.152 28.0681 118.448 31.5094 120.791 34.92C123.457 38.8068 126.161 42.6629 128.834 46.542C130.731 49.292 132.613 52.042 134.495 54.7996C134.618 54.9763 134.702 55.1837 134.887 55.5294C134.357 55.5755 133.934 55.6446 133.519 55.6446C111.282 55.6446 89.0513 55.6446 66.8135 55.6446C56.7968 55.6446 46.7802 55.6369 36.7635 55.6676C35.7035 55.6676 35.0275 55.3911 34.4361 54.4309C31.3481 49.4226 28.1756 44.4604 25.0186 39.4905C22.9676 36.2719 20.8629 33.0841 18.8119 29.8656C16.9684 26.9697 15.1786 24.043 13.3427 21.1394C11.215 17.7749 9.0795 14.4258 6.92869 11.0767C5.56907 8.96427 4.17104 6.88259 2.8191 4.77019C1.88964 3.31839 1.02164 1.84355 0 0.176666Z"
 
+const getMaskUrl = (pathD: string) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 277 152" preserveAspectRatio="xMidYMid meet"><path d="${pathD}" fill="black"/></svg>`
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
+}
+
 const SECTION_IMAGES: Record<string, string> = {
   import: 'https://images.pexels.com/photos/32119533/pexels-photo-32119533.jpeg',
   manufacturing: 'https://images.pexels.com/photos/34221998/pexels-photo-34221998.jpeg',
@@ -104,16 +109,53 @@ export default function About() {
         className="relative w-full h-full"
         style={{ zIndex: 20 }}
       >
+        {/* Masked Logo Windows (Unhovered State) */}
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+          {(['import', 'manufacturing', 'hospitality'] as const).map((id) => {
+             const pathD = id === 'import' ? pathImport : id === 'manufacturing' ? pathManufacturing : pathHospitality;
+             return (
+              <div
+                key={`mask-${id}`}
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  maskImage: getMaskUrl(pathD),
+                  WebkitMaskImage: getMaskUrl(pathD),
+                  maskSize: 'contain',
+                  WebkitMaskSize: 'contain',
+                  maskPosition: 'center',
+                  WebkitMaskPosition: 'center',
+                  maskRepeat: 'no-repeat',
+                  WebkitMaskRepeat: 'no-repeat',
+                  opacity: hovered && hovered !== id ? 0 : 1,
+                  transition: 'opacity 0.5s ease'
+                }}
+              >
+                <img src={SECTION_IMAGES[id]} alt={id} className="w-full h-full object-cover" style={{ filter: 'brightness(0.7) contrast(1.1)' }} />
+                
+                {/* Overlay over it (yellowish unhovered, greenish when hovered) */}
+                <div 
+                  className="absolute inset-0" 
+                  style={{ 
+                    backgroundColor: hovered === id ? '#0E5F13' : '#ECBD27', 
+                    opacity: hovered === id ? 0.6 : 0.25,
+                    backdropFilter: hovered === id ? 'blur(4px)' : 'blur(2px)',
+                    transition: 'all 0.5s ease' 
+                  }} 
+                />
+              </div>
+            )
+          })}
+        </div>
+
         {/* ─────────────────────────────────────────────────────────
             SVG Logo — full edge-to-edge width
-            The logo paths live inside <g> and fade out on hover.
             The ABOUT US text lives outside <g> so it stays visible.
             Transparent hit areas sit on top in a separate <g>.
         ───────────────────────────────────────────────────────── */}
         <svg
           viewBox="0 0 277 152"
           preserveAspectRatio="xMidYMid meet"
-          className="w-full h-full block"
+          className="relative z-20 w-full h-full block"
           style={{ display: 'block', overflow: 'visible' }}
         >
           <defs>
@@ -130,25 +172,6 @@ export default function About() {
             </filter>
           </defs>
 
-          {/* Logo paths — fade to invisible on hover */}
-          <g style={{ opacity: hovered ? 0 : 1, transition: 'opacity 0.5s ease' }}>
-            <path
-              d={pathHospitality}
-              fill={hovered === 'hospitality' ? '#F5CA40' : '#ECBD27'}
-              style={{ transition: 'fill 0.35s ease' }}
-            />
-            <path
-              d={pathManufacturing}
-              fill={hovered === 'manufacturing' ? '#F5CA40' : '#ECBD27'}
-              style={{ transition: 'fill 0.35s ease' }}
-            />
-            <path
-              d={pathImport}
-              fill={hovered === 'import' ? '#F5CA40' : '#ECBD27'}
-              style={{ transition: 'fill 0.35s ease' }}
-            />
-          </g>
-
           {/* ABOUT US — yellowish base (visible on green bg AND dark bg image) */}
           <text
             x="138.5" y="28"
@@ -161,7 +184,7 @@ export default function About() {
             ABOUT US
           </text>
 
-          {/* ABOUT US — dark green layer, clipped to logo shape (green-on-yellow, non-hover only) */}
+          {/* ABOUT US — dark green layer, clipped to logo shape (green-on-image) */}
           <text
             x="138.5" y="28"
             textAnchor="middle" dominantBaseline="middle"
@@ -178,6 +201,8 @@ export default function About() {
           >
             ABOUT US
           </text>
+
+
 
           {/* Transparent hit areas — always on top, trigger hover */}
           <g style={{ cursor: 'pointer' }}>

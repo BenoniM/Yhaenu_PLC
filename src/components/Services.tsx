@@ -58,8 +58,8 @@ const TOTAL_HEIGHT = baseServices.length * CARD_STEP
 const X_SLOPE = -85
 
 export default function Services() {
-  // Start with the second item of the second set (index 5)
-  const [activeIdx, setActiveIdx] = useState(baseServices.length + 1)
+  // Start with the second item (index 1)
+  const [activeIdx, setActiveIdx] = useState(1)
   const sectionRef = useRef<HTMLDivElement>(null)
   const stripRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -67,31 +67,42 @@ export default function Services() {
   const centerY = useRef(0)
   const dragStart = useRef<{ y: number; currentY: number } | null>(null)
   const isDragging = useRef(false)
+  const isWheeling = useRef(false)
+  const isHovered = useRef(false)
+  const wheelTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const snapTween = useRef<gsap.core.Tween | null>(null)
 
-  // ── Entrance Animation ──
   useGSAP(() => {
-    cardRefs.current.forEach((card, i) => {
-      if (!card) return
-      gsap.set(card, { y: i % 2 === 0 ? -1200 : 1200, opacity: 0 })
-    })
+    // ── Auto Scroll Carousel ──
+    let timeout: ReturnType<typeof setTimeout> | null = null
 
-    ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: 'top 85%',
-      onEnter: () => {
-        cardRefs.current.forEach((card, i) => {
-          if (!card) return
-          gsap.to(card, {
-            y: 0,
-            opacity: 1,
-            duration: 1.8,
-            delay: i * 0.04,
-            ease: 'expo.out',
-          })
+    const nextSlide = () => {
+      if (!isDragging.current && !isWheeling.current && !isHovered.current) {
+        const currentY = centerY.current
+        const targetY = Math.round(currentY / CARD_STEP) * CARD_STEP - CARD_STEP
+        
+        if (snapTween.current) snapTween.current.kill()
+        const proxy = { y: currentY }
+        snapTween.current = gsap.to(proxy, {
+          y: targetY,
+          duration: 1.2,
+          ease: 'power2.inOut',
+          onUpdate: () => updatePosition(proxy.y),
+          onComplete: () => {
+            timeout = setTimeout(nextSlide, 3500)
+          }
         })
-      },
-      once: true
-    })
+      } else {
+        timeout = setTimeout(nextSlide, 1000)
+      }
+    }
+
+    timeout = setTimeout(nextSlide, 3500)
+
+    return () => {
+      if (timeout) clearTimeout(timeout)
+      if (snapTween.current) snapTween.current.kill()
+    }
   }, { scope: sectionRef })
 
   const updatePosition = (y: number) => {
@@ -108,9 +119,7 @@ export default function Services() {
     const normalizedIdx = rawIdx % baseServices.length
     const finalIdx = normalizedIdx < 0 ? normalizedIdx + baseServices.length : normalizedIdx
 
-    if (finalIdx !== (activeIdx % baseServices.length)) {
-      setActiveIdx(rawIdx)
-    }
+    setActiveIdx(prev => finalIdx !== prev ? finalIdx : prev)
   }
 
   useEffect(() => {
@@ -121,6 +130,7 @@ export default function Services() {
   }, [])
 
   const onPointerDown = (e: React.PointerEvent) => {
+    if (snapTween.current) snapTween.current.kill()
     isDragging.current = true
     dragStart.current = { y: e.clientY, currentY: centerY.current }
       ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
@@ -135,17 +145,38 @@ export default function Services() {
   const onPointerUp = () => {
     if (!isDragging.current) return
     isDragging.current = false
-    const targetY = Math.round(centerY.current / CARD_STEP) * CARD_STEP
-    const targetX = targetY * (X_SLOPE / CARD_STEP)
-    gsap.to(stripRef.current, {
+    const currentY = centerY.current
+    const targetY = Math.round(currentY / CARD_STEP) * CARD_STEP
+    
+    if (snapTween.current) snapTween.current.kill()
+    const proxy = { y: currentY }
+    snapTween.current = gsap.to(proxy, {
       y: targetY,
-      x: targetX,
       duration: 0.7,
       ease: 'power4.out',
-      onUpdate: () => {
-        centerY.current = gsap.getProperty(stripRef.current, "y") as number
-      }
+      onUpdate: () => updatePosition(proxy.y)
     })
+  }
+
+  const onWheel = (e: React.WheelEvent) => {
+    if (snapTween.current) snapTween.current.kill()
+    isWheeling.current = true
+    updatePosition(centerY.current - e.deltaY * 0.5)
+
+    if (wheelTimeout.current) clearTimeout(wheelTimeout.current)
+    wheelTimeout.current = setTimeout(() => {
+      isWheeling.current = false
+      const currentY = centerY.current
+      const targetY = Math.round(currentY / CARD_STEP) * CARD_STEP
+      
+      const proxy = { y: currentY }
+      snapTween.current = gsap.to(proxy, {
+        y: targetY,
+        duration: 0.6,
+        ease: 'power2.out',
+        onUpdate: () => updatePosition(proxy.y)
+      })
+    }, 200)
   }
 
   return (
@@ -163,7 +194,7 @@ export default function Services() {
       >
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeIdx % baseServices.length}
+            key={activeIdx}
             className="absolute inset-x-0 top-4 bottom-4"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
@@ -171,7 +202,7 @@ export default function Services() {
             transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           >
             <img
-              src={services[activeIdx % services.length].bg}
+              src={baseServices[activeIdx].bg}
               alt=""
               className="w-full h-full object-cover brightness-[0.8]"
             />
@@ -191,10 +222,13 @@ export default function Services() {
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
+          onWheel={onWheel}
+          onMouseEnter={() => { isHovered.current = true }}
+          onMouseLeave={() => { isHovered.current = false }}
         >
           <div ref={stripRef} className="cursor-grab active:cursor-grabbing will-change-transform">
             {services.map((s, i) => {
-              const isActive = activeIdx === i
+              const isActive = (i % baseServices.length) === activeIdx
               const xOffset = i * X_SLOPE
 
               return (
@@ -222,7 +256,7 @@ export default function Services() {
       <div className="flex-1 bg-white h-full flex flex-col items-center justify-center px-12 relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeIdx % baseServices.length}
+            key={activeIdx}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
@@ -231,16 +265,16 @@ export default function Services() {
           >
             <div className="mb-6">
               <span className="px-6 py-2 border border-[#ECBD27]/30 rounded-full text-[#ECBD27] font-mono text-[10px] font-bold tracking-[0.4em] uppercase bg-[#ECBD27]/5 backdrop-blur-sm">
-                {services[activeIdx % services.length].badge}
+                {baseServices[activeIdx].badge}
               </span>
             </div>
 
             <h2 className="text-4xl font-black text-[#0E5F13] leading-[1] mb-6 uppercase tracking-tighter max-w-[300px]">
-              {services[activeIdx % services.length].title}
+              {baseServices[activeIdx].title}
             </h2>
 
             <p className="text-gray-500 text-sm md:text-base leading-relaxed mb-10 max-w-[280px] font-medium">
-              {services[activeIdx % services.length].desc}
+              {baseServices[activeIdx].desc}
             </p>
 
             <a
