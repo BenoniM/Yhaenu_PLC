@@ -70,9 +70,9 @@ export default function Footer() {
           
           {/* 1. Newsletter - 4 cols */}
           <div className="md:col-span-4 space-y-8">
-            <h2 className="text-4xl md:text-5xl font-serif font-light leading-[1.1] tracking-tight">
-              Join our <br />
-              <span className="italic">newsletter</span>
+            <h2 className="text-4xl md:text-5xl font-light leading-[1.1] tracking-tight">
+              Join Our <br />
+              <span className="italic">Newsletter</span>
             </h2>
             <div className="relative group max-w-sm">
               <input 

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
-import { motion, useScroll, useTransform, useInView, useMotionTemplate, useMotionValueEvent } from 'framer-motion'
+import JourneySection from '../components/JourneySection'
+import { motion, useScroll, useTransform, useMotionTemplate, useMotionValueEvent } from 'framer-motion'
 import Cta from '../components/Cta'
 import Footer from '../components/Footer'
 import Services from '../components/Services'
@@ -86,32 +87,32 @@ function StackedValues() {
           className="flex flex-col md:flex-row items-stretch border-t border-[rgba(14,95,19,0.1)] bg-[#F3F6FA] w-full"
           style={{ 
             position: 'sticky',
-            top: 80 + (i * 60), 
-            minHeight: '400px',
+            top: 80 + (i * 80), 
+            minHeight: '250px',
             boxShadow: i > 0 ? '0 -10px 30px -15px rgba(0,0,0,0.1)' : 'none',
             zIndex: 10 + i
           }}
         >
           {/* Left: Number */}
-          <div className="w-full md:w-[15%] p-8 md:p-12 self-start flex-shrink-0">
-            <span className="text-[#0E5F13] font-black text-xl md:text-2xl" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+          <div className="w-full md:w-[15%] px-8 md:px-12 pt-[26px] self-start flex-shrink-0 h-[80px] md:h-auto">
+            <span className="text-[#0E5F13] font-black text-xl md:text-2xl leading-none block" style={{ fontFamily: "'Arial Black', sans-serif" }}>
               0{i + 1} /
             </span>
           </div>
 
           {/* Center: Image */}
-          <div className="w-full md:w-[40%] p-6 md:p-10 border-y md:border-y-0 md:border-x border-[rgba(14,95,19,0.1)] flex-shrink-0 flex flex-col justify-center">
-            <div className="w-full aspect-[4/3] md:aspect-square overflow-hidden bg-gray-200">
+          <div className="w-full md:w-[40%] px-6 md:px-10 pt-4 md:pt-[26px] pb-6 md:pb-10 border-y md:border-y-0 md:border-x border-[rgba(14,95,19,0.1)] flex-shrink-0 flex flex-col justify-start">
+            <div className="w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden bg-gray-200">
               <img src={stackedValuesData[i].img} alt={v.label} className="w-full h-full object-cover" />
             </div>
           </div>
 
           {/* Right: Description */}
-          <div className="w-full md:w-[45%] p-8 md:p-16 flex flex-col justify-center flex-grow">
+          <div className="w-full md:w-[45%] px-8 md:px-16 pt-6 md:pt-[26px] pb-8 md:pb-10 flex flex-col justify-start flex-grow">
             <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#ECBD27] mb-4" style={{ fontFamily: 'monospace' }}>
               {v.label}
             </p>
-            <h3 className="text-3xl md:text-5xl font-black text-[#0E5F13] mb-6 leading-tight" style={{ fontFamily: "'Arial Black', sans-serif", letterSpacing: '-0.02em' }}>
+            <h3 className="text-3xl capitalize text-[#0E5F13] mb-6 leading-tight" style={{ fontFamily: "'Arial Black', sans-serif", letterSpacing: '-0.02em' }}>
               {v.desc}
             </h3>
           </div>
@@ -219,18 +220,8 @@ function MissionVisionSplit() {
   )
 }
 
-// ── Data ─────────────────────────────────────────────────────────────────────
-const timeline = [
-  { year: '2003', event: 'Yhaenu PLC is founded in Addis Ababa, Ethiopia' },
-  { year: '2007', event: 'Expansion into manufacturing — cardboard and carton products' },
-  { year: '2012', event: 'Transportation division launched, growing the logistics fleet' },
-  { year: '2016', event: 'South Star International Hotel opens in Hawassa' },
-  { year: '2020', event: 'Entry into coffee farming and international export markets' },
-  { year: '2024', event: 'Operations now span 15+ countries across Africa and beyond' },
-]
-
 const values = [
-  { icon: '🌱', label: 'Sustainability', desc: 'Building for the long term — people, planet, and profit.' },
+  { icon: '🌱', label: 'Sustainability', desc: 'Building for the long term people, planet, and profit.' },
   { icon: '💡', label: 'Innovation',     desc: 'Continuously improving how we serve our partners.' },
   { icon: '🤝', label: 'Integrity',      desc: 'Honest, transparent dealings in every interaction.' },
   { icon: '🔗', label: 'Partnership',    desc: 'Long-term relationships built on mutual growth.' },
@@ -413,15 +404,6 @@ export default function Aboutpage() {
             <p className="text-base leading-relaxed mb-12" style={{ color: 'rgba(14,95,19,0.8)' }}>
               Our mission is simple: to be the bridge that links Ethiopia's potential to the global stage — delivering quality, precision, and excellence across every vertical we operate in.
             </p>
-
-            <div className="inline-flex max-w-sm group">
-              <div className="flex-grow border border-[#0E5F13] py-4 px-6 font-bold text-sm text-[#0E5F13] group-hover:bg-[#0E5F13] group-hover:text-[#ECBD27] transition-colors cursor-pointer">
-                Request information
-              </div>
-              <div className="border border-[#0E5F13] border-l-0 py-4 px-5 flex items-center justify-center text-[#0E5F13] group-hover:bg-[#0E5F13] group-hover:text-[#ECBD27] transition-colors cursor-pointer">
-                →
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
@@ -512,42 +494,9 @@ export default function Aboutpage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          5. TIMELINE
+          5. JOURNEY (scroll-scrubbed video)
       ══════════════════════════════════════════════ */}
-      <section className="relative py-24 overflow-hidden" style={{ background: '#0E5F13' }}>
-        <NovaOrb size={600} x="80%" y="50%" color1="#ECBD27" color2="#0a3d0a" opacity={0.13} duration={11} delay={2} />
-        <NovaOrb size={400} x="10%" y="30%" color1="#ECBD27" color2="#0E5F13" opacity={0.1} duration={9} delay={5} />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <motion.div className="mb-14" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="h-[2px] w-8 bg-[#ECBD27]" />
-              <span className="text-[#ECBD27] text-xs tracking-[0.4em] uppercase font-bold" style={{ fontFamily: 'monospace' }}>Our Journey</span>
-            </div>
-            <Heading light>Building Ethiopia,{' '}<span style={{ color: '#ECBD27' }}>One Milestone at a Time</span></Heading>
-          </motion.div>
-
-          <div className="relative">
-            <div className="absolute left-[18px] md:left-1/2 top-0 bottom-0 w-[2px]" style={{ background: 'rgba(236,189,39,0.2)', transform: 'translateX(-50%)' }} />
-            <div className="flex flex-col gap-10">
-              {timeline.map((item, i) => (
-                <motion.div key={i}
-                  className={`relative flex items-start gap-6 md:gap-0 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40 }} whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.6 }}>
-                  <div className={`md:w-1/2 ${i % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'} pl-10 md:pl-0`}>
-                    <span className="font-black text-2xl block mb-1" style={{ fontFamily: "'Arial Black', sans-serif", color: '#ECBD27' }}>{item.year}</span>
-                    <p className="text-base" style={{ color: 'rgba(243,246,250,0.8)' }}>{item.event}</p>
-                  </div>
-                  <div className="absolute left-[10px] md:left-1/2 w-4 h-4 rounded-full border-2 border-[#ECBD27]"
-                    style={{ background: '#0E5F13', transform: 'translateX(-50%)', top: 4 }} />
-                  <div className="hidden md:block md:w-1/2" />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <JourneySection />
 
       {/* ══════════════════════════════════════════════
           6. FOOTPRINT

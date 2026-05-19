@@ -172,37 +172,22 @@ export default function About() {
             </filter>
           </defs>
 
-          {/* ABOUT US — yellowish base (visible on green bg AND dark bg image) */}
+          {/* ABOUT US — yellowish base */}
           <text
             x="138.5" y="28"
             textAnchor="middle" dominantBaseline="middle"
             fontFamily="'Arial Black', 'Arial Bold', sans-serif"
             fontWeight="900" fontSize="40" letterSpacing="-1.5"
             fill="#ECBD27"
-            style={{ userSelect: 'none', pointerEvents: 'none' }}
-          >
-            ABOUT US
-          </text>
-
-          {/* ABOUT US — dark green layer, clipped to logo shape (green-on-image) */}
-          <text
-            x="138.5" y="28"
-            textAnchor="middle" dominantBaseline="middle"
-            fontFamily="'Arial Black', 'Arial Bold', sans-serif"
-            fontWeight="900" fontSize="40" letterSpacing="-1.5"
-            fill="#0E5F13"
-            clipPath="url(#about-logo-clip)"
             style={{
               userSelect: 'none',
               pointerEvents: 'none',
-              opacity: hovered ? 0 : 1,
+              opacity: hovered ? 1 : 0,
               transition: 'opacity 0.4s ease',
             }}
           >
             ABOUT US
           </text>
-
-
 
           {/* Transparent hit areas — always on top, trigger hover */}
           <g style={{ cursor: 'pointer' }}>
@@ -215,82 +200,6 @@ export default function About() {
             <path d={pathImport} fill="transparent"
               onMouseEnter={() => setHovered('import')}
               onMouseLeave={() => setHovered(null)} />
-          </g>
-
-          {/* HOVER hint — visible only when nothing is hovered */}
-          <g
-            style={{
-              opacity: hovered ? 0 : 1,
-              transition: 'opacity 0.5s ease',
-              pointerEvents: 'none',
-            }}
-          >
-            {/* "HOVER" label — placed at the arrow origin point */}
-            <text
-              x="78" y="91"
-              textAnchor="middle" dominantBaseline="middle"
-              fontFamily="'Arial Black', monospace"
-              fontWeight="900" fontSize="5.5" letterSpacing="1.2"
-              fill="#ECBD27"
-              style={{ userSelect: 'none' }}
-            >
-              HOVER
-            </text>
-
-            {/*
-              Original paths from #010.svg (viewBox 0 0 1920 1080).
-              Scale factor: 277/1920 ≈ 0.1443 horizontally, 152/1080 ≈ 0.1407 vertically.
-              We apply transform="scale(0.1443, 0.1407)" to each group.
-
-              Arrow 1: Left arrow (→ Hospitality, top-left segment)
-              Body: line 17, Arrowhead: line 18
-            */}
-            <g transform="scale(0.1443, 0.1407)">
-              {/* Arrow 1 body */}
-              <path
-                d="M446.395 631.547C429.189 629.575 380.084 624.682 375.426 590.798C373.487 576.699 376.927 556.345 384.979 546.337C402.271 524.845 436.858 547.724 412.709 574.22C399.166 589.079 376.807 580.378 361.028 573.937C337.768 564.444 324.952 542.605 313.052 516.325C307.008 502.978 289.592 433.975 292.966 435.723"
-                fill="none" stroke="#ECBD27" strokeWidth="5" strokeLinecap="round"
-              />
-              {/* Arrow 1 arrowhead */}
-              <path
-                d="M284.037 411.272C287.466 413.225 313.391 429.254 310.403 426.773C306.492 423.526 302.22 420.684 298.619 416.847C294.359 412.309 289.34 409.175 285.472 404.086C282.078 399.62 279.588 431.393 280.152 437.011"
-                fill="none" stroke="#ECBD27" strokeWidth="5" strokeLinecap="round"
-              />
-            </g>
-
-            {/*
-              Arrow 2: Right arrow (→ Manufacturing, top-right segment)
-              Body: line 21, Arrowhead: line 22
-            */}
-            <g transform="scale(0.1443, 0.1407)">
-              {/* Arrow 2 body */}
-              <path
-                d="M625 630.762C644.116 638.469 697.918 661.496 737.383 616.868C753.804 598.298 771.314 567.695 773.606 548.777C778.528 508.149 720.653 519.151 717.398 570.959C715.572 600.013 746.725 601.431 769.018 602.012C801.88 602.867 837.062 580.075 875.901 550.505C895.626 535.488 983.869 449.43 978.72 449.826"
-                fill="none" stroke="#ECBD27" strokeWidth="5" strokeLinecap="round"
-              />
-              {/* Arrow 2 arrowhead */}
-              <path
-                d="M1012.73 421.011C1007.31 421.661 965.084 428.337 970.602 426.681C977.825 424.512 984.99 423.13 992.511 419.948C1001.41 416.183 1009.62 414.847 1018.69 410.072C1026.65 405.883 996.458 451.903 990.121 459.43"
-                fill="none" stroke="#ECBD27" strokeWidth="5" strokeLinecap="round"
-              />
-            </g>
-
-            {/*
-              Arrow 3: Down arrow (→ Import, bottom segment)
-              Body: line 19, Arrowhead: line 20
-            */}
-            <g transform="scale(0.1443, 0.1407)">
-              {/* Arrow 3 body */}
-              <path
-                d="M490.566 667C489.151 684.093 484.556 732.811 509.39 740.336C519.723 743.467 535.694 741.853 544.621 734.803C563.793 719.663 552.335 683.66 528.223 705.109C514.7 717.138 517.502 739.883 519.707 755.961C522.956 779.66 537.304 794.161 555.165 808.148C564.235 815.251 613.468 838.373 612.716 834.903"
-                fill="none" stroke="#ECBD27" strokeWidth="5" strokeLinecap="round"
-              />
-              {/* Arrow 3 arrowhead */}
-              <path
-                d="M629.697 845.809C628.799 842.267 621.058 815.378 622.429 818.532C624.224 822.66 625.651 827.108 627.944 830.983C630.656 835.567 632.178 840.776 635.372 845.022C638.175 848.747 613.731 848.437 609.578 847.393"
-                fill="none" stroke="#ECBD27" strokeWidth="5" strokeLinecap="round"
-              />
-            </g>
           </g>
         </svg>
 
