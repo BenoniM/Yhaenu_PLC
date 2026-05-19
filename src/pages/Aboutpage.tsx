@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import JourneySection from '../components/JourneySection'
+import LeadershipAccordion from '../components/LeadershipAccordion'
 import { motion, useScroll, useTransform, useMotionTemplate, useMotionValueEvent } from 'framer-motion'
 import Cta from '../components/Cta'
 import Footer from '../components/Footer'
@@ -228,11 +229,6 @@ const values = [
   { icon: '🏆', label: 'Excellence',     desc: 'Uncompromising quality across every vertical.' },
 ]
 
-const leadership = [
-  { name: 'Yhaenu Founder',       role: 'Group President & CEO',                    desc: "Visionary leader with 20+ years driving Ethiopia's trade and manufacturing growth." },
-  { name: 'Operations Director',  role: 'Group Executive Director, Operations',     desc: 'Coordinates logistics, manufacturing, and supply chain across all verticals.' },
-  { name: 'Trade Director',       role: 'Group Executive Director, Trade',          desc: 'Leads import-export strategy and international market expansion.' },
-]
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function SectionLabel({ text }: { text: string }) {
@@ -458,40 +454,9 @@ export default function Aboutpage() {
       <Services />
 
       {/* ══════════════════════════════════════════════
-          4. LEADERSHIP
+          4. LEADERSHIP (DIAGONAL ACCORDION)
       ══════════════════════════════════════════════ */}
-      <section className="relative py-24 overflow-hidden" style={{ background: '#F3F6FA' }}>
-        <NovaOrb size={500} x="15%" y="30%" color1="#ECBD27" color2="#F3F6FA" opacity={0.2} duration={10} delay={1} />
-        <NovaOrb size={400} x="85%" y="70%" color1="#0E5F13" color2="#F3F6FA" opacity={0.1} duration={8} delay={3} />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <motion.div className="mb-14" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <SectionLabel text="Executive Leadership" />
-            <Heading>Our <span style={{ color: '#ECBD27' }}>Leadership</span></Heading>
-            <p className="text-base max-w-xl" style={{ color: 'rgba(14,95,19,0.7)' }}>
-              Our senior executives bring tremendous experience, visionary thinking and a shared commitment to excellence, creativity, and innovation.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {leadership.map((l, i) => (
-              <motion.div key={i} className="rounded-2xl p-7"
-                style={{ background: '#fff', border: '1px solid rgba(14,95,19,0.1)', boxShadow: '0 2px 16px rgba(0,0,0,0.04)' }}
-                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-                whileHover={{ y: -6, boxShadow: '0 16px 40px rgba(14,95,19,0.12)', transition: { duration: 0.25 } }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 font-black text-xl"
-                  style={{ background: '#ECBD27', color: '#0E5F13', fontFamily: "'Arial Black', sans-serif" }}>
-                  {l.name[0]}
-                </div>
-                <h3 className="font-black uppercase text-sm mb-1" style={{ fontFamily: "'Arial Black', sans-serif", color: '#0E5F13' }}>{l.name}</h3>
-                <p className="text-xs mb-3" style={{ color: '#ECBD27' }}>{l.role}</p>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(14,95,19,0.6)' }}>{l.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <LeadershipAccordion />
 
       {/* ══════════════════════════════════════════════
           5. JOURNEY (scroll-scrubbed video)

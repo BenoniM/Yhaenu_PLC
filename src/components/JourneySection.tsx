@@ -18,23 +18,28 @@ const MILESTONES = [
 const SIDES: ('right' | 'left')[] = ['right', 'right', 'right', 'left', 'left', 'left']
 
 export default function JourneySection() {
+  const containerRef = useRef<HTMLDivElement>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
   const videoRef   = useRef<HTMLVideoElement>(null)
   const titleRef   = useRef<HTMLDivElement>(null)
   const panelRef   = useRef<HTMLDivElement>(null)
   const boxRef     = useRef<HTMLDivElement>(null)  // the moving container (rect + text)
+  const holeRef    = useRef<HTMLDivElement>(null)  // the transparent window
   const mRefs      = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
+    const container = containerRef.current
     const section = sectionRef.current
     const video   = videoRef.current
     const title   = titleRef.current
     const panel   = panelRef.current
     const box     = boxRef.current
-    if (!section || !video || !title || !panel || !box) return
+    const hole    = holeRef.current
+    if (!container || !section || !video || !title || !panel || !box || !hole) return
 
     gsap.set(panel, { x: '-100%' })
     gsap.set(box,   { left: '4%' })
+    gsap.set(hole,  { skewX: -12 })
     mRefs.current.forEach(el => el && gsap.set(el, { opacity: 0, y: 10 }))
 
     const proxy = { t: 0 }
@@ -42,10 +47,10 @@ export default function JourneySection() {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: section,
+          trigger: container,
           start: 'top top',
           end: '+=520%',
-          pin: true,
+          pin: section,
           anticipatePin: 1,
           scrub: 0.8,
         },
@@ -71,6 +76,10 @@ export default function JourneySection() {
       // Right phase  (0.78→1.0):  37% → 62%
       tl.to(box, { left: '62%', ease: 'none', duration: 0.22 }, 0.78)
 
+      // ── Rhombus shape flip ───────────────────────────────────────────────
+      // Flips the skew angle exactly as the text swaps from right to left (centered around 0.65)
+      tl.to(hole, { skewX: 12, ease: 'power2.inOut', duration: 0.10 }, 0.60)
+
       // Items 0-2: RIGHT side while rect moves left→center
       // Items 3-5: LEFT side while rect moves center→right
       // Switch happens at center pause (tl time 0.50-0.78)
@@ -89,16 +98,19 @@ export default function JourneySection() {
       schedule.forEach(({ idx, start }) => {
         const el = mRefs.current[idx]
         if (!el) return
-        tl.fromTo(el, { opacity: 0, y: 10 }, { opacity: 1, y: 0, ease: 'none', duration: F }, start)
-        tl.to(el, { opacity: 0, ease: 'none', duration: F }, start + F + H)
+        // Move UP to appear (from y: 16 to y: 0)
+        tl.fromTo(el, { opacity: 0, y: 16 }, { opacity: 1, y: 0, ease: 'power1.out', duration: F }, start)
+        // Move UP to disappear (from y: 0 to y: -16)
+        tl.to(el, { opacity: 0, y: -16, ease: 'power1.in', duration: F }, start + F + H)
       })
-    }, section)
+    }, container)
 
     return () => ctx.revert()
   }, [])
 
   return (
-    <div ref={sectionRef} className="h-screen overflow-hidden bg-black relative">
+    <div ref={containerRef}>
+      <div ref={sectionRef} className="h-screen overflow-hidden bg-black relative">
 
       <video ref={videoRef} src={journeyVideo} muted playsInline preload="auto"
         className="absolute inset-0 w-full h-full object-cover" />
@@ -142,7 +154,7 @@ export default function JourneySection() {
           zIndex: 2,
         }}>
           {/* Transparent window — box-shadow creates the green cover */}
-          <div style={{
+          <div ref={holeRef} style={{
             position: 'absolute', inset: 0,
             background: 'transparent',
             boxShadow: '0 0 0 200vmax #0E5F13',
@@ -202,6 +214,7 @@ export default function JourneySection() {
         </div>
 
       </div>
+    </div>
     </div>
   )
 }
