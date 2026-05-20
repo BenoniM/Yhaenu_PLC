@@ -107,7 +107,7 @@ function HowItWorksAccordion() {
       >
 
         {stepsData.map((item, i) => {
-          const flexValue = hoveredIndex === null ? 1 : (hoveredIndex === i ? 3.5 : 1)
+          const flexValue = hoveredIndex === null ? 1 : (hoveredIndex === i ? 3 : 1.8)
           const isHovered = hoveredIndex === i
           const isCompressed = hoveredIndex !== null && !isHovered
 
@@ -115,8 +115,18 @@ function HowItWorksAccordion() {
             <motion.div
               key={i}
               className="relative h-full overflow-hidden border-r border-black/30 cursor-pointer group"
-              animate={{ flex: flexValue }}
-              transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+              animate={{ 
+                flex: flexValue,
+                x: isCompressed ? [0, -5, 5, -3, 3, -1, 1, 0] : 0
+              }}
+              transition={{ 
+                flex: { duration: 0.6, ease: [0.25, 1, 0.5, 1] },
+                x: { 
+                  duration: 0.6, 
+                  repeat: isCompressed ? Infinity : 0, 
+                  repeatDelay: 0.8 
+                }
+              }}
               onMouseEnter={() => setHoveredIndex(i)}
             >
               <div
@@ -274,20 +284,20 @@ export default function RfqPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '50vh', background: '#0E5F13' }}>
+      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '70vh', background: '#0E5F13' }}>
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0E5F13 0%, rgba(14,95,19,0.5) 50%, rgba(14,95,19,0.2) 100%)' }} />
         <GridBackground color="#ECBD27" gridSize={60} opacity={0.08} isVisible={true} />
 
         <NovaOrb size={700} x="85%" y="40%" color1="#ECBD27" color2="#0E5F13" opacity={0.15} duration={10} />
         <NovaOrb size={400} x="5%" y="70%" color1="#ECBD27" color2="#0a3d0a" opacity={0.1} duration={7} delay={2} />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-36 pb-16 w-full">
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-40 pb-20 w-full">
           <motion.p className="text-xs tracking-[0.4em] uppercase mb-3" style={{ color: '#ECBD27', fontFamily: 'monospace' }}
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             Business Inquiry
           </motion.p>
           <motion.h1 className="font-black uppercase leading-none mb-4"
-            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(3rem, 8vw, 6rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
+            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
             initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
             Request a <span style={{ color: '#ECBD27' }}>Quote</span>
           </motion.h1>
@@ -295,6 +305,8 @@ export default function RfqPage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
             Tell us about your requirements and we'll provide a tailored quote within 24 hours.
           </motion.p>
+          {/* Spacer to match the height of the "Request a Quote" button on the Products page */}
+          <div style={{ height: 74 }} aria-hidden="true" />
         </div>
       </section>
 

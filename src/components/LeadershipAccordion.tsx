@@ -74,8 +74,8 @@ export default function LeadershipAccordion() {
       >
         
         {LEADERSHIP_DATA.map((item, i) => {
-          // If no item is hovered, all are equal (flex 1). If an item is hovered, that item is flex 3.5, others are flex 1.
-          const flexValue = hoveredIndex === null ? 1 : (hoveredIndex === i ? 3.5 : 1)
+          // If no item is hovered, all are equal (flex 1). If an item is hovered, that item is flex 3, others are flex 1.8.
+          const flexValue = hoveredIndex === null ? 1 : (hoveredIndex === i ? 3 : 1.8)
           const isHovered = hoveredIndex === i
           const isCompressed = hoveredIndex !== null && !isHovered
 
@@ -83,8 +83,18 @@ export default function LeadershipAccordion() {
             <motion.div
               key={i}
               className="relative h-full overflow-hidden border-r border-black/30 cursor-pointer group"
-              animate={{ flex: flexValue }}
-              transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+              animate={{ 
+                flex: flexValue,
+                x: isCompressed ? [0, -5, 5, -3, 3, -1, 1, 0] : 0
+              }}
+              transition={{ 
+                flex: { duration: 0.6, ease: [0.25, 1, 0.5, 1] },
+                x: { 
+                  duration: 0.6, 
+                  repeat: isCompressed ? Infinity : 0, 
+                  repeatDelay: 0.8 
+                }
+              }}
               onMouseEnter={() => setHoveredIndex(i)}
             >
               {/* ── Inner Content (Un-skewed) ── 

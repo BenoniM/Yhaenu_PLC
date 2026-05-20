@@ -257,7 +257,7 @@ export default function Services() {
                   key={i}
                   ref={el => { cardRefs.current[i] = el }}
                   className={`relative mb-[12px] transition-all duration-700 ease-out pointer-events-auto cursor-grab active:cursor-grabbing
-                    ${isActive ? 'opacity-100 scale-105' : 'opacity-10 scale-90 blur-[1.5px]'}`}
+                    ${isActive ? 'opacity-100 scale-105 z-10' : 'opacity-100 scale-90 blur-[3px]'}`}
                   style={{
                     width: CARD_W,
                     height: CARD_H,

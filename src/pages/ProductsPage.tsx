@@ -144,7 +144,7 @@ export default function ProductsPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '50vh', background: '#0E5F13' }}>
+      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '70vh', background: '#0E5F13' }}>
         {/* Background video */}
         <video
           ref={videoRef}
@@ -158,13 +158,13 @@ export default function ProductsPage() {
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0E5F13 0%, rgba(14,95,19,0.5) 50%, rgba(14,95,19,0.2) 100%)' }} />
         <GridBackground color="#ECBD27" gridSize={60} opacity={0.08} isVisible={true} />
 
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-40 pb-16">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-40 pb-20">
           <motion.p className="text-xs tracking-[0.4em] uppercase mb-3" style={{ color: '#ECBD27', fontFamily: 'monospace' }}
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             Our Collection
           </motion.p>
           <motion.h1 className="font-black uppercase leading-none mb-4"
-            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(3rem, 8vw, 6rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
+            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
             initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
             Products & <span style={{ color: '#ECBD27' }}>Services</span>
           </motion.h1>

@@ -60,8 +60,8 @@ export default function Footer() {
         <div 
           className="absolute inset-0 bg-[#0E5F13]/50 backdrop-blur-[0.5px]" 
         />
-        {/* Subtle Grain Overlay */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        {/* NOISE OVERLAY - removed broken vercel.app/noise.svg */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" />
       </div>
 
       {/* Top Section: 5-Column Grid */}

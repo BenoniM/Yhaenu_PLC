@@ -42,6 +42,26 @@ const mobileParagraphs = {
 
 const shadow = '0 2px 20px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,0.8)'
 
+const imageVariants = {
+  idle: (i: number) => ({
+    scale: [1, 1.05, 1],
+    transition: {
+      duration: 5,
+      repeat: Infinity,
+      ease: "easeInOut",
+      delay: i * 1,
+    }
+  }),
+  hovered: {
+    scale: 1.1,
+    transition: { duration: 0.6, ease: "easeOut" }
+  },
+  unhovered: {
+    scale: 1,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+}
+
 export default function About() {
   const [hovered, setHovered] = useState<Section>(null)
 
@@ -136,12 +156,12 @@ export default function About() {
       >
         {/* Masked Logo Windows (Unhovered State) */}
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
-          {(['import', 'manufacturing', 'hospitality'] as const).map((id) => {
+          {(['import', 'manufacturing', 'hospitality'] as const).map((id, index) => {
              const pathD = id === 'import' ? pathImport : id === 'manufacturing' ? pathManufacturing : pathHospitality;
              return (
               <div
                 key={`mask-${id}`}
-                className="absolute inset-0 w-full h-full"
+                className="absolute inset-0 w-full h-full origin-center"
                 style={{
                   maskImage: getMaskUrl(pathD),
                   WebkitMaskImage: getMaskUrl(pathD),
@@ -155,18 +175,26 @@ export default function About() {
                   transition: 'opacity 0.5s ease'
                 }}
               >
-                <img src={SECTION_IMAGES[id]} alt={id} className="w-full h-full object-cover" style={{ filter: 'brightness(0.7) contrast(1.1)' }} />
-                
-                {/* Overlay over it (yellowish unhovered, greenish when hovered) */}
-                <div 
-                  className="absolute inset-0" 
-                  style={{ 
-                    backgroundColor: displaySection === id ? '#0E5F13' : '#ECBD27', 
-                    opacity: displaySection === id ? 0.6 : 0.25,
-                    backdropFilter: displaySection === id ? 'blur(4px)' : 'blur(2px)',
-                    transition: 'all 0.5s ease' 
-                  }} 
-                />
+                <motion.div
+                  custom={index}
+                  variants={imageVariants}
+                  initial="idle"
+                  animate={displaySection === id ? "hovered" : displaySection !== null ? "unhovered" : "idle"}
+                  className="absolute inset-0 w-full h-full origin-center"
+                >
+                  <img src={SECTION_IMAGES[id]} alt={id} className="w-full h-full object-cover" style={{ filter: 'brightness(0.7) contrast(1.1)' }} />
+                  
+                  {/* Overlay over it (yellowish unhovered, greenish when hovered) */}
+                  <div 
+                    className="absolute inset-0" 
+                    style={{ 
+                      backgroundColor: displaySection === id ? '#0E5F13' : '#ECBD27', 
+                      opacity: displaySection === id ? 0.6 : 0.25,
+                      backdropFilter: displaySection === id ? 'blur(4px)' : 'blur(2px)',
+                      transition: 'all 0.5s ease' 
+                    }} 
+                  />
+                </motion.div>
               </div>
             )
           })}
@@ -214,18 +242,20 @@ export default function About() {
               </text>
 
               <g style={{ cursor: 'pointer' }}>
-                <path d={pathHospitality} fill="transparent"
-                  onMouseEnter={() => setHovered('hospitality')}
-                  onMouseLeave={() => setHovered(null)}
-                  onClick={() => cycleSection('hospitality')} />
-                <path d={pathManufacturing} fill="transparent"
-                  onMouseEnter={() => setHovered('manufacturing')}
-                  onMouseLeave={() => setHovered(null)}
-                  onClick={() => cycleSection('manufacturing')} />
-                <path d={pathImport} fill="transparent"
-                  onMouseEnter={() => setHovered('import')}
-                  onMouseLeave={() => setHovered(null)}
-                  onClick={() => cycleSection('import')} />
+                {(['import', 'manufacturing', 'hospitality'] as const).map((id) => {
+                  const pathD = id === 'import' ? pathImport : id === 'manufacturing' ? pathManufacturing : pathHospitality;
+                  return (
+                    <path
+                      key={`path-${id}`}
+                      d={pathD}
+                      fill="transparent"
+                      style={{ transformOrigin: '138.5px 76px' }}
+                      onMouseEnter={() => setHovered(id)}
+                      onMouseLeave={() => setHovered(null)}
+                      onClick={() => cycleSection(id)}
+                    />
+                  )
+                })}
               </g>
             </svg>
           </div>

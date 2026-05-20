@@ -12,6 +12,8 @@ const products = [
     title: 'Green Coffee Beans',
     shortTitle: 'Coffee',
     description: 'Premium Ethiopian Arabica green coffee — washed and natural processed from Yirgacheffe, Sidama, Jimma, and Harar regions.',
+    longDescription: 'Our green coffee beans are sourced from the finest high-altitude regions of Ethiopia. With meticulous quality control, we ensure every batch meets export grade standards, offering the rich, distinct flavor profiles that Ethiopian coffee is famous for worldwide.',
+    features: ['Washed & Natural Processed', 'Fully Traceable', 'High Altitude Grown', 'Direct from Farmers'],
     image: 'src/assets/about/export.jpg',
     type: 'Export',
     category: 'Specialty Coffee',
@@ -22,6 +24,8 @@ const products = [
     title: 'Oilseeds & Pulses',
     shortTitle: 'Oilseeds',
     description: 'High-quality Ethiopian sesame seeds, lentils, and other oilseeds exported to international markets with full traceability.',
+    longDescription: 'We export premium Ethiopian oilseeds and pulses, renowned for their nutritional value and purity. Our state-of-the-art cleaning and sorting facilities guarantee a product that meets strict international food safety standards.',
+    features: ['99% Purity Minimum', 'Mechanically Cleaned', 'Organically Grown', 'Bulk Packaging Options'],
     image: '/products2.jpeg',
     type: 'Export',
     category: 'Oil Seeds',
@@ -32,6 +36,8 @@ const products = [
     title: 'Cardboard Packaging',
     shortTitle: 'Packaging',
     description: 'Manufacturing high-quality cardboard and carton packaging products that meet global standards for local and international clients.',
+    longDescription: 'Our manufacturing division produces durable, customizable cardboard and carton packaging. We cater to various industries, providing sustainable packaging solutions that protect goods during transit and enhance brand presentation.',
+    features: ['Corrugated Cartons', 'Custom Printing', 'Eco-Friendly Materials', 'Industrial & Retail Packaging'],
     image: 'src/assets/about/manufacturing.jpg',
     type: 'Manufacturing',
     category: 'Packaging',
@@ -42,6 +48,8 @@ const products = [
     title: 'Transportation Fleet',
     shortTitle: 'Logistics',
     description: 'Reliable fleet of vehicles providing seamless goods transportation across Ethiopia, ensuring timely and secure delivery.',
+    longDescription: 'With a robust fleet of modern trucks, our logistics division ensures safe and timely delivery of goods across Ethiopia. We handle both dry freight and specialized cargo, offering end-to-end supply chain solutions.',
+    features: ['GPS Tracked Fleet', 'Experienced Drivers', 'Heavy Duty Transport', 'Warehousing Services'],
     image: 'src/assets/about/transportation2.jpg',
     type: 'Logistics',
     category: 'Transportation',
@@ -52,6 +60,8 @@ const products = [
     title: 'South Star Hotel',
     shortTitle: 'Hospitality',
     description: 'A 4-star hotel in Hawassa offering memorable experiences through modern, welcoming hospitality for business and leisure travelers.',
+    longDescription: 'South Star International Hotel in Hawassa is a beacon of luxury and comfort. Whether for business conferences or leisurely getaways, our 4-star amenities, exceptional dining, and dedicated staff provide an unforgettable experience.',
+    features: ['Luxury Accommodations', 'Conference Facilities', 'Fine Dining Restaurants', 'Swimming Pool & Spa'],
     image: 'src/assets/about/hospitality.jpg',
     type: 'Hospitality',
     category: 'Hotel & Leisure',
@@ -64,9 +74,11 @@ const products = [
 function PanelCard({
   product,
   cardRef,
+  onExplore,
 }: {
   product: (typeof products)[0]
   cardRef: (el: HTMLDivElement | null) => void
+  onExplore: () => void
 }) {
   const [hovered, setHovered] = useState(false)
 
@@ -170,6 +182,16 @@ function PanelCard({
         >
           {product.type} · {product.detail}
         </p>
+
+        <button
+          onClick={onExplore}
+          className="relative overflow-hidden group border border-[#ECBD27]/30 hover:border-[#ECBD27] transition-colors duration-300 rounded-full px-8 py-3"
+        >
+          <div className="absolute inset-0 bg-[#ECBD27] translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+          <span className="relative z-10 text-[#ECBD27] group-hover:text-[#0E5F13] font-bold text-xs uppercase tracking-widest transition-colors duration-300">
+            Explore More
+          </span>
+        </button>
       </div>
     </div>
   )
@@ -182,6 +204,8 @@ export default function WhatWeOffer() {
   const heroTextRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)   // green panel sliding from right
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  const [activeProduct, setActiveProduct] = useState<(typeof products)[0] | null>(null)
 
   useEffect(() => {
     const container = containerRef.current
@@ -418,6 +442,7 @@ export default function WhatWeOffer() {
                 key={product.title}
                 product={product}
                 cardRef={(el) => { cardRefs.current[i] = el }}
+                onExplore={() => setActiveProduct(product)}
               />
             ))}
           </div>
@@ -436,6 +461,92 @@ export default function WhatWeOffer() {
             zIndex: 5,
           }}
         />
+      </div>
+
+      {/* ── Detail Panel Overlay ── */}
+      <div
+        className={`fixed inset-0 z-50 transition-all duration-500 ${
+          activeProduct ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* Backdrop blur */}
+        <div 
+          className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-500" 
+          onClick={() => setActiveProduct(null)}
+        />
+
+        {/* Slide-in content panel */}
+        <div
+          className={`absolute top-0 left-0 h-full w-full md:w-[75%] bg-[#0E5F13] shadow-[20px_0_60px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-y-auto overflow-x-hidden ${
+            activeProduct ? 'translate-x-0' : '-translate-x-full'
+          }`}
+          style={{
+            background: 'linear-gradient(145deg, #0c4a10 0%, #0E5F13 50%, #0a3d0e 100%)',
+          }}
+        >
+          <GridBackground color="#ECBD27" gridSize={40} opacity={0.06} isVisible={true} />
+          
+          <div className="relative z-10 px-8 py-12 md:px-16 h-full flex flex-col">
+            <button 
+              onClick={() => setActiveProduct(null)} 
+              className="absolute top-16 md:top-24 right-8 md:right-16 text-[#ECBD27] border border-[#ECBD27] hover:bg-[#ECBD27] hover:text-[#0E5F13] transition-colors p-2 rounded-full z-20 shadow-lg bg-[#0E5F13]/50 backdrop-blur-sm"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {activeProduct && (
+              <div className="flex-1 flex flex-col md:flex-row gap-10 md:gap-16 items-start h-full pt-20 md:pt-28 pb-16">
+                
+                {/* Left Side: Text and Details */}
+                <div className="w-full md:w-1/2 flex flex-col justify-center py-4">
+                  <span className="inline-block self-start bg-[#ECBD27] text-[#0E5F13] text-[10px] font-black uppercase tracking-widest px-3 py-1 mb-6 font-['Arial_Black']">
+                    {activeProduct.badge}
+                  </span>
+
+                  <h2 className="text-[#F3F6FA] text-3xl md:text-4xl font-black uppercase tracking-tighter leading-[1.1] mb-6 font-['Arial_Black']">
+                    {activeProduct.title}
+                  </h2>
+
+                  <div className="w-full h-px bg-[#ECBD27]/30 mb-6" />
+
+                  <p className="text-[#F3F6FA]/90 text-sm md:text-base leading-relaxed mb-8">
+                    {activeProduct.longDescription}
+                  </p>
+
+                  <h3 className="text-[#ECBD27] text-xs uppercase tracking-widest font-bold mb-4 font-mono">
+                    Key Features
+                  </h3>
+                  
+                  <ul className="space-y-3 mb-10">
+                    {activeProduct.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center text-[#F3F6FA]/80 text-sm">
+                        <span className="w-1.5 h-1.5 bg-[#ECBD27] rounded-full mr-4 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button className="w-full md:w-max px-12 bg-[#ECBD27] hover:bg-[#F3F6FA] text-[#0E5F13] transition-colors duration-300 font-black text-sm uppercase tracking-widest py-4 rounded-full font-['Arial_Black'] shadow-lg">
+                    Inquire Now
+                  </button>
+                </div>
+
+                {/* Right Side: Image */}
+                <div className="w-full md:w-1/2 h-[30vh] md:h-[70%] md:sticky md:top-28 relative rounded-2xl overflow-hidden border border-[#ECBD27]/20 flex-shrink-0 shadow-2xl">
+                  <img 
+                    src={activeProduct.image} 
+                    alt={activeProduct.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#0E5F13]/80 via-transparent to-transparent mix-blend-multiply" />
+                  <div className="absolute inset-0 border border-[#ECBD27]/10 rounded-2xl" />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <style>{`

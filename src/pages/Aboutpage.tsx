@@ -291,7 +291,7 @@ export default function Aboutpage() {
       {/* ══════════════════════════════════════════════
           1. HERO
       ══════════════════════════════════════════════ */}
-      <div ref={heroRef} className="relative overflow-hidden" style={{ minHeight: '70vh', background: '#0E5F13' }}>
+      <div ref={heroRef} className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '70vh', background: '#0E5F13' }}>
         <motion.video
           src={VIDEO_SRC}
           autoPlay muted loop playsInline preload="auto"
@@ -305,7 +305,7 @@ export default function Aboutpage() {
         <NovaOrb size={400} x="10%" y="70%" color1="#ECBD27" color2="#0a3d0a" opacity={0.12} duration={7} delay={2} />
 
         <motion.div
-          className="relative z-10 flex flex-col justify-end h-full max-w-6xl mx-auto px-6 pb-20 pt-40"
+          className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-40 pb-20"
           style={{ opacity: heroOpacity }}
         >
           <motion.p className="text-xs tracking-[0.4em] uppercase mb-3" style={{ color: '#ECBD27', fontFamily: 'monospace' }}
@@ -314,7 +314,7 @@ export default function Aboutpage() {
           </motion.p>
           <motion.h1
             className="font-black uppercase leading-none mb-4"
-            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(3rem, 9vw, 7rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
+            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
             initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
           >
             About <span style={{ color: '#ECBD27' }}>YHAENU</span>
@@ -323,6 +323,8 @@ export default function Aboutpage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}>
             Yhaenu PLC continues to grow its vision of becoming a leading diversified Ethiopian enterprise delivering sustainable value across agriculture, manufacturing, logistics, and international trade.
           </motion.p>
+          {/* Spacer to match the height of the "Request a Quote" button on the Products page */}
+          <div style={{ height: 74 }} aria-hidden="true" />
         </motion.div>
       </div>
 

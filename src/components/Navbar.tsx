@@ -235,7 +235,7 @@ export default function Navbar() {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       >
         <div
-          className="navbar-container relative flex items-center px-8 py-3 mx-auto w-full transition-all duration-700 ease-in-out"
+          className="navbar-container relative flex items-stretch px-8 mx-auto w-full transition-all duration-700 ease-in-out h-[64px]"
           style={{
             background: shouldHaveBg ? '#0E5F13' : 'transparent',
             maxWidth: (isHomePage && isPastHero) ? 720 : 1600,
@@ -263,24 +263,24 @@ export default function Navbar() {
           </Link>
 
           {/* Nav links — centered */}
-          <div className="flex-1 flex items-center justify-center gap-6 relative">
+          <div className="flex-1 flex items-stretch justify-center gap-4 relative">
             {navLinks.map((link, idx) => {
               const isActive = location.pathname === link.href
               return (
                 <Link
                   key={link.href}
                   to={link.href}
-                  className={`nav-link-${idx} relative flex flex-col items-center px-4 py-2 cursor-pointer z-10 no-underline`}
+                  className={`nav-link-${idx} relative flex items-center justify-center w-[130px] cursor-pointer z-10 no-underline group`}
                   style={{
                     background: 'transparent',
                     textDecoration: 'none'
                   }}
                 >
                   <span
-                    className="font-bold uppercase text-[11px] tracking-widest"
+                    className="font-bold uppercase text-[11px] tracking-widest relative z-10 transition-colors duration-300"
                     style={{
                       fontFamily: "Poppins, sans-serif",
-                      color: '#ECBD27',
+                      color: isActive ? '#0E5F13' : '#ECBD27',
                       letterSpacing: '0.15em'
                     }}
                   >
@@ -289,8 +289,11 @@ export default function Navbar() {
                   {isActive && (
                     <motion.div
                       layoutId="nav-underline"
-                      className="absolute bottom-1 left-1 right-1 h-[3px]"
-                      style={{ background: '#ECBD27' }}
+                      className="absolute inset-0 z-0"
+                      style={{ 
+                        background: '#ECBD27',
+                        clipPath: 'polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%)'
+                      }}
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -311,9 +314,8 @@ export default function Navbar() {
           {/* RFQ — far right */}
           <Link
             to="/rfq"
-            className="nav-right flex items-center px-10 py-3 cursor-pointer flex-shrink-0 overflow-hidden no-underline"
+            className="nav-right flex items-center self-center py-3 px-10 cursor-pointer flex-shrink-0 overflow-hidden no-underline bg-white hover:bg-[#ECBD27] transition-colors duration-300 group"
             style={{
-              background: '#ECBD27',
               clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
               textDecoration: 'none'
             }}

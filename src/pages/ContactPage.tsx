@@ -236,7 +236,7 @@ export default function ContactPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '50vh', background: '#0E5F13' }}>
+      <section className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '70vh', background: '#0E5F13' }}>
         {/* Background video */}
         <video
           ref={videoRef}
@@ -253,13 +253,13 @@ export default function ContactPage() {
         <NovaOrb size={600} x="80%" y="50%" color1="#ECBD27" color2="#0E5F13" opacity={0.15} duration={10} />
         <NovaOrb size={350} x="10%" y="60%" color1="#ECBD27" color2="#0a3d0a" opacity={0.1} duration={7} delay={2} />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-36 pb-16 w-full">
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-40 pb-20 w-full">
           <motion.p className="text-xs tracking-[0.4em] uppercase mb-3" style={{ color: '#ECBD27', fontFamily: 'monospace' }}
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             Get In Touch
           </motion.p>
           <motion.h1 className="font-black uppercase leading-none mb-4"
-            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(3rem, 8vw, 6rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
+            style={{ fontFamily: "'Arial Black', sans-serif", fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', color: '#F3F6FA', letterSpacing: '-0.02em' }}
             initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
             Contact <span style={{ color: '#ECBD27' }}>Us</span>
           </motion.h1>
@@ -267,6 +267,8 @@ export default function ContactPage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
             Reach out to our team for inquiries about import, export, manufacturing, or any of our services.
           </motion.p>
+          {/* Spacer to match the height of the "Request a Quote" button on the Products page */}
+          <div style={{ height: 74 }} aria-hidden="true" />
         </div>
       </section>
 
