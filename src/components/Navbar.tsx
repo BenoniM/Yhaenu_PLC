@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import gsap from 'gsap'
 import logoText from '../assets/logo/Logo-Text.svg'
@@ -20,6 +20,60 @@ const WAVE_FLAT = 'M0,60 C150,50 300,50 450,60 C600,70 750,70 900,60 C1050,50 12
 const WAVE_RISE1 = 'M0,50 C150,35 300,40 450,50 C600,60 750,65 900,50 C1050,35 1200,40 1350,50 L1440,50 L1440,0 L0,0 Z'
 const WAVE_RISE2 = 'M0,55 C150,45 300,35 450,55 C600,75 750,60 900,55 C1050,45 1200,35 1350,55 L1440,55 L1440,0 L0,0 Z'
 const WAVE_SETTLE = 'M0,58 C150,48 300,45 450,58 C600,68 750,68 900,58 C1050,48 1200,45 1350,58 L1440,58 L1440,0 L0,0 Z'
+
+function AnimatedHamburger({ trigger, open }: { trigger: boolean, open: boolean }) {
+  const controls = useAnimation()
+
+  useEffect(() => {
+    const runAnim = async () => {
+      if (open) {
+        await controls.start("align")
+      } else if (trigger) {
+        await controls.start("initial", { duration: 0 })
+        await controls.start("compress")
+        await controls.start("align")
+      } else {
+        await controls.start("initial")
+      }
+    }
+    runAnim()
+  }, [trigger, open, controls])
+
+  return (
+    <svg viewBox="0 0 277 152" className="w-12 h-12 overflow-visible" style={{ pointerEvents: 'none' }}>
+      {/* Left Arm (Transportation) - Becomes Top Line */}
+      <motion.path d={pathTransportation} fill="#ECBD27"
+        style={{ vectorEffect: "non-scaling-stroke", strokeLinecap: "round", strokeLinejoin: "round", stroke: "#ECBD27" }}
+        animate={controls}
+        variants={{
+          initial: { scaleY: 1, scaleX: 1, x: "0%", y: "0%", strokeWidth: 0, originX: 0.5, originY: 0.5 },
+          compress: { y: "-40%", scaleY: 0.05, scaleX: 1.1, strokeWidth: 3, transition: { duration: 1.2, ease: "anticipate" } },
+          align: { x: "53%", y: "-38%", scaleY: 0.05, scaleX: 1.33, strokeWidth: 6, transition: { duration: 1.2, ease: "backOut" } }
+        }}
+      />
+      {/* Right Arm (Manufacturing) - Becomes Middle Line */}
+      <motion.path d={pathManufacturing} fill="#ECBD27"
+        style={{ vectorEffect: "non-scaling-stroke", strokeLinecap: "round", strokeLinejoin: "round", stroke: "#ECBD27" }}
+        animate={controls}
+        variants={{
+          initial: { scaleY: 1, scaleX: 1, x: "0%", y: "0%", strokeWidth: 0, originX: 0.5, originY: 0.5 },
+          compress: { y: "40%", scaleY: 0.05, scaleX: 1.1, strokeWidth: 3, transition: { duration: 1.2, ease: "anticipate" } },
+          align: { x: "-56%", y: "86%", scaleY: 0.05, scaleX: 1.38, strokeWidth: 6, transition: { duration: 1.2, ease: "backOut" } }
+        }}
+      />
+      {/* Bottom Stem (Import) - Becomes Bottom Line */}
+      <motion.path d={pathImport} fill="#ECBD27"
+        style={{ vectorEffect: "non-scaling-stroke", strokeLinecap: "round", strokeLinejoin: "round", stroke: "#ECBD27" }}
+        animate={controls}
+        variants={{
+          initial: { scaleY: 1, scaleX: 1, x: "0%", y: "0%", strokeWidth: 0, originX: 0.5, originY: 0.5 },
+          compress: { y: "40%", scaleY: 0.05, scaleX: 1.0, strokeWidth: 3, transition: { duration: 1.2, ease: "anticipate" } },
+          align: { x: "-4%", y: "42%", scaleY: 0.05, scaleX: 1.16, strokeWidth: 6, transition: { duration: 1.2, ease: "backOut" } }
+        }}
+      />
+    </svg>
+  )
+}
 
 function AnimatedWave() {
   return (
@@ -120,7 +174,14 @@ export default function Navbar() {
     }
     const handleComplete = () => setIsHeroFinished(true)
     window.addEventListener('hero-animation-complete', handleComplete)
-    return () => window.removeEventListener('hero-animation-complete', handleComplete)
+
+    // Failsafe: if the GSAP animation gets blocked or bypassed on mobile, force the navbar to appear after 4 seconds
+    const failsafe = setTimeout(() => setIsHeroFinished(true), 4000)
+
+    return () => {
+      window.removeEventListener('hero-animation-complete', handleComplete)
+      clearTimeout(failsafe)
+    }
   }, [location.pathname])
 
   useEffect(() => {
@@ -275,13 +336,7 @@ export default function Navbar() {
           MOBILE TOP BAR
       ══════════════════════════════════════════════ */}
       <motion.header
-        className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 transition-colors duration-500"
-        style={{
-          height: 60,
-          background: shouldHaveBg ? '#0E5F13' : 'transparent',
-          backdropFilter: shouldHaveBg ? 'blur(8px)' : 'none',
-          borderBottom: shouldHaveBg ? '1px solid rgba(236,189,39,0.1)' : 'none'
-        }}
+        className={`md:hidden fixed top-4 left-0 right-0 ${open ? 'z-[9990]' : 'z-[10000]'} flex items-center justify-center pointer-events-none`}
         initial={{ y: -80, opacity: 0 }}
         animate={{
           y: (visible && isHeroFinished) ? 0 : -80,
@@ -289,17 +344,14 @@ export default function Navbar() {
         }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       >
-        <img src={logoText} alt="YHAENU" style={{ height: 20, width: 'auto', filter: 'brightness(0) saturate(100%) invert(86%) sepia(43%) saturate(1478%) hue-rotate(345deg) brightness(100%) contrast(92%)' }} />
         <motion.button
           onClick={() => setOpen(true)}
           aria-label="Open menu"
           whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
-          className="w-10 h-10 rounded-full flex flex-col items-center justify-center gap-[5px]"
-          style={{ background: 'rgba(236,189,39,0.15)', border: '1px solid rgba(236,189,39,0.3)' }}
+          className="w-16 h-16 rounded-full flex items-center justify-center pointer-events-auto border-2 shadow-lg"
+          style={{ background: '#0E5F13', borderColor: '#ECBD27' }}
         >
-          <span className="block w-4 h-[2px] rounded-full bg-[#ECBD27]" />
-          <span className="block w-4 h-[2px] rounded-full bg-[#ECBD27]" />
-          <span className="block w-3 h-[2px] rounded-full bg-[#ECBD27]" />
+          <AnimatedHamburger trigger={visible && isHeroFinished} open={open} />
         </motion.button>
       </motion.header>
 
@@ -311,45 +363,81 @@ export default function Navbar() {
           <>
             <motion.div key="backdrop"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[99] bg-black/50 md:hidden"
+              className="fixed inset-0 z-[9998] bg-black/60 md:hidden backdrop-blur-sm"
               onClick={() => setOpen(false)}
             />
             <motion.div key="panel"
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed top-0 right-0 bottom-0 z-[100] w-full md:hidden flex flex-col"
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed top-0 right-0 bottom-0 z-[9999] w-full md:hidden flex flex-col"
               style={{ background: '#F3F6FA', overflow: 'visible' }}
             >
               <AnimatedWave />
 
-              {/* Close */}
-              <div className="flex items-center justify-between px-6 py-4 relative z-10">
-                <img src={logoText} alt="YHAENU" style={{ height: 18, width: 'auto', filter: 'brightness(0) saturate(100%) invert(86%) sepia(43%) saturate(1478%) hue-rotate(345deg) brightness(100%) contrast(92%)' }} />
+              {/* Close Button perfectly overlaid on top of the hamburger button spot */}
+              <div className="fixed top-4 left-0 right-0 flex items-center justify-center z-50 pointer-events-none">
                 <motion.button onClick={() => setOpen(false)} aria-label="Close menu"
                   whileHover={{ scale: 1.08, rotate: 90 }} whileTap={{ scale: 0.95 }}
-                  className="w-10 h-10 rounded-full bg-[#0E5F13] flex items-center justify-center shadow-md">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F3F6FA" strokeWidth="3" strokeLinecap="round">
+                  className="w-16 h-16 rounded-full flex items-center justify-center border-2 shadow-lg pointer-events-auto"
+                  style={{ background: '#0E5F13', borderColor: '#ECBD27' }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ECBD27" strokeWidth="2.5" strokeLinecap="round">
                     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
                 </motion.button>
               </div>
-
-              {/* Links */}
-              <nav className="flex flex-col justify-center flex-1 px-8 gap-6 relative z-10">
-                {navLinks.map((link, i) => (
-                  <FlipWord
-                    key={link.href}
-                    label={link.label}
-                    href={link.href}
-                    isActive={location.pathname === link.href}
-                    onClick={() => setOpen(false)}
-                    delay={0.05 + i * 0.07}
-                  />
-                ))}
+              {/* Elegant Premium Links */}
+              <nav className="flex flex-col justify-center flex-1 px-10 gap-8 relative z-10 mt-24 pb-8">
+                {navLinks.map((link, i) => {
+                  const isActive = location.pathname === link.href;
+                  return (
+                    <motion.a
+                      key={link.href}
+                      href={link.href}
+                      onClick={(e) => { e.preventDefault(); setOpen(false); navigate(link.href); }}
+                      initial={{ opacity: 0, x: -30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.5, delay: 0.1 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                      className="block relative overflow-hidden group"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <div className="flex items-center justify-between border-b border-[#0E5F13]/20 pb-4">
+                        <span className="font-medium uppercase tracking-[0.2em] text-2xl"
+                          style={{
+                            fontFamily: "'Poppins', sans-serif",
+                            color: isActive ? '#ECBD27' : '#0E5F13'
+                          }}>
+                          {link.label}
+                        </span>
+                        <motion.span
+                          initial={{ x: -10, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: 0.3 + i * 0.1 }}
+                        >
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={isActive ? '#ECBD27' : '#0E5F13'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                          </svg>
+                        </motion.span>
+                      </div>
+                      {/* Active Indicator Line */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="mobile-premium-indicator"
+                          className="absolute bottom-0 left-0 h-[2px] bg-[#ECBD27]"
+                          initial={{ width: 0 }}
+                          animate={{ width: '100%' }}
+                          transition={{ duration: 0.6, ease: "circOut" }}
+                        />
+                      )}
+                    </motion.a>
+                  );
+                })}
                 <motion.a href="/rfq" onClick={() => { setOpen(false); navigate('/rfq') }}
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.4 }}
-                  className="inline-flex items-center gap-2 self-start font-black uppercase tracking-wide px-10 py-3 text-sm"
+                  className="flex items-center justify-center gap-2 w-full font-black uppercase tracking-wide py-8 text-base shadow-md mt-4 relative top-40"
                   style={{
                     fontFamily: "'Arial Black', sans-serif",
                     background: '#0E5F13',

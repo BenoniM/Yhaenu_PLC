@@ -80,12 +80,25 @@ function FaqItem({
         {/* Interactive Hover Accent */}
         <div className="absolute inset-0 bg-[#ECBD27]/30 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500" />
 
+        {/* Mobile: yellow left accent bar */}
+        <div
+          className="md:hidden absolute left-0 inset-y-0 w-[3px] transition-all duration-500"
+          style={{ background: '#ECBD27', opacity: isOpen ? 1 : 0.25 }}
+        />
+
         <div className={`transition-transform duration-500 ${unskewClass}`}>
           <button
             onClick={onClick}
             className="w-full py-6 px-8 md:px-20 flex items-center justify-between transition-all"
           >
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-4">
+              {/* Mobile question number */}
+              <span
+                className="md:hidden flex-shrink-0 text-[#ECBD27] font-black text-2xl leading-none w-10"
+                style={{ fontFamily: "'Arial Black', sans-serif" }}
+              >
+                {String(item.id).padStart(2, '0')}
+              </span>
               <h3
                 className="text-left font-bold text-lg md:text-xl capitalize tracking-tight"
                 style={{

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import GridBackground from './GridBackground'
 
 type Section = 'import' | 'manufacturing' | 'hospitality' | null
@@ -33,10 +34,34 @@ const PARA_PARTS: { text: string; key: Section | null }[] = [
   { text: "\nHeadquartered in Ethiopia, we have grown into a trusted name in both local and international markets. Our mission is simple: to be the bridge that links Ethiopia's potential to the global stage — delivering quality, precision, and excellence across every vertical we operate in.", key: null },
 ]
 
+const mobileParagraphs = {
+  import: 'Bridging Ethiopian markets with the globe through premium coffee export and diverse import operations.',
+  manufacturing: 'Producing high-quality cardboard and packaging solutions that meet rigorous international standards.',
+  hospitality: 'Delivering exceptional guest experiences with world-class service across our growing hospitality portfolio.'
+}
+
 const shadow = '0 2px 20px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,0.8)'
 
 export default function About() {
   const [hovered, setHovered] = useState<Section>(null)
+
+  // ── Mobile: start with a default active section so content is visible ──
+  const [mobileSection, setMobileSection] = useState<Section>('import')
+  const [isMobileView, setIsMobileView] = useState(
+    typeof window !== 'undefined' && window.innerWidth < 768
+  )
+  useEffect(() => {
+    const handler = () => setIsMobileView(window.innerWidth < 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+
+  // Desktop uses mouse hover; mobile uses the tapped section
+  const displaySection = isMobileView ? mobileSection : hovered
+
+  const cycleSection = (id: Section) => {
+    setMobileSection(id)
+  }
 
   const renderParagraph = () => {
     const intro = PARA_PARTS[0].text
@@ -49,7 +74,7 @@ export default function About() {
         
         <div className="relative h-14 md:h-20 my-1 overflow-hidden">
           {verticals.map((v) => {
-            const isActive = hovered === v.key
+            const isActive = displaySection === v.key
             return (
               <span
                 key={v.key}
@@ -64,7 +89,7 @@ export default function About() {
                   opacity: isActive ? 1 : 0,
                   transform: isActive 
                     ? 'translateY(0)' 
-                    : hovered === null 
+                    : displaySection === null 
                       ? 'translateY(20px)' 
                       : 'translateY(-20px)',
                   visibility: isActive ? 'visible' : 'hidden',
@@ -85,7 +110,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative w-full h-screen overflow-hidden"
+      className="relative w-full min-h-screen md:h-screen overflow-hidden"
       style={{ background: '#0E5F13' }}
     >
       {/* Grid / Glow — same as Hero */}
@@ -98,15 +123,15 @@ export default function About() {
       {/* Hover bg images — fill entire section */}
       {(['import', 'manufacturing', 'hospitality'] as const).map((id) => (
         <div key={id} className="absolute inset-0 pointer-events-none"
-          style={{ opacity: hovered === id ? 1 : 0, transition: 'opacity 0.55s ease', zIndex: 10 }}>
+          style={{ opacity: displaySection === id ? 1 : 0, transition: 'opacity 0.55s ease', zIndex: 10 }}>
           <img src={SECTION_IMAGES[id]} alt={id} className="w-full h-full object-cover"
             style={{ filter: 'brightness(0.5) contrast(1.1)' }} />
         </div>
       ))}
 
-      {/* ── Layout shell — fills full viewport height ── */}
+      {/* ── Desktop Layout shell — hidden on mobile ── */}
       <div
-        className="relative w-full h-full"
+        className="hidden md:block relative w-full h-full"
         style={{ zIndex: 20 }}
       >
         {/* Masked Logo Windows (Unhovered State) */}
@@ -126,7 +151,7 @@ export default function About() {
                   WebkitMaskPosition: 'center',
                   maskRepeat: 'no-repeat',
                   WebkitMaskRepeat: 'no-repeat',
-                  opacity: hovered && hovered !== id ? 0 : 1,
+                  opacity: displaySection && displaySection !== id ? 0 : 1,
                   transition: 'opacity 0.5s ease'
                 }}
               >
@@ -136,9 +161,9 @@ export default function About() {
                 <div 
                   className="absolute inset-0" 
                   style={{ 
-                    backgroundColor: hovered === id ? '#0E5F13' : '#ECBD27', 
-                    opacity: hovered === id ? 0.6 : 0.25,
-                    backdropFilter: hovered === id ? 'blur(4px)' : 'blur(2px)',
+                    backgroundColor: displaySection === id ? '#0E5F13' : '#ECBD27', 
+                    opacity: displaySection === id ? 0.6 : 0.25,
+                    backdropFilter: displaySection === id ? 'blur(4px)' : 'blur(2px)',
                     transition: 'all 0.5s ease' 
                   }} 
                 />
@@ -148,109 +173,190 @@ export default function About() {
         </div>
 
         {/* ─────────────────────────────────────────────────────────
-            SVG Logo — full edge-to-edge width
-            The ABOUT US text lives outside <g> so it stays visible.
-            Transparent hit areas sit on top in a separate <g>.
+            Responsive SVG + Content Container
         ───────────────────────────────────────────────────────── */}
-        <svg
-          viewBox="0 0 277 152"
-          preserveAspectRatio="xMidYMid meet"
-          className="relative z-20 w-full h-full block"
-          style={{ display: 'block', overflow: 'visible' }}
-        >
-          <defs>
-            {/* Clip to logo union shape for two-tone title */}
-            <clipPath id="about-logo-clip">
-              <path d={pathHospitality} />
-              <path d={pathManufacturing} />
-              <path d={pathImport} />
-            </clipPath>
-            {/* Subtle glow on active arm */}
-            <filter id="about-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="2.5" result="blur" />
-              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-          </defs>
+        <div className="absolute inset-0 flex flex-col md:block z-20">
+          
+          {/* Top half on mobile / Full screen on desktop: SVG Logo */}
+          <div className="relative w-full h-[45vh] md:h-full shrink-0 flex items-center md:block">
+            <svg
+              viewBox="0 0 277 152"
+              preserveAspectRatio="xMidYMid meet"
+              className="w-full h-full block"
+              style={{ overflow: 'visible' }}
+            >
+              <defs>
+                <clipPath id="about-logo-clip">
+                  <path d={pathHospitality} />
+                  <path d={pathManufacturing} />
+                  <path d={pathImport} />
+                </clipPath>
+                <filter id="about-glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2.5" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+              </defs>
 
-          {/* ABOUT US — yellowish base */}
-          <text
-            x="138.5" y="28"
-            textAnchor="middle" dominantBaseline="middle"
-            fontFamily="'Arial Black', 'Arial Bold', sans-serif"
-            fontWeight="900" fontSize="40" letterSpacing="-1.5"
-            fill="#ECBD27"
-            style={{
-              userSelect: 'none',
-              pointerEvents: 'none',
-              opacity: hovered ? 1 : 0,
-              transition: 'opacity 0.4s ease',
-            }}
-          >
-            ABOUT US
-          </text>
-
-          {/* Transparent hit areas — always on top, trigger hover */}
-          <g style={{ cursor: 'pointer' }}>
-            <path d={pathHospitality} fill="transparent"
-              onMouseEnter={() => setHovered('hospitality')}
-              onMouseLeave={() => setHovered(null)} />
-            <path d={pathManufacturing} fill="transparent"
-              onMouseEnter={() => setHovered('manufacturing')}
-              onMouseLeave={() => setHovered(null)} />
-            <path d={pathImport} fill="transparent"
-              onMouseEnter={() => setHovered('import')}
-              onMouseLeave={() => setHovered(null)} />
-          </g>
-        </svg>
-
-        {/* ── Description & Stats — absolutely centred over the SVG ── */}
-        <div
-          className="absolute inset-0 flex flex-col items-center pointer-events-none"
-          style={{
-            opacity: hovered ? 1 : 0,
-            transition: 'opacity 0.5s ease',
-            zIndex: 50,
-          }}
-        >
-          {/* Top spacer for title area */}
-          <div className="h-20 md:h-36" />
-
-          {/* Description - Centered between Title and Stats */}
-          <div className="flex-1 flex items-center justify-center px-6">
-            <div className="w-full max-w-4xl text-center">
-              <p
-                className="text-base md:text-xl leading-relaxed tracking-wide"
-                style={{ color: 'white', fontFamily: "'General Sans', sans-serif", fontWeight: 500, textShadow: shadow, whiteSpace: 'pre-line' }}
+              <text
+                x="138.5" y="28"
+                textAnchor="middle" dominantBaseline="middle"
+                fontFamily="'Arial Black', 'Arial Bold', sans-serif"
+                fontWeight="900" fontSize="40" letterSpacing="-1.5"
+                fill="#ECBD27"
+                style={{
+                  userSelect: 'none',
+                  pointerEvents: 'none',
+                  opacity: displaySection ? 1 : 0,
+                  transition: 'opacity 0.4s ease',
+                }}
               >
-                {renderParagraph()}
-              </p>
-            </div>
+                ABOUT US
+              </text>
+
+              <g style={{ cursor: 'pointer' }}>
+                <path d={pathHospitality} fill="transparent"
+                  onMouseEnter={() => setHovered('hospitality')}
+                  onMouseLeave={() => setHovered(null)}
+                  onClick={() => cycleSection('hospitality')} />
+                <path d={pathManufacturing} fill="transparent"
+                  onMouseEnter={() => setHovered('manufacturing')}
+                  onMouseLeave={() => setHovered(null)}
+                  onClick={() => cycleSection('manufacturing')} />
+                <path d={pathImport} fill="transparent"
+                  onMouseEnter={() => setHovered('import')}
+                  onMouseLeave={() => setHovered(null)}
+                  onClick={() => cycleSection('import')} />
+              </g>
+            </svg>
           </div>
 
-          {/* Stats - At the bottom */}
-          <div className="w-full max-w-5xl px-6 pb-6 md:pb-10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
-              {stats.map((stat, i) => (
-                <div key={i} className="flex flex-col items-center">
-                  <span
-                    className="font-black leading-none flex items-baseline"
-                    style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'white', fontFamily: "'Arial Black', sans-serif", textShadow: shadow }}
-                  >
-                    {stat.value}<span>{stat.suffix}</span>
-                  </span>
-                  <span
-                    className="text-[9px] md:text-[12px] tracking-[0.2em] uppercase text-center mt-2"
-                    style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'monospace', fontWeight: 'bold', textShadow: shadow }}
-                  >
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
+          {/* Bottom half on mobile / Centered absolute on desktop: Content */}
+          <div
+            className="flex-1 md:absolute md:inset-0 flex flex-col items-center justify-center md:pointer-events-none pb-12 md:pb-0"
+            style={{
+              opacity: displaySection ? 1 : 0,
+              transition: 'opacity 0.5s ease',
+              zIndex: 50,
+            }}
+          >
+            <div className="hidden md:block h-36" />
+
+            <div className="flex-1 flex items-center justify-center px-6">
+              <div className="w-full max-w-4xl text-center">
+                <p
+                  className="text-sm md:text-xl leading-relaxed tracking-wide"
+                  style={{ color: 'white', fontFamily: "'General Sans', sans-serif", fontWeight: 500, textShadow: shadow, whiteSpace: 'pre-line' }}
+                >
+                  {renderParagraph()}
+                </p>
+              </div>
+            </div>
+
+            <div className="w-full max-w-5xl px-6 pb-2 md:pb-10 mt-6 md:mt-0">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
+                {stats.map((stat, i) => (
+                  <div key={i} className="flex flex-col items-center">
+                    <span
+                      className="font-black leading-none flex items-baseline"
+                      style={{ fontSize: 'clamp(1.5rem, 5vw, 3.5rem)', color: 'white', fontFamily: "'Arial Black', sans-serif", textShadow: shadow }}
+                    >
+                      {stat.value}<span>{stat.suffix}</span>
+                    </span>
+                    <span
+                      className="text-[9px] md:text-[12px] tracking-[0.2em] uppercase text-center mt-2"
+                      style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'monospace', fontWeight: 'bold', textShadow: shadow }}
+                    >
+                      {stat.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
       </div>
+
+      {/* ── MOBILE STACKED LAYOUT ── */}
+      <div className="md:hidden flex flex-col w-full bg-[#0E5F13] relative z-30 pb-20 pt-16">
+        <div className="px-6 mb-10 text-center">
+          <h2
+            className="text-white font-black uppercase leading-[0.88]"
+            style={{
+              fontFamily: "'Arial Black', sans-serif",
+              fontSize: 'clamp(3rem, 14vw, 4.5rem)',
+              textShadow: '0 4px 24px rgba(0,0,0,0.6)',
+            }}
+          >
+            About<br />Us
+          </h2>
+          <p
+            className="text-white/80 text-[14px] mt-6 leading-relaxed max-w-sm mx-auto"
+            style={{ fontFamily: "'General Sans', sans-serif" }}
+          >
+            YHAENU PLC is a family-owned company with over 20 years of experience,
+            headquartered in Ethiopia and trusted across local and international markets.
+          </p>
+        </div>
+
+        {/* The 3 Sections Stacked */}
+        <div className="flex flex-col gap-6 px-4">
+          {([
+            { id: 'import' as const, title: 'Import / Export' },
+            { id: 'manufacturing' as const, title: 'Manufacturing' },
+            { id: 'hospitality' as const, title: 'Hospitality' }
+          ]).map((item) => (
+            <div key={item.id} className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 group aspect-[4/3]">
+              <img
+                src={SECTION_IMAGES[item.id]}
+                alt={item.title}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                style={{ filter: 'brightness(0.4) saturate(1.2)' }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0E5F13]/90 via-[#0E5F13]/40 to-transparent" />
+              
+              <div className="absolute inset-0 flex flex-col justify-end p-6">
+                <span className="text-[#ECBD27] font-mono text-[10px] tracking-[0.3em] uppercase mb-2 font-bold">
+                  Division
+                </span>
+                <h3
+                  className="text-white font-black text-2xl uppercase tracking-tight"
+                  style={{ fontFamily: "'Arial Black', sans-serif" }}
+                >
+                  {item.title}
+                </h3>
+                <p className="text-white/70 text-xs mt-3 line-clamp-3 leading-relaxed">
+                  {mobileParagraphs[item.id]}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Global Stats Grid for mobile */}
+        <div className="grid grid-cols-2 gap-4 px-6 mt-12 border-t border-white/10 pt-8">
+          {stats.map((stat, i) => (
+            <div key={i} className="flex flex-col items-center text-center bg-white/5 py-6 rounded-xl border border-white/5">
+              <span
+                className="font-black text-white leading-none"
+                style={{
+                  fontSize: '2rem',
+                  fontFamily: "'Arial Black', sans-serif",
+                }}
+              >
+                {stat.value}{stat.suffix}
+              </span>
+              <span
+                className="text-[8px] tracking-[0.2em] uppercase text-white/50 mt-2 font-bold"
+                style={{ fontFamily: 'monospace' }}
+              >
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </section>
   )
 }

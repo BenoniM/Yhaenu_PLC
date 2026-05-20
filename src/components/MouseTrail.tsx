@@ -56,7 +56,14 @@ export default function MouseTrail() {
 
   const particlesRef = useRef<Particle[]>([])
 
+  // Computed once — true on phones/tablets that have no pointer hover
+  const isTouchDevice =
+    typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
+
   useEffect(() => {
+    // Skip the entire animation on touch-only devices
+    if (isTouchDevice) return
+
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -204,6 +211,9 @@ export default function MouseTrail() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
   }, [])
+
+  // Don't render the canvas at all on touch-only devices
+  if (isTouchDevice) return null
 
   return (
     <canvas

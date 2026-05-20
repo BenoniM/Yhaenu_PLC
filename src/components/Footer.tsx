@@ -40,7 +40,7 @@ export default function Footer() {
   return (
     <footer 
       ref={footerRef}
-      className="relative min-h-[75vh] flex flex-col justify-between overflow-hidden text-[#F3F6FA] pt-24 pb-8 px-8 md:px-20" 
+      className="relative min-h-[75vh] flex flex-col justify-between overflow-hidden text-[#F3F6FA] pt-14 md:pt-24 pb-8 px-8 md:px-20" 
       style={{ background: '#0E5F13' }}
     >
       {/* Background Video Layer */}
@@ -66,10 +66,10 @@ export default function Footer() {
 
       {/* Top Section: 5-Column Grid */}
       <div className="relative z-10 w-full max-w-[1400px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 gap-x-12 items-start">
+        <div className="grid grid-cols-2 md:grid-cols-12 gap-y-12 md:gap-y-16 gap-x-8 md:gap-x-12 items-start">
           
           {/* 1. Newsletter - 4 cols */}
-          <div className="md:col-span-4 space-y-8">
+          <div className="col-span-2 md:col-span-4 space-y-8 mb-4 md:mb-0">
             <h2 className="text-4xl md:text-5xl font-light leading-[1.1] tracking-tight">
               Join Our <br />
               <span className="italic">Newsletter</span>
@@ -87,7 +87,7 @@ export default function Footer() {
           </div>
 
           {/* 2. Contact - 2 cols */}
-          <div className="md:col-span-2 space-y-6 md:pt-4">
+          <div className="col-span-1 md:col-span-2 space-y-6 md:pt-4">
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Contact</p>
             <div className="space-y-4">
               <div className="space-y-1">
@@ -104,7 +104,7 @@ export default function Footer() {
           </div>
 
           {/* 3. Navigation - 2 cols */}
-          <div className="md:col-span-2 space-y-6 md:pt-4">
+          <div className="col-span-1 md:col-span-2 space-y-6 md:pt-4">
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Navigation</p>
             <div className="flex flex-col gap-3">
               {footerLinks[0].links.map((link, idx) => (
@@ -120,7 +120,7 @@ export default function Footer() {
           </div>
 
           {/* 4. Expertise - 2 cols */}
-          <div className="md:col-span-2 space-y-6 md:pt-4">
+          <div className="col-span-1 md:col-span-2 space-y-6 md:pt-4">
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Expertise</p>
             <div className="flex flex-col gap-3">
               {footerLinks[1].links.map((link, idx) => (
@@ -136,7 +136,7 @@ export default function Footer() {
           </div>
 
           {/* 5. Follow Us - 2 cols */}
-          <div className="md:col-span-2 space-y-6 md:pt-4">
+          <div className="col-span-1 md:col-span-2 space-y-6 md:pt-4">
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Follow Us</p>
             <div className="flex flex-col gap-3">
               {socialLinks.map((social, idx) => (
@@ -154,8 +154,8 @@ export default function Footer() {
       </div>
 
       {/* Bottom Section: Massive Brand Reveal */}
-      <div className="relative z-10 w-full mt-24 flex flex-col md:flex-row items-end justify-between border-t border-white/5 pt-8 pb-4">
-        <div className="w-full md:w-[80%] lg:w-[75%]">
+      <div className="relative z-10 w-full mt-12 md:mt-24 flex flex-row items-center justify-between border-t border-white/5 pt-8 pb-4">
+        <div className="w-[60%] md:w-[80%] lg:w-[75%]">
           <img 
             src={logoText} 
             alt="YHAENU" 
@@ -167,8 +167,8 @@ export default function Footer() {
         </div>
         
         {/* Interactive Logo Badge (No rotating text) */}
-        <div className="mb-4 md:mb-0 group cursor-pointer">
-          <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full border border-white/10 flex items-center justify-center bg-white/[0.03] backdrop-blur-xl transition-all duration-1000 group-hover:border-[#ECBD27]/40 group-hover:scale-105">
+        <div className="group cursor-pointer ml-4 md:ml-0 flex-shrink-0">
+          <div className="relative w-16 h-16 md:w-36 md:h-36 rounded-full border border-white/10 flex items-center justify-center bg-white/[0.03] backdrop-blur-xl transition-all duration-1000 group-hover:border-[#ECBD27]/40 group-hover:scale-105">
             <img 
               src="/logo.png" 
               alt="Logo" 

@@ -58,11 +58,11 @@ const TOTAL_HEIGHT = baseServices.length * CARD_STEP
 const X_SLOPE = -85
 
 export default function Services() {
-  // Start with the second item (index 1)
-  const [activeIdx, setActiveIdx] = useState(1)
+  const [activeIdx, setActiveIdx] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
   const stripRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const slideDir = useRef(1)
 
   const centerY = useRef(0)
   const dragStart = useRef<{ y: number; currentY: number } | null>(null)
@@ -179,6 +179,36 @@ export default function Services() {
     }, 200)
   }
 
+  const mobileNavigate = (dir: 1 | -1) => {
+    slideDir.current = dir
+    const targetY = centerY.current - dir * CARD_STEP
+    if (snapTween.current) snapTween.current.kill()
+    const proxy = { y: centerY.current }
+    snapTween.current = gsap.to(proxy, {
+      y: targetY,
+      duration: 0.7,
+      ease: 'power4.out',
+      onUpdate: () => updatePosition(proxy.y)
+    })
+  }
+
+  const mobileGoTo = (targetIdx: number) => {
+    const forward = (targetIdx - activeIdx + baseServices.length) % baseServices.length
+    const backward = (activeIdx - targetIdx + baseServices.length) % baseServices.length
+    const steps = forward <= backward ? forward : -backward
+    if (steps === 0) return
+    slideDir.current = steps > 0 ? 1 : -1
+    const targetY = centerY.current - steps * CARD_STEP
+    if (snapTween.current) snapTween.current.kill()
+    const proxy = { y: centerY.current }
+    snapTween.current = gsap.to(proxy, {
+      y: targetY,
+      duration: 0.7,
+      ease: 'power4.out',
+      onUpdate: () => updatePosition(proxy.y)
+    })
+  }
+
   return (
     <section
       ref={sectionRef}
@@ -289,6 +319,147 @@ export default function Services() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* ── MOBILE SERVICES LAYOUT (hidden on desktop) ── */}
+      <div className="absolute inset-0 md:hidden z-[60] overflow-hidden bg-white">
+
+        {/* Full-bleed animated background with slide transition */}
+        <AnimatePresence mode="wait" custom={slideDir.current}>
+          <motion.div
+            key={activeIdx}
+            custom={slideDir.current}
+            variants={{
+              enter: (dir: number) => ({ x: dir * 100 + '%', opacity: 0 }),
+              center: { x: 0, opacity: 1 },
+              exit: (dir: number) => ({ x: -dir * 100 + '%', opacity: 0 })
+            }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute inset-0"
+          >
+            <img
+              src={baseServices[activeIdx].bg}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{ filter: 'brightness(0.3) saturate(1.3)' }}
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Brand green tint */}
+        <div className="absolute inset-0 bg-[#0E5F13]/30 pointer-events-none" />
+        {/* Bottom gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none" />
+
+        {/* Yellow left accent stripe */}
+        <div className="absolute left-0 top-[12%] bottom-[12%] w-[3px] bg-[#ECBD27]" />
+
+        {/* Top row: counter only */}
+        <div className="absolute top-10 left-8 right-6 flex justify-between items-start z-10">
+          <div className="flex flex-col">
+            <span
+              className="text-[#ECBD27] font-black leading-[0.85]"
+              style={{ fontFamily: "'Arial Black', sans-serif", fontSize: '3.8rem' }}
+            >
+              {String(activeIdx + 1).padStart(2, '0')}
+            </span>
+            <span className="text-white/30 text-[8px] tracking-[0.4em] uppercase font-mono mt-1">
+              /{String(baseServices.length).padStart(2, '0')}
+            </span>
+          </div>
+        </div>
+
+        {/* Prev / Next nav arrows */}
+        <button
+          onClick={() => mobileNavigate(-1)}
+          aria-label="Previous service"
+          className="absolute left-3 top-[54%] -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 flex items-center justify-center"
+        >
+          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={() => mobileNavigate(1)}
+          aria-label="Next service"
+          className="absolute right-3 top-[54%] -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 flex items-center justify-center"
+        >
+          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        {/* Bottom content */}
+        <div className="absolute bottom-0 left-0 right-0 px-8 pb-12 z-10">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIdx}
+              initial={{ opacity: 0, y: 26 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.45, ease: 'circOut' }}
+            >
+              {/* Badge line */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-px w-8 bg-[#ECBD27]" />
+                <span
+                  className="text-[#ECBD27] text-[8px] font-bold tracking-[0.4em] uppercase"
+                  style={{ fontFamily: 'monospace' }}
+                >
+                  {baseServices[activeIdx].badge}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h2
+                className="text-white uppercase leading-[0.9] mb-4"
+                style={{
+                  fontFamily: "'Arial Black', sans-serif",
+                  fontSize: 'clamp(2rem, 9vw, 2.8rem)',
+                  fontWeight: 900,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {baseServices[activeIdx].title}
+              </h2>
+
+              {/* Description */}
+              <p className="text-white/60 text-[12.5px] leading-relaxed mb-6 max-w-[290px]">
+                {baseServices[activeIdx].desc}
+              </p>
+
+              {/* CTA + dots row */}
+              <div className="flex items-center justify-between">
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-3 px-7 py-3 bg-[#ECBD27] text-[#0E5F13] font-black text-[8.5px] uppercase tracking-[0.22em]"
+                  style={{ clipPath: 'polygon(8% 0, 100% 0, 92% 100%, 0% 100%)' }}
+                >
+                  Explore
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </a>
+                <div className="flex items-center gap-2">
+                  {baseServices.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => mobileGoTo(i)}
+                      aria-label={`Service ${i + 1}`}
+                      className={`transition-all duration-300 rounded-full ${
+                        i === activeIdx ? 'w-6 h-[3px] bg-[#ECBD27]' : 'w-[5px] h-[5px] bg-white/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
     </section>
   )
 }
+

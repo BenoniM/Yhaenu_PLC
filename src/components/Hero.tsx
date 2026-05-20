@@ -69,7 +69,7 @@ export default function Hero() {
     });
 
     // 1. Initial State
-    const LOGO_H = window.innerWidth < 768 ? 80 : 150;
+    const LOGO_H = window.innerWidth < 768 ? 42 : 150;
     const GAP = 20; // Gap between Y and HAENU
     const Y_W = LOGO_H * (277 / 152);
     const HAENU_W = LOGO_H * (537 / 81);
@@ -84,7 +84,9 @@ export default function Hero() {
     // We want its LEFT edge at: -(TOTAL_W/2) + Y_W + GAP
     const HAENU_FINAL_X = -(TOTAL_W / 2) + Y_W + GAP;
 
-    gsap.set(descriptionRef.current, { opacity: 0, y: 84 });
+    const initialDescY = window.innerWidth < 768 ? 30 : 84;
+    const finalDescY   = window.innerWidth < 768 ? 20 : 64;
+    gsap.set(descriptionRef.current, { opacity: 0, y: initialDescY });
     gsap.set(logoCutRef.current, { opacity: 0, x: HAENU_FINAL_X + 40 });
     gsap.set(yLogoRef.current, { scale: 15, x: 0 });
 
@@ -119,7 +121,7 @@ export default function Hero() {
       // 5. Reveal description
       .to(descriptionRef.current, {
         opacity: 1,
-        y: 64,
+        y: finalDescY,
         duration: 1,
         ease: "power2.out"
       }, "-=0.2");
@@ -229,6 +231,9 @@ export default function Hero() {
     if (isEntering) return;
 
     const timeout = setTimeout(() => {
+      // Skip the scroll-driven Y-to-navbar animation on mobile
+      if (window.innerWidth < 768) return;
+
       const navLogo = document.querySelector('.navbar-y-logo') as HTMLElement;
       const navLeft = document.querySelector('.nav-left') as HTMLElement;
       const navRight = document.querySelector('.nav-right') as HTMLElement;
@@ -386,8 +391,8 @@ export default function Hero() {
             ref={yLogoRef}
             className="relative z-[1000]"
             style={{
-              width: `${(window.innerWidth < 768 ? 80 : 150) * (277 / 152)}px`,
-              height: `${window.innerWidth < 768 ? 80 : 150}px`
+              width: `${(window.innerWidth < 768 ? 42 : 150) * (277 / 152)}px`,
+              height: `${window.innerWidth < 768 ? 42 : 150}px`
             }}
           >
             <div ref={yLogoPulseRef} className="absolute inset-0 w-full h-full origin-center">
@@ -446,6 +451,8 @@ export default function Hero() {
                       d={item.path}
                       onMouseEnter={() => setHovered(item.id as HoveredState)}
                       onMouseLeave={() => setHovered(null)}
+                      onTouchStart={() => setHovered(item.id as HoveredState)}
+                      onTouchEnd={() => setHovered(null)}
                       className="cursor-pointer"
                       style={{
                         fill: 'transparent',
@@ -468,8 +475,8 @@ export default function Hero() {
             ref={logoCutRef}
             className="absolute left-1/2 top-1/2 -translate-y-1/2"
             style={{
-              width: `${(window.innerWidth < 768 ? 80 : 150) * (537 / 81)}px`,
-              height: `${window.innerWidth < 768 ? 80 : 150}px`
+              width: `${(window.innerWidth < 768 ? 42 : 150) * (537 / 81)}px`,
+              height: `${window.innerWidth < 768 ? 42 : 150}px`
             }}
           >
             <img
