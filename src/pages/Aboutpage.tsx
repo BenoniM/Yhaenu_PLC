@@ -83,12 +83,12 @@ function StackedValues() {
   return (
     <div className="relative w-full pb-32">
       {values.map((v, i) => (
-        <div 
+        <div
           key={i}
           className="flex flex-col md:flex-row items-stretch border-t border-[rgba(14,95,19,0.1)] bg-[#F3F6FA] w-full"
-          style={{ 
+          style={{
             position: 'sticky',
-            top: 80 + (i * 80), 
+            top: 80 + (i * 80),
             minHeight: '250px',
             boxShadow: i > 0 ? '0 -10px 30px -15px rgba(0,0,0,0.1)' : 'none',
             zIndex: 10 + i
@@ -102,9 +102,13 @@ function StackedValues() {
           </div>
 
           {/* Center: Image */}
-          <div className="w-full md:w-[40%] px-6 md:px-10 pt-4 md:pt-[26px] pb-6 md:pb-10 border-y md:border-y-0 md:border-x border-[rgba(14,95,19,0.1)] flex-shrink-0 flex flex-col justify-start">
-            <div className="w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden bg-gray-200">
-              <img src={stackedValuesData[i].img} alt={v.label} className="w-full h-full object-cover" />
+          <div className="w-full md:w-[40%] px-6 md:px-10 pt-4 md:pt-[26px] pb-6 md:pb-10 border-y md:border-y-0 relative flex-shrink-0 flex flex-col justify-center">
+            {/* Diagonal Dividers matching the Rhombus */}
+            <div className="hidden md:block absolute top-0 bottom-0 w-[1px] bg-[rgba(14,95,19,0.1)] left-0" style={{ transform: 'skewX(-8deg)' }}></div>
+            <div className="hidden md:block absolute top-0 bottom-0 w-[1px] bg-[rgba(14,95,19,0.1)] right-0" style={{ transform: 'skewX(-8deg)' }}></div>
+            
+            <div className="w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden bg-gray-200" style={{ transform: 'skewX(-8deg)' }}>
+              <img src={stackedValuesData[i].img} alt={v.label} className="w-full h-full object-cover" style={{ transform: 'skewX(8deg) scale(1.15)' }} />
             </div>
           </div>
 
@@ -129,24 +133,24 @@ function MissionVisionSplit() {
   return (
     <div className="relative w-full h-[60vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden border-y border-[rgba(236,189,39,0.2)]">
       {/* Left: Mission */}
-      <div 
+      <div
         className="w-full md:w-1/2 relative h-full cursor-pointer overflow-hidden border-b md:border-b-0 md:border-r border-[rgba(236,189,39,0.2)] group/mission"
         onMouseEnter={() => setHoveredSide('mission')}
         onMouseLeave={() => setHoveredSide(null)}
       >
-        <img 
-          src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=1200&auto=format&fit=crop" 
-          alt="Mission" 
+        <img
+          src="https://images.pexels.com/photos/8550846/pexels-photo-8550846.jpeg"
+          alt="Mission"
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out"
           style={{ transform: hoveredSide === 'mission' ? 'scale(1.05)' : 'scale(1)' }}
         />
         <div className={`absolute inset-0 transition-colors duration-500 ${hoveredSide === 'mission' ? 'bg-[#0E5F13]/40' : 'bg-[#0E5F13]/70'}`} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center w-full px-4">
-          <motion.h3 
+          <motion.h3
             className="text-5xl md:text-8xl font-black text-[#F3F6FA] uppercase tracking-widest"
             style={{ fontFamily: "'Arial Black', sans-serif" }}
-            animate={{ 
-              y: hoveredSide === 'mission' ? -20 : 0, 
+            animate={{
+              y: hoveredSide === 'mission' ? -20 : 0,
               opacity: hoveredSide === 'mission' ? 0 : 0.6,
               scale: hoveredSide === 'mission' ? 1.1 : 1
             }}
@@ -157,9 +161,9 @@ function MissionVisionSplit() {
         </div>
 
         {/* Hover Pop-up for Mission */}
-        <div 
+        <div
           className="absolute top-1/2 left-1/2 w-[85%] max-w-[450px] p-10 z-20 pointer-events-none transition-all duration-500 ease-out flex flex-col justify-center items-center text-center shadow-2xl bg-[#ECBD27]"
-          style={{ 
+          style={{
             transform: `translate(-50%, -50%) scale(${hoveredSide === 'mission' ? 1 : 0.95})`,
             opacity: hoveredSide === 'mission' ? 1 : 0,
           }}
@@ -174,24 +178,24 @@ function MissionVisionSplit() {
       </div>
 
       {/* Right: Vision */}
-      <div 
+      <div
         className="w-full md:w-1/2 relative h-full cursor-pointer overflow-hidden group/vision"
         onMouseEnter={() => setHoveredSide('vision')}
         onMouseLeave={() => setHoveredSide(null)}
       >
-        <img 
-          src="https://images.unsplash.com/photo-1444628838545-ac4016a5418a?q=80&w=1200&auto=format&fit=crop" 
-          alt="Vision" 
+        <img
+          src="https://images.unsplash.com/photo-1444628838545-ac4016a5418a?q=80&w=1200&auto=format&fit=crop"
+          alt="Vision"
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out"
           style={{ transform: hoveredSide === 'vision' ? 'scale(1.05)' : 'scale(1)' }}
         />
         <div className={`absolute inset-0 transition-colors duration-500 ${hoveredSide === 'vision' ? 'bg-[#0E5F13]/40' : 'bg-[#0E5F13]/70'}`} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center w-full px-4">
-          <motion.h3 
+          <motion.h3
             className="text-5xl md:text-8xl font-black text-[#ECBD27] uppercase tracking-widest"
             style={{ fontFamily: "'Arial Black', sans-serif" }}
-            animate={{ 
-              y: hoveredSide === 'vision' ? -20 : 0, 
+            animate={{
+              y: hoveredSide === 'vision' ? -20 : 0,
               opacity: hoveredSide === 'vision' ? 0 : 0.6,
               scale: hoveredSide === 'vision' ? 1.1 : 1
             }}
@@ -202,9 +206,9 @@ function MissionVisionSplit() {
         </div>
 
         {/* Hover Pop-up for Vision */}
-        <div 
+        <div
           className="absolute top-1/2 left-1/2 w-[85%] max-w-[450px] p-10 z-20 pointer-events-none transition-all duration-500 ease-out flex flex-col justify-center items-center text-center shadow-2xl bg-[#F3F6FA]"
-          style={{ 
+          style={{
             transform: `translate(-50%, -50%) scale(${hoveredSide === 'vision' ? 1 : 0.95})`,
             opacity: hoveredSide === 'vision' ? 1 : 0,
           }}
@@ -223,10 +227,10 @@ function MissionVisionSplit() {
 
 const values = [
   { icon: '🌱', label: 'Sustainability', desc: 'Building for the long term people, planet, and profit.' },
-  { icon: '💡', label: 'Innovation',     desc: 'Continuously improving how we serve our partners.' },
-  { icon: '🤝', label: 'Integrity',      desc: 'Honest, transparent dealings in every interaction.' },
-  { icon: '🔗', label: 'Partnership',    desc: 'Long-term relationships built on mutual growth.' },
-  { icon: '🏆', label: 'Excellence',     desc: 'Uncompromising quality across every vertical.' },
+  { icon: '💡', label: 'Innovation', desc: 'Continuously improving how we serve our partners.' },
+  { icon: '🤝', label: 'Integrity', desc: 'Honest, transparent dealings in every interaction.' },
+  { icon: '🔗', label: 'Partnership', desc: 'Long-term relationships built on mutual growth.' },
+  { icon: '🏆', label: 'Excellence', desc: 'Uncompromising quality across every vertical.' },
 ]
 
 
@@ -272,7 +276,7 @@ export default function Aboutpage() {
 
   const xValue = useTransform(clipProgress, [0, 100], [0, 757])
   const yValue = useTransform(clipProgress, [0, 100], [0, 934])
-  
+
   const footprintRef = useRef<HTMLElement>(null)
   const { scrollYProgress: footprintScroll } = useScroll({ target: footprintRef, offset: ['start 85%', 'center center'] })
   const footprintClipProgress = useTransform(footprintScroll, [0, 1], [0, 100])
@@ -331,7 +335,7 @@ export default function Aboutpage() {
         <NovaOrb size={350} x="5%" y="80%" color1="#0E5F13" color2="#F3F6FA" opacity={0.1} duration={11} delay={3} />
 
         <div className="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 border-x border-[rgba(0,0,0,0.08)]">
-          
+
           <div className="border-r border-[rgba(0,0,0,0.08)] flex flex-col">
             <div className="w-full relative border-b border-[rgba(0,0,0,0.08)]">
               {/* Corner crosshairs */}
@@ -352,26 +356,26 @@ export default function Aboutpage() {
                 <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[rgba(0,0,0,0.3)]"></div>
               </div>
 
-              <motion.div 
-                style={{ 
-                  aspectRatio: '4/5', 
-                  clipPath: strategyClipPath 
+              <motion.div
+                style={{
+                  aspectRatio: '4/5',
+                  clipPath: strategyClipPath
                 }}
                 className="w-full relative"
               >
-                <img 
-                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop" 
-                  alt="History and Strategy" 
+                <img
+                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop"
+                  alt="History and Strategy"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </motion.div>
-              
+
               {/* Moving Coordinates tracking the expanding bottom-right corner */}
-              <motion.div 
-                className="absolute z-30" 
-                style={{ 
-                  left: useMotionTemplate`${clipProgress}%`, 
-                  top: useMotionTemplate`${clipProgress}%` 
+              <motion.div
+                className="absolute z-30"
+                style={{
+                  left: useMotionTemplate`${clipProgress}%`,
+                  top: useMotionTemplate`${clipProgress}%`
                 }}
               >
                 {/* Crosshair at the moving corner */}
@@ -449,7 +453,7 @@ export default function Aboutpage() {
           <StackedValues />
         </div>
       </section>
-      
+
       {/* ── Services (What We Do) ── */}
       <Services />
 
@@ -472,11 +476,11 @@ export default function Aboutpage() {
 
         <div className="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 border-x border-[rgba(0,0,0,0.08)]">
           {/* Text Left */}
-          <motion.div 
+          <motion.div
             className="p-10 md:p-16 flex flex-col justify-center order-2 md:order-1"
-            initial={{ opacity: 0, x: -40 }} 
-            whileInView={{ opacity: 1, x: 0 }} 
-            viewport={{ once: true }} 
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
             <SectionLabel text="Our Footprint" />
@@ -515,22 +519,22 @@ export default function Aboutpage() {
                 <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
               </div>
 
-              <motion.div 
-                style={{ 
-                  aspectRatio: '4/5', 
-                  clipPath: footprintClipPath 
+              <motion.div
+                style={{
+                  aspectRatio: '4/5',
+                  clipPath: footprintClipPath
                 }}
                 className="w-full relative"
               >
                 <video src={VIDEO_SRC} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
               </motion.div>
-              
+
               {/* Moving Coordinates tracking the expanding bottom-left corner */}
-              <motion.div 
-                className="absolute z-30" 
-                style={{ 
-                  left: footprintClipInverted, 
-                  top: useMotionTemplate`${footprintClipProgress}%` 
+              <motion.div
+                className="absolute z-30"
+                style={{
+                  left: footprintClipInverted,
+                  top: useMotionTemplate`${footprintClipProgress}%`
                 }}
               >
                 {/* Crosshair at the moving corner */}

@@ -213,20 +213,11 @@ export default function Services() {
 
       {/* ── CENTER: Diagonal Strip ── */}
       <div
-        className="absolute left-[67%] inset-y-0 z-40 flex items-center"
+        className="absolute left-[67%] inset-y-0 z-40 flex items-center pointer-events-none"
         style={{ width: CARD_W, transform: 'translateX(-50%)' }}
       >
-        <div
-          className="w-full h-full overflow-visible"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          onWheel={onWheel}
-          onMouseEnter={() => { isHovered.current = true }}
-          onMouseLeave={() => { isHovered.current = false }}
-        >
-          <div ref={stripRef} className="cursor-grab active:cursor-grabbing will-change-transform">
+        <div className="w-full h-full overflow-visible">
+          <div ref={stripRef} className="will-change-transform">
             {services.map((s, i) => {
               const isActive = (i % baseServices.length) === activeIdx
               const xOffset = i * X_SLOPE
@@ -235,7 +226,7 @@ export default function Services() {
                 <div
                   key={i}
                   ref={el => { cardRefs.current[i] = el }}
-                  className={`relative mb-[12px] transition-all duration-700 ease-out 
+                  className={`relative mb-[12px] transition-all duration-700 ease-out pointer-events-auto cursor-grab active:cursor-grabbing
                     ${isActive ? 'opacity-100 scale-105' : 'opacity-10 scale-90 blur-[1.5px]'}`}
                   style={{
                     width: CARD_W,
@@ -243,6 +234,13 @@ export default function Services() {
                     transform: `translateX(${xOffset}px)`,
                     clipPath: 'polygon(23.5% 0%, 100% 0%, 76.5% 100%, 0% 100%)'
                   }}
+                  onPointerDown={onPointerDown}
+                  onPointerMove={onPointerMove}
+                  onPointerUp={onPointerUp}
+                  onPointerCancel={onPointerUp}
+                  onWheel={onWheel}
+                  onMouseEnter={() => { isHovered.current = true }}
+                  onMouseLeave={() => { isHovered.current = false }}
                 >
                   <img src={s.thumb} alt="" className="w-full h-full object-cover pointer-events-none" />
                 </div>

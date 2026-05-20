@@ -12,7 +12,7 @@ const products = [
     title: 'Green Coffee Beans',
     shortTitle: 'Coffee',
     description: 'Premium Ethiopian Arabica green coffee — washed and natural processed from Yirgacheffe, Sidama, Jimma, and Harar regions.',
-    image: '/products1.jpeg',
+    image: 'src/assets/about/export.jpg',
     type: 'Export',
     category: 'Specialty Coffee',
     badge: 'Export Grade',
@@ -32,27 +32,17 @@ const products = [
     title: 'Cardboard Packaging',
     shortTitle: 'Packaging',
     description: 'Manufacturing high-quality cardboard and carton packaging products that meet global standards for local and international clients.',
-    image: '/products3.jpeg',
+    image: 'src/assets/about/manufacturing.jpg',
     type: 'Manufacturing',
     category: 'Packaging',
     badge: 'ISO Standard',
     detail: 'Custom · Bulk · Retail',
   },
   {
-    title: 'Industrial Materials',
-    shortTitle: 'Industrial',
-    description: 'Sourcing and importing essential industrial materials and goods to support Ethiopia\'s growing manufacturing and construction sectors.',
-    image: '/products4.jpeg',
-    type: 'Import',
-    category: 'Industrial',
-    badge: 'Certified',
-    detail: 'Machinery · Equipment · Materials',
-  },
-  {
     title: 'Transportation Fleet',
     shortTitle: 'Logistics',
     description: 'Reliable fleet of vehicles providing seamless goods transportation across Ethiopia, ensuring timely and secure delivery.',
-    image: '/products5.jpeg',
+    image: 'src/assets/about/transportation2.jpg',
     type: 'Logistics',
     category: 'Transportation',
     badge: 'Nationwide',
@@ -62,7 +52,7 @@ const products = [
     title: 'South Star Hotel',
     shortTitle: 'Hospitality',
     description: 'A 4-star hotel in Hawassa offering memorable experiences through modern, welcoming hospitality for business and leisure travelers.',
-    image: '/products6.jpg',
+    image: 'src/assets/about/hospitality.jpg',
     type: 'Hospitality',
     category: 'Hotel & Leisure',
     badge: '4-Star',
@@ -164,12 +154,12 @@ function PanelCard({
         }}
       >
         <div style={{ width: '100%', height: '1px', background: 'rgba(236,189,39,0.4)', marginBottom: '20px' }} />
-        
+
         <h3
           style={{
             fontFamily: "'Arial Black', sans-serif",
             color: '#F3F6FA',
-            fontSize: 'clamp(1.5rem, 2.5vw, 2.5rem)', 
+            fontSize: 'clamp(1.5rem, 2.5vw, 2.5rem)',
             fontWeight: 900,
             lineHeight: 1.1,
             letterSpacing: '-0.02em',
@@ -179,7 +169,7 @@ function PanelCard({
         >
           {product.title}
         </h3>
-        
+
         <div style={{ width: '100%', height: '1px', background: 'rgba(236,189,39,0.4)', marginBottom: '24px' }} />
 
         <p
