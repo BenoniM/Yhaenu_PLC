@@ -292,7 +292,7 @@ export default function Navbar() {
                       className="absolute inset-0 z-0"
                       style={{ 
                         background: '#ECBD27',
-                        clipPath: 'polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%)'
+                        clipPath: `polygon(${(isHomePage && isPastHero) ? 40 : 24}px 0, 100% 0, calc(100% - ${(isHomePage && isPastHero) ? 40 : 24}px) 100%, 0 100%)`
                       }}
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
