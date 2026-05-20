@@ -75,28 +75,17 @@ function PanelCard({
       ref={cardRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="absolute inset-0 flex flex-col md:flex-row items-center md:items-start pt-12 md:pt-[80px] px-6 md:pl-[60px] md:pr-[80px] gap-6 md:gap-[80px]"
       style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start', // Push to top
-        padding: '80px 80px 0 60px', // Moved top-left
-        gap: '80px', // Good breathing room
         opacity: 0, // GSAP controls this
       }}
     >
       {/* ── IMAGE SECTION ── */}
       <div
-        className="card-image-wrapper"
+        className="relative shrink-0 p-2 md:p-3 box-border h-[40%] md:h-[65%]"
         style={{
-          height: '65%', // Smaller overall size
           aspectRatio: '3/4', // EXACT ORIGINAL SHAPE, locked.
-          flexShrink: 0, // Don't allow flex to squish the aspect ratio
-          position: 'relative',
-          padding: '12px',
           border: '1px solid rgba(236,189,39,0.3)',
-          boxSizing: 'border-box',
         }}
       >
         <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
@@ -142,16 +131,7 @@ function PanelCard({
 
       {/* ── TEXT SECTION ── */}
       <div
-        className="card-text"
-        style={{
-          flex: '1',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          textAlign: 'left',
-          height: '65%',
-        }}
+        className="flex-1 flex flex-col justify-start items-center md:items-start text-center md:text-left h-auto md:h-[65%] w-full"
       >
         <div style={{ width: '100%', height: '1px', background: 'rgba(236,189,39,0.4)', marginBottom: '20px' }} />
 
@@ -173,13 +153,7 @@ function PanelCard({
         <div style={{ width: '100%', height: '1px', background: 'rgba(236,189,39,0.4)', marginBottom: '24px' }} />
 
         <p
-          style={{
-            fontSize: 15,
-            color: 'rgba(243,246,250,0.85)',
-            lineHeight: 1.7,
-            marginBottom: 24,
-            maxWidth: '90%',
-          }}
+          className="text-sm md:text-[15px] text-[#F3F6FA]/85 leading-relaxed mb-6 max-w-full md:max-w-[90%]"
         >
           {product.description}
         </p>
@@ -236,7 +210,7 @@ export default function WhatWeOffer() {
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          end: '+=450%', // Significantly reduced total scroll distance
+          end: '+=600%', // Increased scroll distance to accommodate equalized hold times
           pin: section,
           anticipatePin: 1,
           scrub: 0.5, // Reduced scrub delay for snappier scrolling connection
@@ -253,31 +227,30 @@ export default function WhatWeOffer() {
       )
 
       // Phase 2: Sequential card transitions
-      const STAGGER = 0.15 // Time gap between each card sequence
-      const TRANSIT = 0.12 // Duration of the animation
-      // The hold is now very short (STAGGER - TRANSIT = 0.03) to keep things moving
-      const CARD_START = 0.2
+      const PANEL_ARRIVE = 0.2  // Time when panel is fully in place
+      const HOLD_0 = 0.02       // Drastically shortened hold for the first card since it's already read while sliding in
+      const HOLD = 0.15         // Amount of scrolling time subsequent cards stay fully readable
+      const TRANSIT = 0.10      // Amount of scrolling time the slide-in/out animation takes
 
       products.forEach((_, i) => {
         const wrapper = cardRefs.current[i]
         if (!wrapper) return
 
-        // Determine when this card's enter/exit transition happens
-        const syncTime = CARD_START + i * STAGGER
-
-        // Enter animation for cards 1 to N
-        if (i > 0) {
-          // Enter from bottom-right exactly at syncTime
-          tl.to(wrapper, { opacity: 1, x: 0, y: 0, ease: 'power1.inOut', duration: TRANSIT }, syncTime)
-        }
-
-        // Exit animation for all but the last card
-        if (i < products.length - 1) {
-          // The exit happens exactly at the same syncTime for the NEXT card
-          const exitTime = CARD_START + (i + 1) * STAGGER
-
-          // Whole card moves to top-left
+        if (i === 0) {
+          // Card 0 is already visible. It exits almost immediately after the panel arrives to prevent the "weird" stall.
+          const exitTime = PANEL_ARRIVE + HOLD_0
           tl.to(wrapper, { opacity: 0, x: '-40vw', y: '-40vh', ease: 'power1.inOut', duration: TRANSIT }, exitTime)
+        } else {
+          // Calculate enter time dynamically based on the first card's unique shorter hold
+          const enterTime = PANEL_ARRIVE + HOLD_0 + (i - 1) * (TRANSIT + HOLD)
+          
+          tl.to(wrapper, { opacity: 1, x: 0, y: 0, ease: 'power1.inOut', duration: TRANSIT }, enterTime)
+
+          // Calculate exit time for all but the very last card
+          if (i < products.length - 1) {
+            const exitTime = enterTime + TRANSIT + HOLD
+            tl.to(wrapper, { opacity: 0, x: '-40vw', y: '-40vh', ease: 'power1.inOut', duration: TRANSIT }, exitTime)
+          }
         }
       })
 
@@ -429,31 +402,16 @@ export default function WhatWeOffer() {
         {/* ── Green panel (slides in from right) ── */}
         <div
           ref={panelRef}
+          className="absolute top-0 right-0 h-full w-full md:w-[75%] z-20 flex flex-col overflow-hidden shadow-[-8px_0_60px_rgba(0,0,0,0.5)]"
           style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            width: '75%', // Expanded to 75% width
-            height: '100%',
-            zIndex: 20,
             background: 'linear-gradient(160deg, #0c4a10 0%, #0E5F13 40%, #0a3d0e 100%)',
-            boxShadow: '-8px 0 60px rgba(0,0,0,0.5)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
           }}
         >
           <GridBackground color="#ECBD27" gridSize={60} opacity={0.08} isVisible={true} />
 
           {/* Overlapping Card Slot */}
           <div
-            style={{
-              flex: 1,
-              position: 'relative',
-              margin: '0 40px 40px',
-              borderRadius: 24,
-              zIndex: 10,
-            }}
+            className="flex-1 relative mx-6 md:mx-[40px] mb-6 md:mb-[40px] rounded-[24px] z-10"
           >
             {products.map((product, i) => (
               <PanelCard

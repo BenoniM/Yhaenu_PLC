@@ -65,6 +65,28 @@ function HowItWorksAccordion() {
   return (
     <div className="relative w-full h-[80vh] md:h-screen overflow-hidden bg-[#0E5F13] flex items-center justify-center">
 
+      {/* ── Mobile Global Tap to Expand Hint ── */}
+      <AnimatePresence>
+        {hoveredIndex === null && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none md:hidden w-max">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center justify-center bg-black/40 backdrop-blur-md px-8 py-5 rounded-2xl border border-white/20 shadow-[0_0_40px_rgba(0,0,0,0.8)]"
+            >
+              <svg className="mb-2 text-[#ECBD27] animate-bounce" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+              </svg>
+              <span className="text-white text-lg font-black uppercase tracking-widest text-center" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+                Tap to Expand
+              </span>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* ── Title Overlay ── */}
       <div className="absolute top-12 left-10 md:top-16 md:left-16 z-20 pointer-events-none">
         <div className="flex items-center gap-3 mb-4">
