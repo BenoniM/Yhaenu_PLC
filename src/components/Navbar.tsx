@@ -83,20 +83,22 @@ export default function Navbar() {
   const location = useLocation()
 
   useEffect(() => {
+    const isHomePage = location.pathname === '/'
+
     const onScroll = () => {
       const current = window.scrollY
       const heroThreshold = window.innerHeight * 1.2 // Threshold past the Hero pinning
 
       setIsPastHero(current > heroThreshold)
 
-      if (current < heroThreshold) {
-        // Keep navbar visible while in or near the Hero section
+      if (isHomePage && current < heroThreshold) {
+        // Keep navbar visible while in or near the Hero section on home page
         setVisible(true)
       } else {
         // Apply hide-on-scroll-down, show-on-scroll-up logic
-        if (current > lastScrollY.current + 10) {
+        if (current > lastScrollY.current + 10 && current > 0) {
           setVisible(false)
-        } else if (current < lastScrollY.current - 10) {
+        } else if (current < lastScrollY.current - 10 || current <= 0) {
           setVisible(true)
         }
       }

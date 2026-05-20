@@ -1,5 +1,7 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
 import Footer from '../components/Footer'
 import GridBackground from '../components/GridBackground'
 
@@ -30,23 +32,203 @@ const serviceOptions = [
   'Other',
 ]
 
-const steps = [
-  { num: '01', title: 'Fill the Form', desc: 'Provide your details and requirements.' },
-  { num: '02', title: 'We Review', desc: 'Our team reviews your request within 24 hours.' },
-  { num: '03', title: 'Get a Quote', desc: 'Receive a tailored quote for your needs.' },
-  { num: '04', title: 'Start Partnership', desc: 'Confirm and begin your business relationship.' },
+const stepsData = [
+  {
+    num: '01',
+    title: 'Fill the Form',
+    desc: 'Provide your details and requirements.',
+    image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    num: '02',
+    title: 'We Review',
+    desc: 'Our team reviews your request within 24 hours.',
+    image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=800&auto=format&fit=crop'
+  },
+  {
+    num: '03',
+    title: 'Get a Quote',
+    desc: 'Receive a tailored quote for your needs.',
+    image: 'https://images.pexels.com/photos/6950237/pexels-photo-6950237.jpeg'
+  },
+  {
+    num: '04',
+    title: 'Start Partnership',
+    desc: 'Confirm and begin your business relationship.',
+    image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=800&auto=format&fit=crop'
+  },
 ]
 
-const inputStyle = {
-  width: '100%',
-  padding: '14px 16px',
-  borderRadius: 12,
-  border: '1px solid rgba(14,95,19,0.2)',
-  background: '#fff',
-  color: '#0E5F13',
-  fontSize: '0.95rem',
-  outline: 'none',
-  fontFamily: 'inherit',
+function HowItWorksAccordion() {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+
+  return (
+    <div className="relative w-full h-[80vh] md:h-screen overflow-hidden bg-[#0E5F13] flex items-center justify-center">
+
+      {/* ── Title Overlay ── */}
+      <div className="absolute top-12 left-10 md:top-16 md:left-16 z-20 pointer-events-none">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="h-[2px] w-8 bg-[#ECBD27]" />
+          <span className="text-xs tracking-[0.4em] uppercase font-bold text-[#ECBD27]" style={{ fontFamily: 'monospace' }}>
+            Our Process
+          </span>
+        </div>
+        <h2 className="font-black text-3xl md:text-5xl uppercase text-white" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+          How It <span style={{ color: '#ECBD27' }}>Works</span>
+        </h2>
+      </div>
+
+      <div
+        className="absolute flex w-[140%] h-full left-1/2"
+        style={{ transform: 'translateX(-50%) skewX(-12deg)' }}
+        onMouseLeave={() => setHoveredIndex(null)}
+      >
+
+        {stepsData.map((item, i) => {
+          const flexValue = hoveredIndex === null ? 1 : (hoveredIndex === i ? 3.5 : 1)
+          const isHovered = hoveredIndex === i
+          const isCompressed = hoveredIndex !== null && !isHovered
+
+          return (
+            <motion.div
+              key={i}
+              className="relative h-full overflow-hidden border-r border-black/30 cursor-pointer group"
+              animate={{ flex: flexValue }}
+              transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+              onMouseEnter={() => setHoveredIndex(i)}
+            >
+              <div
+                className="absolute top-0 h-full w-[100vw] flex flex-col items-center justify-end pb-20 pointer-events-none"
+                style={{
+                  left: '50%',
+                  transform: 'translateX(-50%) skewX(12deg)'
+                }}
+              >
+                {/* Background Image */}
+                <div className="absolute inset-0 w-full h-full">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
+                    style={{ filter: isHovered ? 'grayscale(0%)' : 'grayscale(80%) brightness(0.6)' }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E5F13]/60 via-[#0E5F13]/20 to-transparent" />
+                </div>
+
+                {/* Text Content */}
+                <motion.div
+                  className="relative z-10 flex flex-col items-center text-center w-[85%] max-w-[450px]"
+                  animate={{
+                    y: isHovered ? 0 : (isCompressed ? 20 : 10),
+                    opacity: isHovered ? 1 : 0,
+                    scale: isCompressed ? 0.9 : 1
+                  }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <span className="text-[#ECBD27] font-black text-2xl md:text-4xl opacity-40 mb-2" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+                    {item.num}
+                  </span>
+                  <h3
+                    className="font-black text-xl md:text-3xl uppercase mb-2 text-white"
+                    style={{ fontFamily: "'Arial Black', sans-serif", textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}
+                  >
+                    {item.title}
+                  </h3>
+
+                  <motion.p
+                    className="text-white/90 text-sm md:text-base leading-relaxed font-bold tracking-wider uppercase"
+                    initial={false}
+                    animate={{
+                      height: isHovered ? 'auto' : 0,
+                      opacity: isHovered ? 1 : 0,
+                      marginTop: isHovered ? 8 : 0
+                    }}
+                    style={{ overflow: 'hidden' }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    {item.desc}
+                  </motion.p>
+                </motion.div>
+              </div>
+
+            </motion.div>
+          )
+        })}
+
+      </div>
+    </div>
+  )
+}
+
+function InputField({ label, required = false, children, isTextarea = false }: { label: string, required?: boolean, children: React.ReactNode, isTextarea?: boolean }) {
+  return (
+    <div className={`group relative flex flex-col sm:flex-row ${isTextarea ? 'sm:items-start pt-5 pb-6' : 'sm:items-center py-5'} border-b border-[rgba(14,95,19,0.3)]`}>
+      <label className={`sm:w-1/3 font-bold text-[#0E5F13] mb-2 sm:mb-0 text-[1.1rem] transition-colors duration-300 group-focus-within:text-[#ECBD27] ${isTextarea ? 'pt-1' : ''}`}>
+        {label} {required && '*'}
+      </label>
+      <div className="flex-1 w-full">
+        {children}
+      </div>
+      <div className="absolute bottom-[-1px] left-0 w-0 h-[2px] bg-[#ECBD27] transition-all duration-500 ease-out group-focus-within:w-full z-10" />
+    </div>
+  )
+}
+
+function CustomSelect({ value, onChange, options, name }: { value: string, onChange: (e: any) => void, options: string[], name: string }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div className="relative w-full" ref={containerRef}>
+      <div
+        className="flex items-center justify-between cursor-pointer py-1"
+        onClick={() => setIsOpen(!isOpen)}
+        tabIndex={0}
+      >
+        <span className="text-[1.1rem] text-[#0E5F13]">{value}</span>
+        <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#0E5F13]">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </motion.span>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute left-0 top-full mt-3 w-full bg-white shadow-2xl rounded-xl z-50 border border-[rgba(14,95,19,0.1)] overflow-hidden"
+          >
+            {options.map((opt) => (
+              <div
+                key={opt}
+                className="px-5 py-3 hover:bg-[#F3F6FA] cursor-pointer text-[#0E5F13] transition-colors"
+                onClick={() => {
+                  onChange({ target: { name, value: opt } } as any)
+                  setIsOpen(false)
+                }}
+              >
+                {opt}
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
 }
 
 export default function RfqPage() {
@@ -95,21 +277,7 @@ export default function RfqPage() {
       </section>
 
       {/* ── How It Works ── */}
-      <section className="relative overflow-hidden py-16" style={{ background: '#ECBD27' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {steps.map((step, i) => (
-              <motion.div key={i} className="text-center"
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}>
-                <p className="font-black text-4xl mb-2" style={{ fontFamily: "'Arial Black', sans-serif", color: '#0E5F13', opacity: 0.3 }}>{step.num}</p>
-                <p className="font-black uppercase text-sm mb-1" style={{ fontFamily: "'Arial Black', sans-serif", color: '#0E5F13' }}>{step.title}</p>
-                <p className="text-xs" style={{ color: 'rgba(14,95,19,0.7)' }}>{step.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HowItWorksAccordion />
 
       {/* ── RFQ Form ── */}
       <section className="relative overflow-hidden py-20" style={{ background: '#F3F6FA' }}>
@@ -141,100 +309,94 @@ export default function RfqPage() {
                 </div>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                <div>
-                  <h2 className="font-black uppercase text-xl mb-1" style={{ fontFamily: "'Arial Black', sans-serif", color: '#0E5F13' }}>
+              <form onSubmit={handleSubmit} className="flex flex-col">
+                <div className='mb-10'>
+                  <h2 className="font-black uppercase text-2xl mb-1" style={{ fontFamily: "'Arial Black', sans-serif", color: '#0E5F13' }}>
                     RFQ Form
                   </h2>
                   <p className="text-sm" style={{ color: 'rgba(14,95,19,0.6)' }}>Fields marked with * are required.</p>
                 </div>
 
-                {/* Company Info */}
-                <div>
-                  <p className="font-black uppercase text-xs mb-4 pb-2 border-b" style={{ fontFamily: "'Arial Black', sans-serif", color: '#ECBD27', borderColor: 'rgba(14,95,19,0.1)' }}>
+                <div className="border-t border-[rgba(14,95,19,0.3)]">
+                  <p className="font-black uppercase text-sm mt-8 mb-4 text-[#ECBD27]" style={{ fontFamily: "'Arial Black', sans-serif" }}>
                     Company Information
                   </p>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Company Name *</label>
-                      <input name="companyName" required value={form.companyName} onChange={handleChange} placeholder="Your company name" style={inputStyle} />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Contact Person *</label>
-                      <input name="contactName" required value={form.contactName} onChange={handleChange} placeholder="Full name" style={inputStyle} />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Email *</label>
-                      <input name="email" type="email" required value={form.email} onChange={handleChange} placeholder="your@email.com" style={inputStyle} />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Phone *</label>
-                      <input name="phone" required value={form.phone} onChange={handleChange} placeholder="+1 234 567 8900" style={inputStyle} />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Country / Region *</label>
-                      <input name="country" required value={form.country} onChange={handleChange} placeholder="e.g. United States, UAE, Germany" style={inputStyle} />
-                    </div>
-                  </div>
-                </div>
 
-                {/* Product / Service */}
-                <div>
-                  <p className="font-black uppercase text-xs mb-4 pb-2 border-b" style={{ fontFamily: "'Arial Black', sans-serif", color: '#ECBD27', borderColor: 'rgba(14,95,19,0.1)' }}>
+                  <InputField label="Company Name" required>
+                    <input name="companyName" required value={form.companyName} onChange={handleChange} placeholder="Your company name" className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" />
+                  </InputField>
+
+                  <InputField label="Contact Person" required>
+                    <input name="contactName" required value={form.contactName} onChange={handleChange} placeholder="Full name" className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" />
+                  </InputField>
+
+                  <InputField label="Email" required>
+                    <input name="email" type="email" required value={form.email} onChange={handleChange} placeholder="your@email.com" className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" />
+                  </InputField>
+
+                  <InputField label="Phone" required>
+                    <input name="phone" required value={form.phone} onChange={handleChange} placeholder="+1 234 567 8900" className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" />
+                  </InputField>
+
+                  <InputField label="Country / Region" required>
+                    <input name="country" required value={form.country} onChange={handleChange} placeholder="e.g. United States, UAE, Germany" className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" />
+                  </InputField>
+
+                  <p className="font-black uppercase text-sm mt-12 mb-4 text-[#ECBD27]" style={{ fontFamily: "'Arial Black', sans-serif" }}>
                     Product / Service Details
                   </p>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="md:col-span-2">
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Service / Product *</label>
-                      <select name="service" value={form.service} onChange={handleChange} style={inputStyle}>
-                        {serviceOptions.map(s => <option key={s} value={s}>{s}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Quantity</label>
-                      <input name="quantity" value={form.quantity} onChange={handleChange} placeholder="e.g. 10,000" style={inputStyle} />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Unit</label>
-                      <input name="unit" value={form.unit} onChange={handleChange} placeholder="e.g. kg, MT, units" style={inputStyle} />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Required Delivery Date</label>
-                      <input name="deliveryDate" type="date" value={form.deliveryDate} onChange={handleChange} style={inputStyle} />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Destination Port / City</label>
-                      <input name="destination" value={form.destination} onChange={handleChange} placeholder="e.g. Dubai, Rotterdam, New York" style={inputStyle} />
-                    </div>
-                  </div>
+
+                  <InputField label="Service / Product" required>
+                    <CustomSelect name="service" value={form.service} onChange={handleChange} options={serviceOptions} />
+                  </InputField>
+
+                  <InputField label="Quantity">
+                    <input name="quantity" value={form.quantity} onChange={handleChange} placeholder="e.g. 10,000" className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" />
+                  </InputField>
+
+                  <InputField label="Unit">
+                    <input name="unit" value={form.unit} onChange={handleChange} placeholder="e.g. kg, MT, units" className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" />
+                  </InputField>
+
+                  <InputField label="Required Delivery Date">
+                    <input name="deliveryDate" type="date" value={form.deliveryDate} onChange={handleChange} className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" style={{ colorScheme: 'light' }} />
+                  </InputField>
+
+                  <InputField label="Destination Port / City">
+                    <input name="destination" value={form.destination} onChange={handleChange} placeholder="e.g. Dubai, Rotterdam, New York" className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)]" />
+                  </InputField>
+
+                  <InputField label="Additional Requirements / Notes" isTextarea>
+                    <textarea name="additionalInfo" rows={5} value={form.additionalInfo} onChange={handleChange}
+                      placeholder="Describe any specific requirements, certifications needed, packaging preferences, etc."
+                      className="w-full bg-transparent border-none outline-none text-[1.1rem] text-[#0E5F13] placeholder-[rgba(14,95,19,0.4)] resize-none" />
+                  </InputField>
                 </div>
 
-                {/* Additional Info */}
-                <div>
-                  <label className="text-xs uppercase font-bold mb-1 block" style={{ color: '#0E5F13', fontFamily: 'monospace' }}>Additional Requirements / Notes</label>
-                  <textarea name="additionalInfo" rows={5} value={form.additionalInfo} onChange={handleChange}
-                    placeholder="Describe any specific requirements, certifications needed, packaging preferences, etc."
-                    style={{ ...inputStyle, resize: 'vertical' }} />
-                </div>
-
-                {/* Terms */}
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 mt-8 mb-8">
                   <input type="checkbox" name="agreeToTerms" id="terms" required checked={form.agreeToTerms}
-                    onChange={handleChange} className="mt-1 w-4 h-4 flex-shrink-0" style={{ accentColor: '#0E5F13' }} />
-                  <label htmlFor="terms" className="text-sm" style={{ color: 'rgba(14,95,19,0.7)' }}>
+                    onChange={handleChange} className="mt-1 w-5 h-5 flex-shrink-0 cursor-pointer" style={{ accentColor: '#0E5F13' }} />
+                  <label htmlFor="terms" className="text-[1.1rem] cursor-pointer text-[#0E5F13]">
                     I agree that Yhaenu PLC may contact me regarding this quote request. *
                   </label>
                 </div>
 
-                <motion.button type="submit"
-                  className="w-full py-5 rounded-full font-black uppercase text-sm tracking-wide"
-                  style={{ background: '#0E5F13', color: '#ECBD27', fontFamily: "'Arial Black', sans-serif", border: '2px solid #ECBD27' }}
-                  whileHover={{ scale: 1.02, background: '#ECBD27', color: '#0E5F13' }}
-                  whileTap={{ scale: 0.98 }}>
-                  Submit Quote Request →
-                </motion.button>
+                <div className="flex">
+                  <button type="submit"
+                    className="group flex items-stretch border border-[rgba(14,95,19,0.4)] hover:border-[#0E5F13] bg-[rgba(14,95,19,0.02)] hover:bg-[#0E5F13] transition-all duration-300 w-full sm:w-auto">
+                    <span className="px-8 py-4 font-bold text-[1.1rem] text-[#0E5F13] group-hover:text-[#ECBD27] transition-colors duration-300 flex-1 text-center sm:text-left">
+                      Submit Quote Request
+                    </span>
+                    <span className="flex items-center justify-center px-5 border-l border-[rgba(14,95,19,0.4)] group-hover:border-[#0E5F13] text-[#0E5F13] group-hover:text-[#ECBD27] transition-all duration-300">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
 
-                <p className="text-xs text-center" style={{ color: 'rgba(14,95,19,0.5)' }}>
+                <p className="text-xs text-center mt-8" style={{ color: 'rgba(14,95,19,0.5)' }}>
                   We respond within 24 hours · yhaenuplc@gmail.com · +251 911 761 855
                 </p>
               </form>

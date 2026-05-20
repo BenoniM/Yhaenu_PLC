@@ -26,7 +26,7 @@ export default function LeadershipAccordion() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null) // Default to equally divided (null)
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black flex items-center justify-center">
+    <div className="relative w-full h-screen overflow-hidden bg-[#0E5F13] flex items-center justify-center">
       
       {/* ── Title Overlay (Absolute on top of accordion) ── */}
       <div className="absolute top-12 left-10 md:top-16 md:left-16 z-20 pointer-events-none">
@@ -85,7 +85,7 @@ export default function LeadershipAccordion() {
                     className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
                     style={{ filter: isHovered ? 'grayscale(0%)' : 'grayscale(80%) brightness(0.6)' }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E5F13]/60 via-[#0E5F13]/20 to-transparent" />
                 </div>
 
                 {/* Text Content */}
@@ -93,7 +93,7 @@ export default function LeadershipAccordion() {
                   className="relative z-10 flex flex-col items-center text-center w-[85%] max-w-[450px]"
                   animate={{ 
                     y: isHovered ? 0 : (isCompressed ? 20 : 10),
-                    opacity: isHovered ? 1 : (isCompressed ? 0 : 0.8),
+                    opacity: isHovered ? 1 : 0,
                     scale: isCompressed ? 0.9 : 1
                   }}
                   transition={{ duration: 0.5 }}
