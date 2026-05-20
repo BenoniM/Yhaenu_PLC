@@ -1,7 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
 import Footer from '../components/Footer'
 import GridBackground from '../components/GridBackground'
 

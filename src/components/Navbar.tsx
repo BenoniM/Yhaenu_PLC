@@ -88,46 +88,7 @@ function AnimatedWave() {
   )
 }
 
-function FlipWord({ label, href, onClick, delay = 0, isActive }: {
-  label: string; href: string; onClick: () => void; delay?: number; isActive?: boolean
-}) {
-  const navigate = useNavigate()
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    onClick()
-    navigate(href)
-  }
-  return (
-    <motion.a href={href} onClick={handleClick}
-      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      whileHover="hovered" className="cursor-pointer select-none" style={{ textDecoration: 'none' }}>
-      <span className="flex flex-wrap relative pb-2">
-        {label.split('').map((char, i) => (
-          <motion.span key={i} className="inline-block font-black uppercase"
-            style={{
-              fontFamily: "'Arial Black', sans-serif",
-              fontSize: 'clamp(1.4rem, 5vw, 2rem)',
-              color: isActive ? '#ECBD27' : '#0E5F13'
-            }}
-            variants={{ hovered: { color: '#ECBD27', scale: 1.05 } }}
-            transition={{ duration: 0.3, delay: i * 0.02 }}>
-            {char === ' ' ? '\u00A0' : char}
-          </motion.span>
-        ))}
-        {isActive && (
-          <motion.div
-            layoutId="mobile-nav-underline"
-            className="absolute bottom-0 left-0 h-[4px] bg-[#ECBD27]"
-            initial={{ width: 0 }}
-            animate={{ width: '100%' }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          />
-        )}
-      </span>
-    </motion.a>
-  )
-}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [visible, setVisible] = useState(true)
