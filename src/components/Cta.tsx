@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 
 interface CtaProps {
@@ -17,10 +17,28 @@ export default function Cta({
   buttonLink = '/contact',
   isDark = true,
 }: CtaProps) {
+  const navigate = useNavigate()
+  const [isNavigating, setIsNavigating] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const bgColor = isDark ? '#0E5F13' : '#F3F6FA'
   const textColor = isDark ? '#F3F6FA' : '#0E5F13'
   const accentColor = '#ECBD27'
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const isMobile = window.matchMedia('(max-width: 1024px)').matches || ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (isMobile) {
+      e.preventDefault()
+      if (isNavigating) return
+
+      setIsNavigating(true)
+      setIsHovered(true)
+
+      // Let the beautiful ripple, button fill, and wavy animation play before navigating
+      setTimeout(() => {
+        navigate(buttonLink)
+      }, 1000)
+    }
+  }
 
   const turb1Ref = useRef<SVGFETurbulenceElement>(null)
   const disp1Ref = useRef<SVGFEDisplacementMapElement>(null)
@@ -177,8 +195,13 @@ export default function Cta({
                 >
                   <Link
                     to={buttonLink}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={handleClick}
+                    onMouseEnter={() => {
+                      if (!isNavigating) setIsHovered(true)
+                    }}
+                    onMouseLeave={() => {
+                      if (!isNavigating) setIsHovered(false)
+                    }}
                     className="group relative flex items-center justify-center w-40 h-40 md:w-48 md:h-48 flex-shrink-0 aspect-square rounded-full border border-white/30 transition-all duration-500 overflow-hidden"
                     style={{ borderColor: isHovered ? accentColor : 'rgba(255,255,255,0.3)' }}
                   >
