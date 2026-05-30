@@ -49,7 +49,7 @@ function AppContent() {
     <>
 
       <ScrollToTop />
-      <PageLoader key={pathname} />
+      {pathname === '/' && <PageLoader key={pathname} />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<Aboutpage />} />
