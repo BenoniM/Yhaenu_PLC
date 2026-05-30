@@ -31,7 +31,7 @@ const contactInfo = [
   { icon: '📍', label: 'Head Office', value: 'Selam City Mall, Office #601, 602, 603\nAddis Ababa, Ethiopia', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800' },
   { icon: '📞', label: 'Phone', value: '+251 911 761 855', image: 'https://images.unsplash.com/photo-1523966211575-eb4a01e7dd51?auto=format&fit=crop&q=80&w=800' },
   { icon: '✉️', label: 'Email', value: 'yhaenuplc@gmail.com\nyhaenu2016@gmail.com', image: 'https://images.unsplash.com/photo-1557200134-90327ee9fafa?auto=format&fit=crop&q=80&w=800' },
-  { icon: '🌐', label: 'Website', value: 'www.yhaenuplc.com', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800' },
+  // { icon: '🌐', label: 'Website', value: 'www.yhaenuplc.com', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800' },
 ]
 
 const socialLinks = [

@@ -1,385 +1,397 @@
-import { useRef, useEffect } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import journeyVideo from '../assets/journey/13844771_3840_2160_25fps (1).mp4'
-import GridBackground from './GridBackground'
+import { useRef, useEffect, useCallback, useState } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { Loader2 } from "lucide-react";
+import journeyVideo from "../assets/journey/13844771_3840_2160_25fps (1).mp4";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-const MILESTONES = [
-  { year: '2003', event: 'Yhaenu PLC is founded in Addis Ababa, Ethiopia' },
-  { year: '2007', event: 'Expansion into manufacturing — cardboard and carton products' },
-  { year: '2012', event: 'Transportation division launched, growing the logistics fleet' },
-  { year: '2016', event: 'South Star International Hotel opens in Hawassa' },
-  { year: '2020', event: 'Entry into coffee farming and international export markets' },
-  { year: '2024', event: 'Operations now span 15+ countries across Africa and beyond' },
-]
+export interface MilestoneData {
+  id: string;
+  year: string;
+  title: string;
+  description: string | null;
+  created_at: string;
+}
 
-// One Unsplash image per milestone — swaps in ONLY when that year appears
-const MILESTONE_IMAGES = [
-  'https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1600&q=80', // 2003 – Addis / founding
-  'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1600&q=80', // 2007 – manufacturing
-  'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=1600&q=80', // 2012 – logistics
-  'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80', // 2016 – hotel
-  'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80', // 2020 – coffee
-  'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=1600&q=80', // 2024 – global
-]
-
-const SIDES: ('right' | 'left')[] = ['right', 'right', 'right', 'left', 'left', 'left']
+const CANVAS_W = 1920;
+const CANVAS_H = 1080;
+const START_BUF = 0.05; 
+const END_BUF = 0.05; 
+const CH_FADE = 0.06;
 
 export default function JourneySection() {
-  const containerRef  = useRef<HTMLDivElement>(null)
-  const sectionRef    = useRef<HTMLDivElement>(null)
-  const videoRef      = useRef<HTMLVideoElement>(null)
-  const titleRef      = useRef<HTMLDivElement>(null)
+  const [milestones, setMilestones] = useState<MilestoneData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // ── Visual cover (green bg + images + grid) ─────────────────────────────────
-  // Separate from the label panel so we can apply an SVG clip-path that
-  // cuts the rhombus hole cleanly, letting the video show through.
-  const coverRef      = useRef<HTMLDivElement>(null)
+  const outerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const overlayRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // ── Label panel (transparent container — just positions the milestone text) ──
-  const panelRef      = useRef<HTMLDivElement>(null)
-  const boxRef        = useRef<HTMLDivElement>(null)
-  const holeRef       = useRef<HTMLDivElement>(null) // tracks skewX value for GSAP
+  const targetTimeRef = useRef(0);
+  const currentTimeRef = useRef(0);
+  const durationRef = useRef(0);
+  const seekingRef = useRef(false);
 
-  // ── SVG clip-path that punches the rhombus out of coverRef ──────────────────
-  const clipPathElRef = useRef<SVGPathElement>(null)
+  const rafRef = useRef<number | null>(null);
 
-  const mRefs     = useRef<(HTMLDivElement | null)[]>([])
-  const imageRefs = useRef<(HTMLDivElement | null)[]>([])
+  const dragProgress = useMotionValue(0);
+  const handleY = useMotionValue(0);
+  const smoothProgress = useSpring(dragProgress, { damping: 20, stiffness: 100 });
+  const smoothHandleY = useSpring(handleY, { damping: 25, stiffness: 200 });
+  const progressBarHeight = useTransform(smoothProgress, [0, 1], ["0%", "100%"]);
+  
+  const stRef = useRef<globalThis.ScrollTrigger | null>(null);
+  const isDraggingRef = useRef(false);
+
+  // ── Fetch Milestones ────────────────────────────────────────────────────────
+  useEffect(() => {
+    const fetchMilestones = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_LINK}/milestones`);
+        if (!res.ok) throw new Error("Failed to fetch milestones");
+        const data = await res.json();
+        
+        // Sort by year
+        const sorted = data.sort((a: MilestoneData, b: MilestoneData) => parseInt(a.year) - parseInt(b.year));
+        setMilestones(sorted);
+      } catch (err) {
+        console.error("Error fetching milestones:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMilestones();
+  }, []);
+
+  const drawFrame = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || video.readyState < 2) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const vw = video.videoWidth, vh = video.videoHeight;
+    if (!vw || !vh) return;
+    const vR = vw / vh, cR = CANVAS_W / CANVAS_H;
+    let sx = 0, sy = 0, sw = vw, sh = vh;
+    if (vR > cR) { sw = vh * cR; sx = (vw - sw) / 2; }
+    else { sh = vw / cR; sy = (vh - sh) / 2; }
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, CANVAS_W, CANVAS_H);
+  }, []);
 
   useEffect(() => {
-    const container = containerRef.current
-    const section   = sectionRef.current
-    const video     = videoRef.current
-    const title     = titleRef.current
-    const cover     = coverRef.current
-    const panel     = panelRef.current
-    const box       = boxRef.current
-    const hole      = holeRef.current
-    const clipEl    = clipPathElRef.current
-    if (!container || !section || !video || !title || !cover || !panel || !box || !hole || !clipEl) return
-
-    // ── Initial states ────────────────────────────────────────────────────────
-    gsap.set([panel, cover], { x: '-100%' })
-    gsap.set(box, { left: '4%' })
-    gsap.set(hole, { skewX: -12 })
-    mRefs.current.forEach(el  => el && gsap.set(el,  { opacity: 0, y: 10 }))
-    imageRefs.current.forEach(el => el && gsap.set(el, { opacity: 0 }))
-
-    // ── Proxy objects for video scrub + panel progress ────────────────────────
-    const proxyT        = { t: 0 }
-    const proxyPanel    = { progress: 0 }   // 0 = fully left, 1 = fully on-screen
-
-    // Init the clip-path once so there's no flash
-    clipEl.setAttribute('clip-rule', 'evenodd')
-    updateClipPath()
-
-    // ── Clip-path updater — runs every animation frame via gsap.ticker ────────
-    function updateClipPath() {
-      if (!box || !hole || !section || !clipEl) return
-      const sW = section.offsetWidth
-      const sH = section.offsetHeight
-      if (!sW || !sH) return
-
-      // Convert panel progress → pixel translation of cover (matches x: '-100%' → '0%')
-      const panelX = -sW * (1 - proxyPanel.progress)
-
-      // Box left (GSAP writes CSS directly): e.g. '4%', '37%', '62%'
-      const leftPx = (parseFloat(box.style.left || '4') / 100) * sW
-      const absLeft = panelX + leftPx
-
-      const topPx    = 0.12 * sH
-      const widthPx  = 0.26 * sW
-      const heightPx = 0.76 * sH
-
-      const skewDeg  = (gsap.getProperty(hole, 'skewX') as number) ?? -12
-      const tanSkew  = Math.tan((skewDeg * Math.PI) / 180)
-
-      // Four corners of the skewed rhombus hole in section coordinates
-      const tlx = absLeft + topPx * tanSkew,          tly = topPx
-      const trx = absLeft + widthPx + topPx * tanSkew, tr_y = topPx
-      const blx = absLeft + (topPx + heightPx) * tanSkew,          bly = topPx + heightPx
-      const brx = absLeft + widthPx + (topPx + heightPx) * tanSkew, br_y = topPx + heightPx
-
-      // Even-odd path: outer rect fills cover; inner polygon subtracts the hole
-      const d = [
-        `M0,0 L${sW},0 L${sW},${sH} L0,${sH} Z`,
-        `M${tlx},${tly} L${trx},${tr_y} L${brx},${br_y} L${blx},${bly} Z`,
-      ].join(' ')
-
-      clipEl.setAttribute('d', d)
-    }
-
-    gsap.ticker.add(updateClipPath)
-
-    // ── Main scroll-driven timeline ───────────────────────────────────────────
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: container,
-          start: 'top top',
-          end:   '+=520%',
-          pin:    section,
-          anticipatePin: 1,
-          scrub:  0.8,
-        },
-      })
-
-      // Phase 1 (0→10%): title fades out
-      tl.to(title, { opacity: 0, y: -40, ease: 'none', duration: 0.10 }, 0)
-
-      // Phase 2 (0→38%): green box slides in FIRST — cover + labels together
-      tl.fromTo([cover, panel], { x: '-100%' }, { x: '0%', ease: 'power2.out', duration: 0.38 }, 0)
-      // Mirror into the proxy so clip-path can track the slide-in position
-      tl.fromTo(proxyPanel, { progress: 0 }, { progress: 1, ease: 'power2.out', duration: 0.38 }, 0)
-
-      // Phase 3 (38→100%): video scrub
-      tl.to(proxyT, {
-        t: 1, ease: 'none', duration: 0.62,
-        onUpdate() { if (video.duration) video.currentTime = proxyT.t * video.duration },
-      }, 0.38)
-
-      // Box movement: left → center → right
-      tl.to(box, { left: '37%', ease: 'none', duration: 0.12 }, 0.38)
-      tl.to(box, { left: '62%', ease: 'none', duration: 0.22 }, 0.78)
-
-      // Rhombus shape flip (skew reversal at midpoint)
-      tl.to(hole, { skewX: 12, ease: 'power2.inOut', duration: 0.10 }, 0.60)
-
-      // Milestone schedule — labels AND background images only appear here
-      const F = 0.03   // fade duration
-      const H = 0.05   // hold before fade-out
-
-      const schedule = [
-        { idx: 0, start: 0.38 }, // RIGHT — rect moving left→center
-        { idx: 1, start: 0.46 }, // RIGHT — rect near center
-        { idx: 2, start: 0.54 }, // RIGHT — fully paused at center
-        { idx: 3, start: 0.65 }, // LEFT  — still paused at center
-        { idx: 4, start: 0.78 }, // LEFT  — rect resuming right
-        { idx: 5, start: 0.89 }, // LEFT  — rect near right edge
-      ]
-
-      schedule.forEach(({ idx, start }) => {
-        const el  = mRefs.current[idx]
-        const img = imageRefs.current[idx]
-        if (!el) return
-
-        // Milestone text: slide up to appear, slide up to disappear
-        tl.fromTo(el, { opacity: 0, y: 16 }, { opacity: 1, y: 0,   ease: 'power1.out', duration: F }, start)
-        tl.to(el,                             { opacity: 0, y: -16,  ease: 'power1.in',  duration: F }, start + F + H)
-
-        // Background image fades in when year appears, fades out when it leaves
-        // Blur is CONSTANT (8px) — only opacity moves
-        if (img) {
-          tl.to(img, { opacity: 1, ease: 'power1.out', duration: F }, start)
-          if (idx < MILESTONES.length - 1) {
-            tl.to(img, { opacity: 0, ease: 'power1.in', duration: F }, start + F + H)
-          }
-          // Last image stays at opacity:1 until scroll ends
-        }
-      })
-    }, container)
-
+    const video = videoRef.current;
+    if (!video) return;
+    const onReady = () => {
+      durationRef.current = video.duration;
+      video.currentTime = 0;
+    };
+    const onSeeked = () => {
+      drawFrame();
+      currentTimeRef.current = video.currentTime;
+      seekingRef.current = false;
+    };
+    if (video.readyState >= 1) onReady();
+    else video.addEventListener("loadedmetadata", onReady, { once: true });
+    video.addEventListener("seeked", onSeeked);
     return () => {
-      ctx.revert()
-      gsap.ticker.remove(updateClipPath)
-    }
-  }, [])
+      video.removeEventListener("loadedmetadata", onReady);
+      video.removeEventListener("seeked", onSeeked);
+    };
+  }, [drawFrame]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const LERP = 0.18;
+    const tick = () => {
+      if (!seekingRef.current) {
+        const gap = targetTimeRef.current - currentTimeRef.current;
+        if (Math.abs(gap) > 0.02) {
+          seekingRef.current = true;
+          video.currentTime = currentTimeRef.current + gap * LERP;
+        }
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, []);
+
+  useEffect(() => {
+    if (loading || milestones.length === 0) return;
+    const outer = outerRef.current;
+    if (!outer) return;
+
+    const update = (p: number) => {
+      const dur = durationRef.current;
+      if (dur) {
+        const vp = p <= START_BUF ? 0 : (p - START_BUF) / (1 - START_BUF);
+        targetTimeRef.current = Math.min(dur - 0.02, Math.max(0, vp * dur));
+      }
+
+      const numChapters = milestones.length;
+      milestones.forEach((_, i) => {
+        const el = overlayRefs.current[i];
+        const dot = dotRefs.current[i];
+
+        const winStart = i / numChapters;
+        const winEnd = (i + 1) / numChapters;
+        const fadeInEnd = winStart + CH_FADE;
+        const fadeOutStart = winEnd - CH_FADE;
+        const isFirst = i === 0;
+        const isLast = i === numChapters - 1;
+        const effectiveEnd = isLast ? (1 - END_BUF + 0.001) : winEnd;
+
+        let opacity = 0;
+        if (p >= winStart && p < effectiveEnd) {
+          if (!isFirst && p < fadeInEnd) {
+            opacity = (p - winStart) / CH_FADE;
+          } else if (!isLast && p > fadeOutStart) {
+            opacity = (winEnd - p) / CH_FADE;
+          } else {
+            opacity = 1;
+          }
+        }
+        if (isLast && p >= (1 - END_BUF)) {
+          opacity = Math.max(0, (1 - p) / END_BUF);
+        }
+
+        const o = Math.max(0, Math.min(1, opacity));
+        if (el) {
+          el.style.opacity = String(o);
+          el.style.transform = `translateY(${(1 - o) * 16}px)`;
+        }
+        if (dot) {
+          const active = p >= winStart && p < effectiveEnd;
+          const dotO = isLast && p >= (1 - END_BUF)
+            ? Math.max(0.3, (1 - p) / END_BUF)
+            : active ? 1 : 1;
+          dot.style.opacity = String(dotO);
+          dot.style.transform = active ? "scaleY(1)" : "scaleY(0.5)";
+          dot.style.backgroundColor = active ? "#ECBD27" : "rgba(255, 255, 255, 1)";
+        }
+      });
+    };
+
+    update(0);
+
+    const st = ScrollTrigger.create({
+      trigger: outer,
+      start: "top top",
+      end: "bottom bottom",
+      onUpdate: (self) => {
+        update(self.progress);
+        if (!isDraggingRef.current) {
+          dragProgress.set(self.progress);
+          handleY.set(self.progress * 320);
+        }
+      },
+    });
+
+    stRef.current = st;
+
+    return () => { st.kill(); };
+  }, [loading, milestones, dragProgress, handleY]);
 
   return (
-    <div ref={containerRef} className="relative">
-      <div ref={sectionRef} className="h-screen overflow-hidden bg-black relative">
-
-        {/* ── Background video (shows through the rhombus hole) ── */}
+    <div ref={outerRef} className="relative" style={{ height: "400vh" }}>
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        {loading && (
+          <div className="absolute inset-0 z-[100] bg-[#0E5F13] flex items-center justify-center">
+            <Loader2 className="w-10 h-10 animate-spin text-[#ECBD27]" />
+          </div>
+        )}
         <video
           ref={videoRef}
           src={journeyVideo}
           muted
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute opacity-0 pointer-events-none"
+          style={{ width: "1px", height: "1px" }}
         />
 
-        {/* Radial vignette */}
+        <canvas
+          ref={canvasRef}
+          width={CANVAS_W}
+          height={CANVAS_H}
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: "cover" }}
+        />
+
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%)',
-            zIndex: 1,
+            background: "linear-gradient(100deg, rgba(14,95,19,0.95) 0%, rgba(14,95,19,0.7) 40%, rgba(14,95,19,0.2) 70%, transparent 100%)",
           }}
         />
 
-        {/* ── Title (fades as panel slides in) ── */}
         <div
-          ref={titleRef}
-          className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-          style={{ zIndex: 20 }}
-        >
-          <div className="flex items-center gap-3 mb-5">
-            <span className="h-[2px] w-8 bg-[#ECBD27]" />
-            <span
-              className="text-[#ECBD27] text-xs tracking-[0.4em] uppercase font-bold"
-              style={{ fontFamily: 'monospace' }}
-            >
-              Our Journey
-            </span>
-            <span className="h-[2px] w-8 bg-[#ECBD27]" />
-          </div>
-          <h2
-            className="font-black uppercase text-center text-white leading-[1.05]"
-            style={{
-              fontFamily: "'Arial Black', sans-serif",
-              fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-              letterSpacing: '-0.03em',
-              textShadow: '0 2px 30px rgba(0,0,0,0.5)',
-            }}
-          >
-            Building Ethiopia,<br />
-            <span style={{ color: '#ECBD27' }}>One Milestone</span><br />
-            at a Time
-          </h2>
+          className="absolute bottom-0 left-0 right-0 h-2/5"
+          style={{ background: "linear-gradient(to top, rgba(14,95,19,0.9) 0%, transparent 100%)" }}
+        />
+
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-10 py-7 border-b border-white/10">
+          <span className="ml-2 text-sm font-bold tracking-[0.24em] uppercase text-[#ECBD27]">Our Journey</span>
+          <span className="ml-2 text-sm font-medium tracking-[0.2em] uppercase text-white/80">Scroll to explore</span>
         </div>
 
-        {/* ────────────────────────────────────────────────────────────────────
-            SVG clip-path definition.
-            The <path> uses an even-odd combined shape:
-              outer rect (full section)  + inner rhombus (the hole).
-            The intersection is excluded → the rhombus is transparent,
-            showing the video behind coverRef.
-        ──────────────────────────────────────────────────────────────────── */}
-        <svg
-          aria-hidden="true"
-          style={{ position: 'absolute', width: 0, height: 0, overflow: 'visible' }}
-        >
-          <defs>
-            <clipPath id="journey-panel-clip" clipPathUnits="userSpaceOnUse">
-              <path ref={clipPathElRef} d="" clipRule="evenodd" />
-            </clipPath>
-          </defs>
-        </svg>
-
-        {/* ── Visual cover: green + per-milestone images + grid ──────────────
-            Slides in from left (same animation as panelRef).
-            SVG clip-path cuts the rhombus hole so video shows through.
-            Grid/glow lives ONLY here — on the green box, nowhere else.
-        ──────────────────────────────────────────────────────────────────── */}
-        <div
-          ref={coverRef}
-          className="absolute inset-0 overflow-hidden pointer-events-none"
-          style={{ zIndex: 25, clipPath: 'url(#journey-panel-clip)' }}
-        >
-          {/* Solid brand-green background (the "green box") */}
-          <div style={{ position: 'absolute', inset: 0, background: '#0E5F13', zIndex: 0 }} />
-
-          {/* Blurred Unsplash images — appear ONLY when their milestone does.
-              Blur (8px) is a constant CSS filter; opacity is what GSAP animates.
-              Scale(1.04) hides the blur-edge bleed without changing composition. */}
-          {MILESTONE_IMAGES.map((url, i) => (
-            <div
-              key={`img-${i}`}
-              ref={el => { imageRefs.current[i] = el }}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                backgroundImage: `url(${url})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                filter: 'blur(8px) brightness(0.7)',
-                transform: 'scale(1.04)',
-                opacity: 0,
-                zIndex: 1,
-                willChange: 'opacity',
-              }}
-            />
-          ))}
-
-          {/* Grid + glow — ONLY on the green box (per user request) */}
-          <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
-            <GridBackground color="#ECBD27" gridSize={60} opacity={0.09} isVisible={true} />
-          </div>
-        </div>
-
-        {/* ── Label panel: transparent container, just positions milestone text ──
-            Slides in identically to coverRef so labels align with the cover.
-            holeRef inside boxRef has NO boxShadow — visuals are handled by coverRef.
-        ──────────────────────────────────────────────────────────────────── */}
-        <div
-          ref={panelRef}
-          className="absolute inset-0 overflow-visible pointer-events-none"
-          style={{ zIndex: 30 }}
-        >
+        {milestones.map((m, i) => (
           <div
-            ref={boxRef}
+            key={m.id || i}
+            ref={(el) => { overlayRefs.current[i] = el; }}
+            className="absolute bottom-[25%] left-[4%] pointer-events-none"
             style={{
-              position: 'absolute',
-              top: '12%',
-              height: '76%',
-              width: '26%',
-              left: '4%',
-              overflow: 'visible',
-              zIndex: 3,
+              maxWidth: "min(580px, 70vw)",
+              opacity: i === 0 ? 1 : 0,
+              transition: "opacity 0.08s linear, transform 0.08s linear",
+              willChange: "opacity, transform",
             }}
           >
-            {/* holeRef: transparent div used only so GSAP can animate skewX for clip-path tracking */}
-            <div
-              ref={holeRef}
-              style={{ position: 'absolute', inset: 0, zIndex: 1 }}
-            />
-
-            {/* Milestone labels — positioned outside the box to left/right */}
-            {MILESTONES.map((m, i) => {
-              const isRight = SIDES[i] === 'right'
-              return (
-                <div
-                  key={i}
-                  ref={el => { mRefs.current[i] = el }}
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    ...(isRight
-                      ? { left: 'calc(100% + 24px)', right: 'auto' }
-                      : { right: 'calc(100% + 24px)', left: 'auto' }),
-                    width: '22vw',
-                    zIndex: 3,
-                    opacity: 0,
-                  }}
+            <div className="flex gap-7 items-start">
+              <div
+                className="w-[3px] min-h-[150px] flex-shrink-0 mt-1 rounded-sm"
+                style={{ background: "linear-gradient(to bottom, #ECBD27, #f5d657)" }}
+              />
+              <div
+                className="rounded-xl px-6 py-4"
+                style={{
+                  background: "rgba(14,95,19,0.55)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                }}
+              >
+                <p className="text-[11px] font-black tracking-[0.3em] uppercase mb-3 text-[#ECBD27] font-['Arial_Black']">
+                  Chapter {String(i + 1).padStart(2, '0')}
+                </p>
+                <p
+                  className="font-black leading-none mb-1 select-none font-['Arial_Black']"
+                  style={{ fontSize: "clamp(2.8rem, 6vw, 5rem)", color: "white" }}
                 >
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: isRight ? 'flex-start' : 'flex-end',
-                    gap: 8,
-                  }}>
-                    <span style={{
-                      fontFamily: "'Arial Black', sans-serif",
-                      color: '#ECBD27',
-                      fontSize: 'clamp(2rem, 3.5vw, 3rem)',
-                      fontWeight: 900,
-                      lineHeight: 1,
-                      textShadow: '0 2px 20px rgba(0,0,0,0.6)',
-                    }}>
-                      {m.year}
-                    </span>
-                    <p style={{
-                      color: 'rgba(243,246,250,0.92)',
-                      fontSize: 'clamp(0.85rem, 1.4vw, 1.1rem)',
-                      lineHeight: 1.65,
-                      textAlign: isRight ? 'left' : 'right',
-                      textShadow: '0 1px 10px rgba(0,0,0,0.5)',
-                    }}>
-                      {m.event}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
+                  {m.year}
+                </p>
+                <h3
+                  className="font-black leading-[1.05] mb-4 text-[#ECBD27] font-['Arial_Black'] uppercase"
+                  style={{ fontSize: "clamp(1.5rem, 3.8vw, 2.5rem)", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}
+                >
+                  {m.title}
+                </h3>
+                {m.description && (
+                  <p
+                    className="text-white font-light leading-[1.8]"
+                    style={{ fontSize: "clamp(0.9rem, 1.3vw, 1rem)", maxWidth: "400px", opacity: 0.92 }}
+                  >
+                    {m.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <div className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 flex items-center gap-8 z-50">
+          <div className="flex flex-col items-center gap-4">
+            {milestones.map((_, i) => (
+              <div key={i} className="flex flex-col items-center gap-[6px]">
+                <div
+                  ref={(el) => { dotRefs.current[i] = el; }}
+                  className="w-[3px] h-6 md:h-9 rounded-sm transition-all duration-200"
+                  style={{ backgroundColor: "rgba(255, 255, 255, 1)", transformOrigin: "center", opacity: 1 }}
+                />
+                <span
+                  className="text-[10px] md:text-sm font-bold tracking-[0.15em] uppercase text-white select-none"
+                  style={{ writingMode: "vertical-rl", textOrientation: "mixed", transform: "rotate(180deg)" }}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div 
+            className="relative group flex flex-col items-center hidden md:flex" 
+            style={{ 
+              height: 320, 
+              width: 44, 
+              touchAction: "none",
+              cursor: isDraggingRef.current ? "none" : "grab"
+            }}
+            onPointerDown={(e) => {
+              const target = e.currentTarget;
+              const st = stRef.current;
+              if (!st) return;
+
+              const rect = target.getBoundingClientRect();
+              const initialY = Math.max(0, Math.min(320, e.clientY - rect.top));
+              const initialP = initialY / 320;
+              
+              isDraggingRef.current = true;
+              handleY.set(initialY);
+              dragProgress.set(initialP);
+              gsap.set(window, { scrollTo: st.start + (initialP * (st.end - st.start)) });
+
+              target.requestPointerLock();
+
+              const onMouseMove = (me: MouseEvent) => {
+                const currentVal = handleY.get();
+                const nextVal = Math.max(0, Math.min(320, currentVal + me.movementY));
+                const p = nextVal / 320;
+
+                handleY.set(nextVal);
+                dragProgress.set(p);
+                gsap.set(window, { scrollTo: st.start + (p * (st.end - st.start)) });
+              };
+
+              const onLockChange = () => {
+                if (document.pointerLockElement !== target) {
+                  isDraggingRef.current = false;
+                  document.removeEventListener("mousemove", onMouseMove);
+                  document.removeEventListener("pointerlockchange", onLockChange);
+                }
+              };
+
+              document.addEventListener("mousemove", onMouseMove);
+              document.addEventListener("pointerlockchange", onLockChange);
+
+              const onUp = () => {
+                if (document.pointerLockElement === target) {
+                  document.exitPointerLock();
+                }
+                window.removeEventListener("pointerup", onUp);
+              };
+              window.addEventListener("pointerup", onUp);
+            }}
+          >
+            <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[1px] bg-white rounded-full" />
+            <motion.div
+              className="absolute left-1/2 -translate-x-1/2 top-0 w-[2px] bg-[#ECBD27] rounded-full origin-top pointer-events-none"
+              style={{ height: progressBarHeight }}
+            />
+            <motion.div
+              style={{ y: smoothHandleY, translateY: "-50%" }}
+              className="absolute top-0 -translate-x-1/2 w-6 h-16 bg-[#0E5F13] rounded-full cursor-grab active:cursor-grabbing border border-[#ECBD27] flex items-center justify-center z-10 transition-transform group-hover:scale-105 active:scale-95"
+            >
+              <div className="flex flex-col gap-1.5 pointer-events-none">
+                <div className="w-2 h-[3px] bg-[#ECBD27] rounded-xl" />
+                <div className="w-2 h-[3px] bg-[#ECBD27] rounded-xl" />
+              </div>
+            </motion.div>
+            <div className="absolute -right-14 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none translate-x-2 group-hover:translate-x-0">
+              <span
+                className="text-[9px] font-black tracking-[0.4em] uppercase text-[#ECBD27] whitespace-nowrap"
+                style={{ writingMode: "vertical-rl" }}
+              >
+                DRAG · SCRUB
+              </span>
+            </div>
           </div>
         </div>
-
       </div>
     </div>
-  )
+  );
 }

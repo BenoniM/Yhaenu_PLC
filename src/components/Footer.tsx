@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useRef } from 'react'
 import { useInView } from 'framer-motion'
-import ftrVideo from '../assets/ftr-video/14610569_2160_3840_24fps.mp4'
-import logoText from '../assets/logo/Logo-Text.svg'
+import logoText from '/yhaenu.svg'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -38,36 +37,14 @@ export default function Footer() {
   ]
 
   return (
-    <footer 
+    <footer
       ref={footerRef}
-      className="relative min-h-[75vh] flex flex-col justify-between overflow-hidden text-[#F3F6FA] pt-14 md:pt-24 pb-8 px-8 md:px-20" 
+      className="relative min-h-[75vh] flex flex-col justify-between overflow-hidden text-[#F3F6FA] pt-14 md:pt-24 pb-8 px-8 md:px-20"
       style={{ background: '#0E5F13' }}
     >
-      {/* Background Video Layer */}
-      <div className="absolute inset-0 z-0">
-        {isVisible && (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover opacity-50 grayscale-[0.2] brightness-[0.7]"
-          >
-            <source src={ftrVideo} type="video/mp4" />
-          </video>
-        )}
-        {/* Soft greenish tint overlay */}
-        <div 
-          className="absolute inset-0 bg-[#0E5F13]/50 backdrop-blur-[0.5px]" 
-        />
-        {/* NOISE OVERLAY - removed broken vercel.app/noise.svg */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" />
-      </div>
-
       {/* Top Section: 5-Column Grid */}
       <div className="relative z-10 w-full max-w-[1400px] mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-12 gap-y-12 md:gap-y-16 gap-x-8 md:gap-x-12 items-start">
-          
           {/* 1. Newsletter - 4 cols */}
           <div className="col-span-2 md:col-span-4 space-y-8 mb-4 md:mb-0">
             <h2 className="text-4xl md:text-5xl font-light leading-[1.1] tracking-tight">
@@ -75,9 +52,9 @@ export default function Footer() {
               <span className="italic">Newsletter</span>
             </h2>
             <div className="relative group max-w-sm">
-              <input 
-                type="email" 
-                placeholder="Email address" 
+              <input
+                type="email"
+                placeholder="Email address"
                 className="w-full bg-transparent border-b border-white/20 py-3 pr-12 focus:outline-none focus:border-[#ECBD27] transition-all duration-500 placeholder:text-white/30 text-lg"
               />
               <button className="absolute right-0 bottom-3 text-2xl transition-transform group-hover:translate-x-2 group-hover:-translate-y-2 duration-500">
@@ -91,8 +68,12 @@ export default function Footer() {
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Contact</p>
             <div className="space-y-4">
               <div className="space-y-1">
-                <a href="mailto:info@yhaenu.com" className="block text-sm font-medium hover:text-[#ECBD27] transition-colors duration-300">info@yhaenu.com</a>
-                <a href="tel:+251111111111" className="block text-sm font-medium hover:text-[#ECBD27] transition-colors duration-300">+251 11 111 1111</a>
+                <a href="mailto:info@yhaenu.com" className="block text-sm font-medium hover:text-[#ECBD27] transition-colors duration-300">
+                  info@yhaenu.com
+                </a>
+                <a href="tel:+251111111111" className="block text-sm font-medium hover:text-[#ECBD27] transition-colors duration-300">
+                  +251 11 111 1111
+                </a>
               </div>
               <div className="space-y-1">
                 <p className="text-[11px] text-white/60 leading-relaxed font-light">
@@ -108,11 +89,7 @@ export default function Footer() {
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Navigation</p>
             <div className="flex flex-col gap-3">
               {footerLinks[0].links.map((link, idx) => (
-                <Link 
-                  key={idx} 
-                  to={link.href} 
-                  className="text-sm font-light hover:text-[#ECBD27] transition-all duration-300"
-                >
+                <Link key={idx} to={link.href} className="text-sm font-light hover:text-[#ECBD27] transition-all duration-300">
                   {link.label}
                 </Link>
               ))}
@@ -124,11 +101,7 @@ export default function Footer() {
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Expertise</p>
             <div className="flex flex-col gap-3">
               {footerLinks[1].links.map((link, idx) => (
-                <Link 
-                  key={idx} 
-                  to={link.href} 
-                  className="text-sm font-light hover:text-[#ECBD27] transition-all duration-300"
-                >
+                <Link key={idx} to={link.href} className="text-sm font-light hover:text-[#ECBD27] transition-all duration-300">
                   {link.label}
                 </Link>
               ))}
@@ -140,11 +113,7 @@ export default function Footer() {
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#ECBD27] font-bold">Follow Us</p>
             <div className="flex flex-col gap-3">
               {socialLinks.map((social, idx) => (
-                <a 
-                  key={idx} 
-                  href={social.href} 
-                  className="text-sm font-light hover:text-[#ECBD27] transition-colors duration-300"
-                >
+                <a key={idx} href={social.href} className="text-sm font-light hover:text-[#ECBD27] transition-colors duration-300">
                   {social.label}
                 </a>
               ))}
@@ -154,28 +123,14 @@ export default function Footer() {
       </div>
 
       {/* Bottom Section: Massive Brand Reveal */}
-      <div className="relative z-10 w-full mt-12 md:mt-24 flex flex-row items-center justify-between border-t border-white/5 pt-8 pb-4">
-        <div className="w-[60%] md:w-[80%] lg:w-[75%]">
-          <img 
-            src={logoText} 
-            alt="YHAENU" 
+      <div className="relative z-10 w-full mt-12 md:mt-24 flex flex-row items-center justify-center border-t border-white/5 pt-8 pb-4">
+        <div className="w-[70%] md:w-[90%] lg:w-[85%] flex justify-center mx-auto">
+          <img
+            src={logoText}
+            alt="YHAENU"
             className="w-full h-auto opacity-95 transition-opacity hover:opacity-100"
-            style={{ 
-              filter: 'brightness(0) saturate(100%) invert(86%) sepia(43%) saturate(1478%) hue-rotate(345deg) brightness(100%) contrast(92%)'
-            }}
+            style={{ filter: 'brightness(0) saturate(100%) invert(86%) sepia(43%) saturate(1478%) hue-rotate(345deg) brightness(100%) contrast(92%)' }}
           />
-        </div>
-        
-        {/* Interactive Logo Badge (No rotating text) */}
-        <div className="group cursor-pointer ml-4 md:ml-0 flex-shrink-0">
-          <div className="relative w-16 h-16 md:w-36 md:h-36 rounded-full border border-white/10 flex items-center justify-center bg-white/[0.03] backdrop-blur-xl transition-all duration-1000 group-hover:border-[#ECBD27]/40 group-hover:scale-105">
-            <img 
-              src="/logo.png" 
-              alt="Logo" 
-              className="w-14 h-14 md:w-18 md:h-18 object-contain relative z-10 mix-blend-screen transition-transform duration-[2s] group-hover:rotate-[360deg]" 
-            />
-            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#ECBD27]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-          </div>
         </div>
       </div>
 

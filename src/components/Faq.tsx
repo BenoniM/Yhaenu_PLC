@@ -1,65 +1,83 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 
-const faqs = [
+export interface FAQData {
+  id: string
+  question: string
+  answer: string
+  created_at: string
+  updated_at: string
+}
+
+const fallbackFaqs: FAQData[] = [
   {
-    id: 1,
-    question: 'What industries does Yhaenu PLC operate in?',
-    answer:
-      'Yhaenu PLC operates across multiple sectors including Import & Export, Manufacturing (cardboard and carton products), Transportation, and Hospitality. Our diverse portfolio allows us to serve clients across various industries with tailored solutions.',
+    id: "019e784f-6427-7063-bb0d-14d69fe8beab",
+    question: "What industries does Yhaenu PLC operate in?",
+    answer: "Yhaenu PLC operates across multiple sectors including Import & Export, Manufacturing (cardboard and carton products), Transportation, and Hospitality. Our diverse portfolio allows us to serve clients across various industries with tailored solutions.",
+    created_at: "2026-05-30T09:55:29+00:00",
+    updated_at: "2026-05-30T09:55:29+00:00"
   },
   {
-    id: 2,
-    question: 'What types of coffees do you offer?',
-    answer:
-      'We specialize in sourcing and exporting premium Ethiopian coffees. Our coffee selection includes various grades and origins from different regions of Ethiopia, ensuring quality and consistency for our international partners.',
+    id: "019e7850-03b5-7366-b003-5128f4ae3842",
+    question: "What types of coffees do you offer?",
+    answer: "We specialize in sourcing and exporting premium Ethiopian coffees. Our coffee selection includes various grades and origins from different regions of Ethiopia, ensuring quality and consistency for our international partners.",
+    created_at: "2026-05-30T09:56:10+00:00",
+    updated_at: "2026-05-30T09:56:10+00:00"
   },
   {
-    id: 3,
-    question: 'What packaging solutions do you offer?',
-    answer:
-      'We offer comprehensive packaging solutions including custom cardboard boxes, carton products, and specialized packaging for various industries. Our manufacturing facility produces high-quality packaging that meets international standards and specifications.',
+    id: "019e7852-2bfb-71c0-ba56-fdc35df3e5ba",
+    question: "What packaging solutions do you offer?",
+    answer: "We offer comprehensive packaging solutions including custom cardboard boxes, carton products, and specialized packaging for various industries. Our manufacturing facility produces high-quality packaging that meets international standards and specifications.",
+    created_at: "2026-05-30T09:58:31+00:00",
+    updated_at: "2026-05-30T09:58:31+00:00"
   },
   {
-    id: 4,
-    question: 'How can I partner with Yhaenu PLC for international trade?',
-    answer:
-      'We welcome partnerships with international distributors and suppliers. Contact our trade department through the contact form or via email to discuss potential collaborations and market opportunities.',
+    id: "019e7856-9f17-7058-970f-262b464ad519",
+    question: "How can I partner with Yhaenu PLC for international trade?",
+    answer: "We welcome partnerships with international distributors and suppliers. Contact our trade department through the contact form or via email to discuss potential collaborations and market opportunities.",
+    created_at: "2026-05-30T10:03:23+00:00",
+    updated_at: "2026-05-30T10:03:23+00:00"
   },
   {
-    id: 5,
-    question: 'What is the production capacity of your manufacturing facility?',
-    answer:
-      'Our manufacturing unit is equipped with high-speed automated machinery for cardboard and carton production, allowing us to handle both small-batch custom orders and large-scale industrial requirements efficiently.',
+    id: "019e785b-1ef4-7243-9fbd-daf56f1420c5",
+    question: "What is the production capacity of your manufacturing facility?",
+    answer: " Our manufacturing unit is equipped with high-speed automated machinery for cardboard and carton production, allowing us to handle both small-batch custom orders and large-scale industrial requirements efficiently.",
+    created_at: "2026-05-30T10:08:18+00:00",
+    updated_at: "2026-05-30T10:08:18+00:00"
   },
   {
-    id: 6,
-    question: 'Do you provide end-to-end logistics support?',
-    answer:
-      'Yes, through our dedicated transportation fleet, we offer comprehensive logistics solutions, ensuring your products are moved safely and on time across Ethiopia and beyond.',
+    id: "019e785c-34ed-719e-878b-1caa597ab915",
+    question: "Do you provide end-to-end logistics support?",
+    answer: " Yes, through our dedicated transportation fleet, we offer comprehensive logistics solutions, ensuring your products are moved safely and on time across Ethiopia and beyond.",
+    created_at: "2026-05-30T10:09:29+00:00",
+    updated_at: "2026-05-30T10:09:29+00:00"
   },
   {
-    id: 7,
-    question: 'How do you ensure the quality of your export products?',
-    answer:
-      'We maintain strict quality control measures at every stage, from sourcing to final packaging. Our products undergo rigorous inspections to ensure they meet international standards before export.',
+    id: "019e785d-4e76-7222-b2f2-934471b84f93",
+    question: "How do you ensure the quality of your export products?",
+    answer: "We maintain strict quality control measures at every stage, from sourcing to final packaging. Our products undergo rigorous inspections to ensure they meet international standards before export.",
+    created_at: "2026-05-30T10:10:41+00:00",
+    updated_at: "2026-05-30T10:10:41+00:00"
   },
   {
-    id: 8,
-    question: 'Do you offer custom branding on packaging?',
-    answer:
-      'Yes, our cardboard and carton manufacturing facility is equipped to provide custom branding and printing services, ensuring your packaging perfectly represents your brand identity.',
-  },
+    id: "019e785d-ce10-730b-92ea-c76dc7b46f16",
+    question: "Do you offer custom branding on packaging?",
+    answer: "Yes, our cardboard and carton manufacturing facility is equipped to provide custom branding and printing services, ensuring your packaging perfectly represents your brand identity.",
+    created_at: "2026-05-30T10:11:14+00:00",
+    updated_at: "2026-05-30T10:11:14+00:00"
+  }
 ]
 
 function FaqItem({
   item,
+  displayIndex,
   isOpen,
   onClick,
   index,
   unskewClass
 }: {
-  item: typeof faqs[0];
+  item: FAQData;
+  displayIndex: number;
   isOpen: boolean;
   onClick: () => void;
   index: number;
@@ -97,7 +115,7 @@ function FaqItem({
                 className="md:hidden flex-shrink-0 text-[#ECBD27] font-black text-2xl leading-none w-10"
                 style={{ fontFamily: "'Arial Black', sans-serif" }}
               >
-                {String(item.id).padStart(2, '0')}
+                {String(displayIndex).padStart(2, '0')}
               </span>
               <h3
                 className="text-left font-bold text-lg md:text-xl capitalize tracking-tight"
@@ -159,10 +177,30 @@ function FaqItem({
 }
 
 export default function Faq() {
-  const [openId, setOpenId] = useState<number | null>(null)
+  const [faqs, setFaqs] = useState<FAQData[]>(fallbackFaqs)
+  const [openId, setOpenId] = useState<string | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] })
   const bgY = useTransform(scrollYProgress, [0, 1], ['-5%', '5%'])
+
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_LINK}/faqs`)
+        if (!res.ok) throw new Error('Failed to fetch FAQs')
+        const data = await res.json()
+        
+        // Sort by created_at ascending to match original order
+        const sorted = data.sort((a: FAQData, b: FAQData) => 
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        )
+        setFaqs(sorted)
+      } catch (err) {
+        console.error('Error fetching FAQs:', err)
+      }
+    }
+    fetchFaqs()
+  }, [])
 
   return (
     <section
@@ -245,6 +283,7 @@ export default function Faq() {
                     key={item.id}
                     item={item}
                     index={index}
+                    displayIndex={index + 1}
                     isOpen={openId === item.id}
                     onClick={() => setOpenId(openId === item.id ? null : item.id)}
                     unskewClass="md:-skew-x-[20deg]"
@@ -261,6 +300,7 @@ export default function Faq() {
                     key={item.id}
                     item={item}
                     index={index + 2}
+                    displayIndex={index + 3}
                     isOpen={openId === item.id}
                     onClick={() => setOpenId(openId === item.id ? null : item.id)}
                     unskewClass="md:skew-x-[20deg]"
@@ -286,6 +326,7 @@ export default function Faq() {
                     key={item.id}
                     item={item}
                     index={index + 4}
+                    displayIndex={index + 5}
                     isOpen={openId === item.id}
                     onClick={() => setOpenId(openId === item.id ? null : item.id)}
                     unskewClass="md:skew-x-[20deg]"

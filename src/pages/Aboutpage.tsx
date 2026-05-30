@@ -291,7 +291,7 @@ export default function Aboutpage() {
       {/* ══════════════════════════════════════════════
           1. HERO
       ══════════════════════════════════════════════ */}
-      <div ref={heroRef} className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '70vh', background: '#0E5F13' }}>
+      <div ref={heroRef} className="relative overflow-hidden flex flex-col justify-end" style={{ position: 'relative', minHeight: '70vh', background: '#0E5F13' }}>
         <motion.video
           src={VIDEO_SRC}
           autoPlay muted loop playsInline preload="auto"
@@ -457,12 +457,12 @@ export default function Aboutpage() {
       </section>
 
       {/* ── Services (What We Do) ── */}
-      <Services />
+      {/* <Services /> */}
 
       {/* ══════════════════════════════════════════════
           4. LEADERSHIP (DIAGONAL ACCORDION)
       ══════════════════════════════════════════════ */}
-      <LeadershipAccordion />
+      {/* <LeadershipAccordion /> */}
 
       {/* ══════════════════════════════════════════════
           5. JOURNEY (scroll-scrubbed video)
@@ -472,13 +472,13 @@ export default function Aboutpage() {
       {/* ══════════════════════════════════════════════
           6. FOOTPRINT
       ══════════════════════════════════════════════ */}
-      <section ref={footprintRef} className="relative py-24 overflow-hidden border-y border-[rgba(0,0,0,0.08)]" style={{ background: '#F3F6FA' }}>
+      {/* <section ref={footprintRef} className="relative py-24 overflow-hidden border-y border-[rgba(0,0,0,0.08)]" style={{ background: '#F3F6FA' }}>
         <NovaOrb size={600} x="50%" y="50%" color1="#ECBD27" color2="#F3F6FA" opacity={0.2} duration={10} />
         <NovaOrb size={300} x="90%" y="10%" color1="#0E5F13" color2="#F3F6FA" opacity={0.1} duration={7} delay={3} />
 
-        <div className="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 border-x border-[rgba(0,0,0,0.08)]">
+        <div className="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 border-x border-[rgba(0,0,0,0.08)]"> */}
           {/* Text Left */}
-          <motion.div
+          {/* <motion.div
             className="p-10 md:p-16 flex flex-col justify-center order-2 md:order-1"
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -498,13 +498,13 @@ export default function Aboutpage() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </motion.div> */}
 
           {/* Image Right */}
-          <div className="border-l border-[rgba(0,0,0,0.08)] flex flex-col order-1 md:order-2">
-            <div className="w-full relative border-b border-[rgba(0,0,0,0.08)]">
+          {/* <div className="border-l border-[rgba(0,0,0,0.08)] flex flex-col order-1 md:order-2">
+            <div className="w-full relative border-b border-[rgba(0,0,0,0.08)]"> */}
               {/* Corner crosshairs */}
-              <div className="absolute -top-1.5 -left-1.5 w-3 h-3 z-20">
+              {/* <div className="absolute -top-1.5 -left-1.5 w-3 h-3 z-20">
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
                 <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
               </div>
@@ -519,9 +519,9 @@ export default function Aboutpage() {
               <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 z-20">
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
                 <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
-              </div>
+              </div> */}
 
-              <motion.div
+              {/* <motion.div
                 style={{
                   aspectRatio: '4/5',
                   clipPath: footprintClipPath
@@ -529,34 +529,34 @@ export default function Aboutpage() {
                 className="w-full relative"
               >
                 <video src={VIDEO_SRC} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
-              </motion.div>
+              </motion.div> */}
 
               {/* Moving Coordinates tracking the expanding bottom-left corner */}
-              <motion.div
+              {/* <motion.div
                 className="absolute z-30"
                 style={{
                   left: footprintClipInverted,
                   top: useMotionTemplate`${footprintClipProgress}%`
                 }}
-              >
+              > */}
                 {/* Crosshair at the moving corner */}
-                <div className="absolute -top-1.5 -left-1.5 w-3 h-3">
+                {/* <div className="absolute -top-1.5 -left-1.5 w-3 h-3">
                   <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#0E5F13]"></div>
                   <div className="absolute left-1/2 top-0 w-[1px] h-full bg-[#0E5F13]"></div>
-                </div>
+                </div> */}
 
-                <div className="absolute -bottom-6 -right-8 text-[10px] text-[#0E5F13] font-mono tracking-widest whitespace-nowrap">
+                {/* <div className="absolute -bottom-6 -right-8 text-[10px] text-[#0E5F13] font-mono tracking-widest whitespace-nowrap">
                   <AnimatedCoordinate val={footprintXValue} prefix="X" />
                 </div>
                 <div className="absolute -top-12 -left-12 text-[10px] text-[#0E5F13] font-mono tracking-widest whitespace-nowrap rotate-90 origin-bottom-left">
                   <AnimatedCoordinate val={footprintYValue} prefix="Y" />
                 </div>
-              </motion.div>
-            </div>
+              </motion.div> */}
+            {/* </div>
             <div className="flex-grow p-10 min-h-[100px]"></div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <Cta />
       <Footer />

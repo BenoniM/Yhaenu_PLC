@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import gsap from 'gsap'
-import logoText from '../assets/logo/Logo-Text.svg'
+import logoText from '/yhaenu.svg'
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -102,15 +102,13 @@ export default function Navbar() {
 
     const onScroll = () => {
       const current = window.scrollY
-      const heroThreshold = window.innerHeight * 1.2 // Threshold past the Hero pinning
+      const heroThreshold = window.innerHeight * 1.2
 
       setIsPastHero(current > heroThreshold)
 
       if (isHomePage && current < heroThreshold) {
-        // Keep navbar visible while in or near the Hero section on home page
         setVisible(true)
       } else {
-        // Apply hide-on-scroll-down, show-on-scroll-up logic
         if (current > lastScrollY.current + 10 && current > 0) {
           setVisible(false)
         } else if (current < lastScrollY.current - 10 || current <= 0) {
@@ -136,7 +134,6 @@ export default function Navbar() {
     const handleComplete = () => setIsHeroFinished(true)
     window.addEventListener('hero-animation-complete', handleComplete)
 
-    // Failsafe: if the GSAP animation gets blocked or bypassed on mobile, force the navbar to appear after 4 seconds
     const failsafe = setTimeout(() => setIsHeroFinished(true), 4000)
 
     return () => {
@@ -148,33 +145,20 @@ export default function Navbar() {
   useEffect(() => {
     setOpen(false)
 
-
     if (location.pathname !== '/') {
       setIsHeroFinished(true)
-      // Safety reset for GSAP-modified elements
       const navLeft = document.querySelector('.nav-left')
       const navRight = document.querySelector('.nav-right')
       if (navLeft) gsap.set(navLeft, { clearProps: "x,y,opacity,transform,position,left,right,top,bottom,yPercent" })
       if (navRight) gsap.set(navRight, { clearProps: "x,y,opacity,transform,position,left,right,top,bottom,yPercent" })
-      gsap.set('.navbar-container', { clearProps: "maxWidth" })
       gsap.set('.nav-link-0, .nav-link-1, .nav-link-2, .nav-link-3', { clearProps: "x,y,opacity,transform" })
     } else {
-      // If going back to home, reset hero finished state so it can animate again
       setIsHeroFinished(false)
-
-      // Explicitly reset navbar elements to their default home-page states
       const navLeft = document.querySelector('.nav-left')
       const navRight = document.querySelector('.nav-right')
       if (navLeft) gsap.set(navLeft, { clearProps: "x,y,opacity,transform,position,left,right,top,bottom,yPercent" })
       if (navRight) gsap.set(navRight, { clearProps: "x,y,opacity,transform,position,left,right,top,bottom,yPercent" })
-
-      // Ensure container starts at full width
-      gsap.set('.navbar-container', { maxWidth: 1600, clearProps: "clipPath" })
-
-      // Reset links
       gsap.set('.nav-link-0, .nav-link-1, .nav-link-2, .nav-link-3', { clearProps: "x,y,opacity,transform" })
-
-      // Ensure the Y logo is hidden initially
       gsap.set('.navbar-y-logo', { opacity: 0 })
     }
     setVisible(true)
@@ -184,7 +168,7 @@ export default function Navbar() {
   return (
     <>
       {/* ══════════════════════════════════════════════
-          DESKTOP — Rekorder-style floating pill navbar
+          DESKTOP — floating navbar
       ══════════════════════════════════════════════ */}
       <motion.div
         className="hidden md:block fixed top-4 left-0 right-0 z-50 px-4"
@@ -196,14 +180,12 @@ export default function Navbar() {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       >
         <div
-          className="navbar-container relative flex items-stretch px-8 mx-auto w-full transition-all duration-700 ease-in-out h-[64px]"
+          className="navbar-container relative flex items-stretch px-8 mx-auto w-full h-[64px]"
           style={{
             background: shouldHaveBg ? '#0E5F13' : 'transparent',
-            maxWidth: (isHomePage && isPastHero) ? 720 : 1600,
+            maxWidth: 1600,
             backdropFilter: shouldHaveBg ? 'blur(8px)' : 'none',
-            clipPath: (isHomePage && isPastHero)
-              ? 'polygon(40px 0, 100% 0, calc(100% - 40px) 100%, 0 100%)'
-              : 'polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%)',
+            clipPath: 'polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%)',
           }}
         >
           {/* Brand — far left */}
@@ -216,7 +198,7 @@ export default function Navbar() {
               src={logoText}
               alt="YHAENU"
               style={{
-                height: 22,
+                height: 45,
                 width: 'auto',
                 filter: 'brightness(0) saturate(100%) invert(86%) sepia(43%) saturate(1478%) hue-rotate(345deg) brightness(100%) contrast(92%)'
               }}
@@ -251,9 +233,9 @@ export default function Navbar() {
                     <motion.div
                       layoutId="nav-underline"
                       className="absolute inset-0 z-0"
-                      style={{ 
+                      style={{
                         background: '#ECBD27',
-                        clipPath: `polygon(${(isHomePage && isPastHero) ? 40 : 24}px 0, 100% 0, calc(100% - ${(isHomePage && isPastHero) ? 40 : 24}px) 100%, 0 100%)`
+                        clipPath: 'polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%)'
                       }}
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
@@ -337,7 +319,7 @@ export default function Navbar() {
             >
               <AnimatedWave />
 
-              {/* Close Button perfectly overlaid on top of the hamburger button spot */}
+              {/* Close Button */}
               <div className="fixed top-4 left-0 right-0 flex items-center justify-center z-50 pointer-events-none">
                 <motion.button onClick={() => setOpen(false)} aria-label="Close menu"
                   whileHover={{ scale: 1.08, rotate: 90 }} whileTap={{ scale: 0.95 }}
@@ -349,6 +331,7 @@ export default function Navbar() {
                   </svg>
                 </motion.button>
               </div>
+
               {/* Elegant Premium Links */}
               <nav className="flex flex-col justify-center flex-1 px-10 gap-8 relative z-10 mt-24 pb-8">
                 {navLinks.map((link, i) => {
@@ -384,7 +367,6 @@ export default function Navbar() {
                           </svg>
                         </motion.span>
                       </div>
-                      {/* Active Indicator Line */}
                       {isActive && (
                         <motion.div
                           layoutId="mobile-premium-indicator"

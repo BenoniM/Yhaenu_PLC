@@ -2,7 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import Services from './components/Services'
+import WhatWeOffer from './components/WhatWeOffer'
 import Faq from './components/Faq'
 import Cta from './components/Cta'
 import Footer from './components/Footer'
@@ -10,8 +10,9 @@ import Aboutpage from './pages/Aboutpage'
 import ProductsPage from './pages/ProductsPage'
 import ContactPage from './pages/ContactPage'
 import RfqPage from './pages/RfqPage'
-import MouseTrail from './components/MouseTrail'
+
 import About from './components/About'
+import PageLoader from './components/PageLoader'
 
 
 if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
@@ -32,7 +33,7 @@ function Home() {
   return (
     <>
       <Hero />
-      <Services />
+      <WhatWeOffer />
       <About />
       <Faq />
       <Cta />
@@ -41,11 +42,14 @@ function Home() {
   )
 }
 
-function App() {
+function AppContent() {
+  const { pathname } = useLocation()
+
   return (
     <>
-      <MouseTrail />
+
       <ScrollToTop />
+      <PageLoader key={pathname} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<Aboutpage />} />
@@ -56,6 +60,10 @@ function App() {
       <Navbar />
     </>
   )
+}
+
+function App() {
+  return <AppContent />
 }
 
 export default App
