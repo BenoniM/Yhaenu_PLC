@@ -1,12 +1,8 @@
 import { Link } from 'react-router-dom'
-import { useRef } from 'react'
-import { useInView } from 'framer-motion'
 import logoText from '/yhaenu.svg'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
-  const footerRef = useRef(null)
-  const isVisible = useInView(footerRef, { once: true, margin: '200px' })
 
   const footerLinks = [
     {
@@ -38,7 +34,6 @@ export default function Footer() {
 
   return (
     <footer
-      ref={footerRef}
       className="relative min-h-[75vh] flex flex-col justify-between overflow-hidden text-[#F3F6FA] pt-14 md:pt-24 pb-8 px-8 md:px-20"
       style={{ background: '#0E5F13' }}
     >

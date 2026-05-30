@@ -1,10 +1,8 @@
 import React, { useRef, useState } from 'react'
 import JourneySection from '../components/JourneySection'
-import LeadershipAccordion from '../components/LeadershipAccordion'
 import { motion, useScroll, useTransform, useMotionTemplate, useMotionValueEvent } from 'framer-motion'
 import Cta from '../components/Cta'
 import Footer from '../components/Footer'
-import Services from '../components/Services'
 import GridBackground from '../components/GridBackground'
 
 const VIDEO_SRC =
@@ -276,15 +274,6 @@ export default function Aboutpage() {
 
   const xValue = useTransform(clipProgress, [0, 100], [0, 757])
   const yValue = useTransform(clipProgress, [0, 100], [0, 934])
-
-  const footprintRef = useRef<HTMLElement>(null)
-  const { scrollYProgress: footprintScroll } = useScroll({ target: footprintRef, offset: ['start 85%', 'center center'] })
-  const footprintClipProgress = useTransform(footprintScroll, [0, 1], [0, 100])
-  const footprintClipInverted = useTransform(footprintClipProgress, v => `${100 - v}%`)
-  const footprintClipPath = useMotionTemplate`inset(0% 0% ${footprintClipInverted} ${footprintClipInverted})`
-
-  const footprintXValue = useTransform(footprintClipProgress, [0, 100], [0, 757])
-  const footprintYValue = useTransform(footprintClipProgress, [0, 100], [0, 934])
 
   return (
     <>
