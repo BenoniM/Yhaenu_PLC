@@ -95,15 +95,12 @@ export default function Hero() {
       ))}
 
       {/* ── GRADIENT OVERLAY ── */}
-      {/* Radial dark center + vignette so logo/text pop */}
+      {/* Linear fade from transparent at top to green at bottom */}
       <div
         ref={overlayRef}
         className="absolute inset-0 z-[2] pointer-events-none"
         style={{
-          background: `
-            radial-gradient(ellipse 70% 60% at 50% 45%, rgba(10,26,11,0.15) 0%, rgba(10,26,11,0.55) 60%, rgba(10,26,11,0.88) 100%),
-            linear-gradient(to bottom, rgba(10,26,11,0.6) 0%, transparent 25%, transparent 65%, rgba(10,26,11,0.85) 100%)
-          `,
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(10,26,11,0.95) 100%)',
         }}
       />
 
